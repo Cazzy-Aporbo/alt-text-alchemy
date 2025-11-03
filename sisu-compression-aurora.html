@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISU - The Compression Aurora</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            cursor: crosshair;
+        }
+        
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #A7F3D0;
+            font-size: 14px;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(167, 243, 208, 0.5);
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        #compression-level {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #6EE7B7;
+            font-size: 12px;
+            z-index: 10;
+        }
+        
+        #void-meter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 20px;
+            border: 1px solid #052E16;
+            background: linear-gradient(90deg, #F0FDF4 0%, #052E16 100%);
+            z-index: 10;
+        }
+        
+        #void-indicator {
+            height: 100%;
+            width: 50%;
+            background: rgba(5, 46, 22, 0.8);
+            transition: width 0.3s ease;
+        }
+        
+        #timeline {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #34D399;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 20px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #A7F3D0;
+            color: #A7F3D0;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button:hover {
+            background: #A7F3D0;
+            color: #052E16;
+            box-shadow: 0 0 20px rgba(167, 243, 208, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="aurora"></canvas>
+    
+    <div id="info">
+        <div>COMPRESSION AURORA</div>
+        <div>Particles: <span id="particle-count">0</span></div>
+        <div>Entropy: <span id="entropy">0.00</span></div>
+        <div>Depth: <span id="depth">SURFACE</span></div>
+    </div>
+    
+    <div id="timeline">1950</div>
+    
+    <div id="compression-level">
+        Compression Ratio: <span id="ratio">1:1</span>
+    </div>
+    
+    <div id="void-meter">
+        <div id="void-indicator"></div>
+    </div>
+    
+    <div id="controls">
+        <button onclick="aurora.compress()">COMPRESS</button>
+        <button onclick="aurora.breathe()">BREATHE</button>
+        <button onclick="aurora.traverse()">TRAVERSE TIME</button>
+        <button onclick="aurora.void()">ENTER VOID</button>
+    </div>
+    
+    <script>
+        class CompressionAurora {
+            constructor() {
+                this.canvas = document.getElementById('aurora');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                
+                // Sisu color spectrum
+                this.colors = [
+                    '#F0FDF4', '#ECFDF5', '#DCFCE7', '#D4FFE4', '#C6F7E2',
+                    '#BBF7D0', '#A7F3D0', '#94F2C2', '#86EFAC', '#73E9A0',
+                    '#6EE7B7', '#5CE1A6', '#4ADE80', '#34D399', '#22C55E',
+                    '#16A34A', '#15803D', '#166534', '#14532D', '#0F462A', '#052E16'
+                ];
+                
+                // Aquatic bridge
+                this.aquatic = [
+                    '#F5FFFA', '#00FF7F', '#00FA9A', '#2E8B57', '#3CB371',
+                    '#66CDAA', '#7FFFD4', '#40E0D0', '#20B2AA', '#48D1CC',
+                    '#00CED1', '#008080', '#008B8B'
+                ];
+                
+                this.particles = [];
+                this.compressionWaves = [];
+                this.codeFragments = [];
+                this.timelineYear = 1950;
+                this.compressionLevel = 1;
+                this.entropy = 1.0;
+                this.breathing = false;
+                this.voidMode = false;
+                this.traversing = false;
+                
+                this.mouse = { x: this.width / 2, y: this.height / 2 };
+                
+                this.initParticles();
+                this.initCodeFragments();
+                this.bindEvents();
+                this.animate();
+            }
+            
+            resize() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+            }
+            
+            initParticles() {
+                // Create particle system representing code atoms
+                for (let i = 0; i < 500; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 3 + 1,
+                        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+                        compression: Math.random(),
+                        era: Math.floor(Math.random() * 7), // 7 decades
+                        language: ['ASM', 'C', 'C++', 'LISP', 'JAVA', 'JS', 'RUST'][Math.floor(Math.random() * 7)],
+                        pattern: Math.random() > 0.5 ? 'functional' : 'imperative',
+                        lifetime: 0,
+                        compressed: false
+                    });
+                }
+            }
+            
+            initCodeFragments() {
+                // Historical code fragments that float through space
+                const fragments = [
+                    { text: 'mov ax, bx', year: 1950, depth: 0.9 },
+                    { text: 'malloc(sizeof(int))', year: 1972, depth: 0.8 },
+                    { text: 'class Object {}', year: 1985, depth: 0.6 },
+                    { text: '(lambda (x) x)', year: 1960, depth: 0.7 },
+                    { text: 'async/await', year: 2015, depth: 0.3 },
+                    { text: '|0⟩ + |1⟩', year: 2020, depth: 0.1 },
+                    { text: 'fn compress(&self)', year: 2010, depth: 0.4 },
+                    { text: 'for(;;);', year: 1978, depth: 0.85 },
+                    { text: 'return 0;', year: 1950, depth: 1.0 }
+                ];
+                
+                fragments.forEach(fragment => {
+                    this.codeFragments.push({
+                        text: fragment.text,
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        year: fragment.year,
+                        depth: fragment.depth,
+                        opacity: 0.5,
+                        floating: true,
+                        angle: Math.random() * Math.PI * 2
+                    });
+                });
+            }
+            
+            bindEvents() {
+                window.addEventListener('resize', () => this.resize());
+                
+                this.canvas.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                    this.createCompressionWave(e.clientX, e.clientY);
+                });
+                
+                this.canvas.addEventListener('click', (e) => {
+                    this.burstCompression(e.clientX, e.clientY);
+                });
+            }
+            
+            createCompressionWave(x, y) {
+                // Compression waves that ripple through the particle field
+                this.compressionWaves.push({
+                    x: x,
+                    y: y,
+                    radius: 0,
+                    maxRadius: 200,
+                    speed: 2,
+                    opacity: 1,
+                    color: this.colors[Math.floor(this.compressionLevel)]
+                });
+                
+                // Limit waves
+                if (this.compressionWaves.length > 5) {
+                    this.compressionWaves.shift();
+                }
+            }
+            
+            burstCompression(x, y) {
+                // Explosive compression that affects nearby particles
+                this.particles.forEach(particle => {
+                    const dx = particle.x - x;
+                    const dy = particle.y - y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        const force = (150 - distance) / 150;
+                        particle.vx += (dx / distance) * force * 5;
+                        particle.vy += (dy / distance) * force * 5;
+                        particle.compressed = true;
+                        particle.compression *= 0.5; // Compress by half
+                        
+                        // Change color to deeper green
+                        const currentIndex = this.colors.indexOf(particle.color);
+                        if (currentIndex < this.colors.length - 1) {
+                            particle.color = this.colors[currentIndex + 1];
+                        }
+                    }
+                });
+                
+                this.compressionLevel = Math.min(this.compressionLevel * 1.1, 20);
+                this.updateInfo();
+            }
+            
+            compress() {
+                // Global compression - all particles converge
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                
+                this.particles.forEach(particle => {
+                    const dx = centerX - particle.x;
+                    const dy = centerY - particle.y;
+                    particle.vx += dx * 0.001;
+                    particle.vy += dy * 0.001;
+                    particle.size *= 0.98;
+                    
+                    // Deepen color
+                    const currentIndex = this.colors.indexOf(particle.color);
+                    if (currentIndex < this.colors.length - 1 && Math.random() > 0.9) {
+                        particle.color = this.colors[currentIndex + 1];
+                    }
+                });
+                
+                this.entropy *= 0.9;
+                this.compressionLevel *= 1.5;
+                this.updateInfo();
+            }
+            
+            breathe() {
+                this.breathing = !this.breathing;
+            }
+            
+            traverse() {
+                this.traversing = !this.traversing;
+            }
+            
+            void() {
+                this.voidMode = !this.voidMode;
+                if (this.voidMode) {
+                    // All particles slowly turn to void color
+                    this.particles.forEach(particle => {
+                        particle.targetColor = '#052E16';
+                    });
+                } else {
+                    // Restore colors
+                    this.particles.forEach(particle => {
+                        particle.targetColor = null;
+                    });
+                }
+            }
+            
+            updateInfo() {
+                document.getElementById('particle-count').textContent = this.particles.filter(p => p.size > 0.1).length;
+                document.getElementById('entropy').textContent = this.entropy.toFixed(2);
+                document.getElementById('ratio').textContent = Math.floor(this.compressionLevel) + ':1';
+                document.getElementById('timeline').textContent = Math.floor(this.timelineYear);
+                
+                // Update depth based on compression
+                const depths = ['SURFACE', 'SHALLOW', 'MEDIUM', 'DEEP', 'ANCIENT', 'VOID'];
+                const depthIndex = Math.min(Math.floor(this.compressionLevel / 4), depths.length - 1);
+                document.getElementById('depth').textContent = depths[depthIndex];
+                
+                // Update void meter
+                document.getElementById('void-indicator').style.width = (this.compressionLevel * 5) + '%';
+            }
+            
+            update() {
+                // Update particles
+                this.particles.forEach(particle => {
+                    // Physics
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.lifetime++;
+                    
+                    // Friction
+                    particle.vx *= 0.99;
+                    particle.vy *= 0.99;
+                    
+                    // Wrap around edges
+                    if (particle.x < 0) particle.x = this.width;
+                    if (particle.x > this.width) particle.x = 0;
+                    if (particle.y < 0) particle.y = this.height;
+                    if (particle.y > this.height) particle.y = 0;
+                    
+                    // Breathing effect
+                    if (this.breathing) {
+                        const breathCycle = Math.sin(particle.lifetime * 0.01);
+                        particle.size = particle.size * (1 + breathCycle * 0.1);
+                    }
+                    
+                    // Void transition
+                    if (particle.targetColor) {
+                        // Gradually transition to target color
+                        const currentIndex = this.colors.indexOf(particle.color);
+                        if (currentIndex < this.colors.length - 1) {
+                            particle.color = this.colors[currentIndex + 1];
+                        }
+                    }
+                    
+                    // Attraction to mouse
+                    const dx = this.mouse.x - particle.x;
+                    const dy = this.mouse.y - particle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 200) {
+                        const force = (200 - distance) / 200;
+                        particle.vx += (dx / distance) * force * 0.1;
+                        particle.vy += (dy / distance) * force * 0.1;
+                    }
+                    
+                    // Era-based movement patterns
+                    if (this.traversing) {
+                        const eraAngle = (particle.era / 7) * Math.PI * 2 + particle.lifetime * 0.001;
+                        particle.vx += Math.cos(eraAngle) * 0.05;
+                        particle.vy += Math.sin(eraAngle) * 0.05;
+                    }
+                });
+                
+                // Update compression waves
+                this.compressionWaves = this.compressionWaves.filter(wave => {
+                    wave.radius += wave.speed;
+                    wave.opacity = 1 - (wave.radius / wave.maxRadius);
+                    return wave.radius < wave.maxRadius;
+                });
+                
+                // Update code fragments
+                this.codeFragments.forEach(fragment => {
+                    fragment.angle += 0.001;
+                    fragment.x += Math.cos(fragment.angle) * 0.5;
+                    fragment.y += Math.sin(fragment.angle * 1.5) * 0.3;
+                    
+                    // Wrap around
+                    if (fragment.x < -100) fragment.x = this.width + 100;
+                    if (fragment.x > this.width + 100) fragment.x = -100;
+                    if (fragment.y < -50) fragment.y = this.height + 50;
+                    if (fragment.y > this.height + 50) fragment.y = -50;
+                });
+                
+                // Update timeline
+                if (this.traversing) {
+                    this.timelineYear += 0.2;
+                    if (this.timelineYear > 2024) this.timelineYear = 1950;
+                }
+                
+                // Update entropy
+                this.entropy += (Math.random() - 0.5) * 0.01;
+                this.entropy = Math.max(0.1, Math.min(1.0, this.entropy));
+                
+                this.updateInfo();
+            }
+            
+            draw() {
+                // Create aurora effect with gradient
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+                
+                // Draw compression waves
+                this.compressionWaves.forEach(wave => {
+                    this.ctx.strokeStyle = wave.color + Math.floor(wave.opacity * 255).toString(16).padStart(2, '0');
+                    this.ctx.lineWidth = 2 * wave.opacity;
+                    this.ctx.beginPath();
+                    this.ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                });
+                
+                // Draw particle connections (when close)
+                this.particles.forEach((p1, i) => {
+                    this.particles.slice(i + 1).forEach(p2 => {
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100 && p1.era === p2.era) {
+                            this.ctx.strokeStyle = p1.color + '22';
+                            this.ctx.lineWidth = (100 - distance) / 100;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+                
+                // Draw particles
+                this.particles.forEach(particle => {
+                    if (particle.size > 0.1) {
+                        // Glow effect
+                        const gradient = this.ctx.createRadialGradient(
+                            particle.x, particle.y, 0,
+                            particle.x, particle.y, particle.size * 3
+                        );
+                        gradient.addColorStop(0, particle.color);
+                        gradient.addColorStop(1, particle.color + '00');
+                        
+                        this.ctx.fillStyle = gradient;
+                        this.ctx.fillRect(
+                            particle.x - particle.size * 3,
+                            particle.y - particle.size * 3,
+                            particle.size * 6,
+                            particle.size * 6
+                        );
+                        
+                        // Core
+                        this.ctx.fillStyle = particle.color;
+                        this.ctx.fillRect(
+                            particle.x - particle.size / 2,
+                            particle.y - particle.size / 2,
+                            particle.size,
+                            particle.size
+                        );
+                    }
+                });
+                
+                // Draw floating code fragments
+                this.ctx.font = '12px Courier New';
+                this.codeFragments.forEach(fragment => {
+                    const colorIndex = Math.floor(fragment.depth * (this.colors.length - 1));
+                    this.ctx.fillStyle = this.colors[colorIndex] + Math.floor(fragment.opacity * 255).toString(16).padStart(2, '0');
+                    this.ctx.save();
+                    this.ctx.translate(fragment.x, fragment.y);
+                    this.ctx.rotate(Math.sin(fragment.angle) * 0.1);
+                    this.ctx.fillText(fragment.text, 0, 0);
+                    this.ctx.restore();
+                });
+                
+                // Draw aurora streaks
+                for (let i = 0; i < 3; i++) {
+                    const time = Date.now() * 0.0001;
+                    const x1 = Math.sin(time + i) * this.width / 3 + this.width / 2;
+                    const y1 = 0;
+                    const x2 = Math.cos(time + i) * this.width / 3 + this.width / 2;
+                    const y2 = this.height;
+                    
+                    const gradient = this.ctx.createLinearGradient(x1, y1, x2, y2);
+                    this.colors.forEach((color, index) => {
+                        gradient.addColorStop(index / this.colors.length, color + '11');
+                    });
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.fillRect(0, 0, this.width, this.height);
+                }
+            }
+            
+            animate() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Initialize
+        const aurora = new CompressionAurora();
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'c': aurora.compress(); break;
+                case 'b': aurora.breathe(); break;
+                case 't': aurora.traverse(); break;
+                case 'v': aurora.void(); break;
+                case ' ': aurora.burstCompression(aurora.width / 2, aurora.height / 2); break;
+            }
+        });
+    </script>
+</body>
+</html>

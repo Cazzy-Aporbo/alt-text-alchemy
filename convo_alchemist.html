@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Women's Health — Confidential Chat Concierge Prototype</title>
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar for chat */
+    .scroll-slim::-webkit-scrollbar { width: 8px; height: 8px; }
+    .scroll-slim::-webkit-scrollbar-track { background: transparent; }
+    .scroll-slim::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 8px; }
+    .gradient-bg { background: linear-gradient(135deg,#E9D3FF 0%,#FFE5AA 100%); }
+    .glass { backdrop-filter: blur(12px); background: rgba(255,255,255,0.8); }
+    .shadow-soft { box-shadow: 0 10px 30px rgba(43,16,51,0.12); }
+    .card { background: rgba(255,255,255,0.92); border: 1px solid rgba(43,16,51,0.12); }
+    .dot { height: 8px; width: 8px; border-radius: 9999px; display: inline-block; }
+  </style>
+</head>
+<body class="min-h-screen gradient-bg text-[#2B1033]">
+  <!-- Page wrapper -->
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-tight">Women's Health — Confidential Chat Concierge</h1>
+        <p class="text-sm md:text-base text-[#6B5A74] mt-1">A privacy‑first prototype that answers questions about Women's Health. By default it stores <span class="font-semibold">nothing</span>. When a user chooses to join, it seamlessly shifts to onboarding mode with explicit consent.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-[#6B5A74]">Mode</span>
+        <div class="inline-flex rounded-full border border-[#2B1033]/20 overflow-hidden bg-white">
+          <button id="modeConfidential" class="px-4 py-2 text-sm font-medium bg-[#2B1033] text-white">Confidential</button>
+          <button id="modeOnboarding" class="px-4 py-2 text-sm font-medium hover:bg-black/5">Onboarding</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top notice -->
+    <section id="privacyBanner" class="glass rounded-xl p-4 mt-6 shadow-soft">
+      <div class="flex items-start gap-3">
+        <div class="dot bg-emerald-500 mt-1.5"></div>
+        <div>
+          <p class="text-sm md:text-base"><span class="font-semibold">Confidential Mode:</span> No messages are persisted. No analytics. Everything stays in‑memory for this session only.</p>
+          <p class="text-xs text-[#6B5A74]">Switch to Onboarding Mode only after you opt in; then, responses relevant to your profile are structured and previewed below. In production, this would write to HIPAA‑aligned storage <em>only</em> after consent.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main grid -->
+    <main class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <!-- Story / Rationale panel -->
+      <section class="card rounded-2xl p-6 shadow-soft">
+        <h2 class="text-xl font-semibold">Why this feature matters</h2>
+        <ol class="list-decimal ml-5 mt-3 space-y-2 text-sm leading-6 text-[#3c2a43]">
+          <li><span class="font-medium">Trust by design:</span> Most users explore before they commit. Confidential mode removes friction by answering questions without saving anything.</li>
+          <li><span class="font-medium">Seamless join flow:</span> When a user is ready, the chat shifts to onboarding. The conversation context becomes structured inputs for profile setup.</li>
+          <li><span class="font-medium">Right‑sized guidance:</span> The concierge recommends health features based on needs (e.g., symptom tracking, appointment notes, daily insights).</li>
+          <li><span class="font-medium">Compliance‑ready patterns:</span> Explicit consent gates and a clear data boundary make it easier to meet regulatory expectations.</li>
+          <li><span class="font-medium">Single conversation, two intents:</span> Exploration → Enrollment, without sending users to a different surface.</li>
+        </ol>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl p-4 border border-[#2B1033]/10 bg-white">
+            <h3 class="font-medium">How it works (prototype)</h3>
+            <ul class="list-disc ml-5 mt-2 text-sm text-[#3c2a43] space-y-1">
+              <li>Rule‑based assistant to keep the demo deterministic.</li>
+              <li>Ephemeral memory in Confidential mode (clears on refresh).</li>
+              <li>Onboarding mode shows a structured JSON preview of what would be stored.</li>
+              <li>Optional “Export onboarding JSON” to simulate secure transfer.</li>
+            </ul>
+          </div>
+          <div class="rounded-xl p-4 border border-[#2B1033]/10 bg-white">
+            <h3 class="font-medium">Data boundaries (prototype)</h3>
+            <ul class="list-disc ml-5 mt-2 text-sm text-[#3c2a43] space-y-1">
+              <li><span class="font-semibold">No localStorage</span> in Confidential mode.</li>
+              <li><span class="font-semibold">Consent toggle</span> gates any persistence.</li>
+              <li>Onboarding fields are validated and mapped to a profile schema.</li>
+              <li>“What’s captured” panel provides full transparency.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Simple SVG flow diagram -->
+        <div class="mt-6 rounded-xl border border-[#2B1033]/10 bg-white p-4">
+          <h3 class="font-medium">Conversation → Consent → Profile</h3>
+          <svg viewBox="0 0 800 160" class="w-full mt-2">
+            <defs>
+              <linearGradient id="g" x1="0" x2="1">
+                <stop offset="0%" stop-color="#E9D3FF"/>
+                <stop offset="100%" stop-color="#FFE5AA"/>
+              </linearGradient>
+            </defs>
+            <rect x="20" y="30" width="210" height="80" rx="14" fill="url(#g)" stroke="#2B1033" stroke-opacity="0.15" />
+            <text x="125" y="75" text-anchor="middle" font-size="14" fill="#2B1033">Confidential Q&A</text>
+
+            <polygon points="250,70 310,70 300,60 300,80" fill="#2B1033" fill-opacity="0.3" />
+
+            <rect x="320" y="30" width="160" height="80" rx="14" fill="white" stroke="#2B1033" stroke-opacity="0.15" />
+            <text x="400" y="65" text-anchor="middle" font-size="14" fill="#2B1033">Consent</text>
+            <text x="400" y="85" text-anchor="middle" font-size="12" fill="#6B5A74">User opts into onboarding</text>
+
+            <polygon points="500,70 560,70 550,60 550,80" fill="#2B1033" fill-opacity="0.3" />
+
+            <rect x="570" y="30" width="210" height="80" rx="14" fill="white" stroke="#2B1033" stroke-opacity="0.15" />
+            <text x="675" y="65" text-anchor="middle" font-size="14" fill="#2B1033">Structured Profile</text>
+            <text x="675" y="85" text-anchor="middle" font-size="12" fill="#6B5A74">Ready for Health app</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- Chat + Onboarding panel -->
+      <section class="card rounded-2xl p-6 shadow-soft flex flex-col min-h-[620px]">
+        <!-- Chat window -->
+        <div class="flex-1 rounded-xl border border-[#2B1033]/10 bg-white p-4 flex flex-col">
+          <div id="chatLog" class="flex-1 overflow-y-auto scroll-slim space-y-3 pr-2"></div>
+          <form id="chatForm" class="mt-3 flex gap-2">
+            <input id="chatInput" class="flex-1 rounded-xl border border-[#2B1033]/20 px-3 py-2 outline-none focus:ring-2 focus:ring-[#2B1033]/20" placeholder="Ask about Women's Health, features, or say ‘onboard me’." />
+            <button class="rounded-xl px-4 py-2 bg-[#2B1033] text-white">Send</button>
+          </form>
+        </div>
+
+        <!-- Onboarding controls -->
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-[#2B1033]/10 bg-white p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-medium">Onboarding Controls</h3>
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input id="consentToggle" type="checkbox" class="h-4 w-4" />
+                <span>Consent to save onboarding data</span>
+              </label>
+            </div>
+            <form id="onboardForm" class="mt-3 grid grid-cols-2 gap-3 text-sm">
+              <input name="full_name" placeholder="Full name" class="col-span-2 rounded-lg border border-[#2B1033]/20 px-3 py-2" />
+              <input name="email" placeholder="Email" class="col-span-2 md:col-span-1 rounded-lg border border-[#2B1033]/20 px-3 py-2" />
+              <input name="age" placeholder="Age" class="col-span-2 md:col-span-1 rounded-lg border border-[#2B1033]/20 px-3 py-2" />
+              <select name="primary_goal" class="col-span-2 rounded-lg border border-[#2B1033]/20 px-3 py-2">
+                <option value="">Primary goal</option>
+                <option>Symptom tracking</option>
+                <option>Appointment Notes</option>
+                <option>Cycle insights</option>
+                <option>Daily insights</option>
+              </select>
+              <textarea name="top_concerns" placeholder="Top concerns (comma‑separated)" class="col-span-2 rounded-lg border border-[#2B1033]/20 px-3 py-2"></textarea>
+              <button id="saveOnboarding" class="col-span-2 rounded-lg bg-[#2B1033] text-white px-4 py-2 disabled:opacity-40" disabled>Save onboarding snapshot</button>
+            </form>
+            <p class="text-xs text-[#6B5A74] mt-2">Prototype: data is kept in memory unless you export. Enable consent to activate the Save button.</p>
+          </div>
+
+          <div class="rounded-xl border border-[#2B1033]/10 bg-white p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-medium">What would be captured</h3>
+              <button id="exportBtn" class="rounded-lg border border-[#2B1033]/20 px-3 py-1 text-sm hover:bg-black/5">Export onboarding JSON</button>
+            </div>
+            <pre id="capturePreview" class="mt-2 text-xs whitespace-pre-wrap bg-white p-2 rounded-lg border border-[#2B1033]/10 max-h-56 overflow-y-auto scroll-slim">{}</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-10 text-xs text-[#6B5A74]">
+      <p>Prototype for demonstration purposes only. This page has no analytics, no trackers, and does not persist chat content.</p>
+    </footer>
+  </div>
+
+  <script>
+    // --- State ---
+    const state = {
+      mode: 'confidential', // 'confidential' | 'onboarding'
+      chat: [],             // ephemeral
+      onboarding: { },      // structured snapshot (in-memory only)
+      consent: false,
+    };
+
+    // Utilities
+    const el = (sel) => document.querySelector(sel);
+    const chatLog = el('#chatLog');
+
+    function setMode(m) {
+      state.mode = m;
+      // UI
+      el('#modeConfidential').classList.toggle('bg-[#2B1033]', m === 'confidential');
+      el('#modeConfidential').classList.toggle('text-white', m === 'confidential');
+      el('#modeOnboarding').classList.toggle('bg-[#2B1033]', m === 'onboarding');
+      el('#modeOnboarding').classList.toggle('text-white', m === 'onboarding');
+      // Banner text
+      if (m === 'confidential') {
+        el('#privacyBanner').innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="dot bg-emerald-500 mt-1.5"></div>
+            <div>
+              <p class="text-sm md:text-base"><span class="font-semibold">Confidential Mode:</span> No messages are persisted. No analytics. Everything stays in‑memory for this session only.</p>
+              <p class="text-xs text-[#6B5A74]">Switch to Onboarding Mode only after you opt in; then, responses relevant to your profile are structured and previewed below. In production, this would write to HIPAA‑aligned storage <em>only</em> after consent.</p>
+            </div>
+          </div>`;
+      } else {
+        el('#privacyBanner').innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="dot bg-amber-500 mt-1.5"></div>
+            <div>
+              <p class="text-sm md:text-base"><span class="font-semibold">Onboarding Mode:</span> You can provide profile details and, with consent, save a structured snapshot. Chat remains in‑memory.</p>
+              <p class="text-xs text-[#6B5A74]">This prototype shows exactly what would be captured before any storage occurs.</p>
+            </div>
+          </div>`;
+      }
+      // System message
+      pushBot(m === 'confidential'
+        ? 'You are exploring in Confidential mode. Ask about the apps features or say "onboard me" when ready.'
+        : 'You are now in Onboarding mode. Fill the panel on the right and enable consent to save a snapshot.');
+    }
+
+    function pushMsg(role, text) {
+      state.chat.push({ role, text, t: Date.now() });
+      const bubble = document.createElement('div');
+      bubble.className = role === 'user'
+        ? 'ml-auto max-w-[80%] rounded-2xl px-4 py-2 bg-[#2B1033] text-white'
+        : 'mr-auto max-w-[85%] rounded-2xl px-4 py-2 bg-white border border-[#2B1033]/10';
+      bubble.textContent = text;
+      chatLog.appendChild(bubble);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function pushUser(text) { pushMsg('user', text); }
+    function pushBot(text) { pushMsg('bot', text); }
+
+    // Simple, deterministic assistant for the prototype
+    function botReply(input) {
+      const q = input.toLowerCase();
+      if (q.includes('onboard me') || q.includes('sign up') || q.includes('join')) {
+        setMode('onboarding');
+        return;
+      }
+      if (q.includes('features') || q.includes('what can you do') || q.includes('what does fo')) {
+        pushBot('This Health App offers symptom tracking, the Appointment for visit prep, cycle and hormonal insights, and Daily insights or a weekly roadmap for pattern‑level health insights. I can suggest what fits you based on your goals.');
+        return;
+      }
+      if (q.includes('privacy') || q.includes('confidential')) {
+        pushBot('In this prototype, messages are not persisted in Confidential mode—no logs, no analytics. Onboarding requires explicit consent before a structured profile snapshot is saved.');
+        return;
+      }
+      if (q.includes('which is best') || q.includes('recommend')) {
+        pushBot('Tell me your top goal (e.g., track symptoms, prepare for a visit, understand cycles). I will map you to the best feature set.');
+        return;
+      }
+      // Default
+      pushBot('I can explain the Health App and help you decide the best features. Ask about features, privacy, or say "onboard me" when ready.');
+    }
+
+    // Form handlers
+    el('#chatForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = el('#chatInput').value.trim();
+      if (!val) return;
+      el('#chatInput').value = '';
+      pushUser(val);
+      botReply(val);
+    });
+
+    el('#modeConfidential').addEventListener('click', () => setMode('confidential'));
+    el('#modeOnboarding').addEventListener('click', () => setMode('onboarding'));
+
+    el('#consentToggle').addEventListener('change', (e) => {
+      state.consent = !!e.target.checked;
+      el('#saveOnboarding').disabled = !state.consent;
+    });
+
+    el('#onboardForm').addEventListener('submit', (e) => e.preventDefault());
+
+    el('#saveOnboarding').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!state.consent) return;
+      const fd = new FormData(el('#onboardForm'));
+      const snapshot = {
+        full_name: (fd.get('full_name')||'').trim(),
+        email: (fd.get('email')||'').trim(),
+        age: (fd.get('age')||'').trim(),
+        primary_goal: (fd.get('primary_goal')||'').trim(),
+        top_concerns: (fd.get('top_concerns')||'').trim().split(',').map(s=>s.trim()).filter(Boolean),
+        timestamp: new Date().toISOString(),
+        source: 'confidential-chat-concierge-prototype'
+      };
+      state.onboarding = snapshot;
+      el('#capturePreview').textContent = JSON.stringify(snapshot, null, 2);
+      pushBot('Onboarding snapshot saved in memory. Use Export to download a JSON file for transfer to the Health app.');
+    });
+
+    el('#exportBtn').addEventListener('click', () => {
+      const data = state.onboarding && Object.keys(state.onboarding).length ? state.onboarding : {};
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'health_onboarding_snapshot.json';
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      a.remove();
+    });
+
+    // Initial system message
+    pushBot('Welcome to an App about Health. This is a confidential space: nothing is saved unless you consent to onboard. Ask anything, or say "onboard me" when ready.');
+  </script>
+</body>
+</html>

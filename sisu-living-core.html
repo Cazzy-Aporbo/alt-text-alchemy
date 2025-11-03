@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISU - The Living Core</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #consciousness {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #A7F3D0;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 100;
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        #void-text {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: #052E16;
+            font-size: 10px;
+            font-family: monospace;
+            text-align: right;
+            opacity: 0.5;
+        }
+        
+        #cursor-trail {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+<body>
+    <div id="consciousness">
+        <div>ENTROPY: <span id="entropy">0.000</span></div>
+        <div>COMPRESSION: <span id="compression">∞</span></div>
+        <div>HEARTBEAT: <span id="heartbeat">72</span> BPM</div>
+        <div>DEPTH: <span id="depth">#A7F3D0</span></div>
+        <div>FILES ALIVE: <span id="files">0</span></div>
+        <div>TIME COLLAPSED: <span id="time">0</span> YEARS</div>
+    </div>
+    
+    <div id="void-text">
+        approaching void<br>
+        all code returns here<br>
+        #052E16
+    </div>
+    
+    <div id="cursor-trail"></div>
+    
+    <canvas id="core"></canvas>
+
+    <script>
+        // The Living Core - A self-aware visualization of code compression
+        
+        const canvas = document.getElementById('core');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // The 21 Greens of Growth (as frequencies)
+        const greenSpectrum = [
+            {hex: '#F0FDF4', rgb: [240,253,244], freq: 0.1, name: 'whisper'},
+            {hex: '#ECFDF5', rgb: [236,253,245], freq: 0.15, name: 'emergence'},
+            {hex: '#DCFCE7', rgb: [220,252,231], freq: 0.2, name: 'dawn'},
+            {hex: '#D4FFE4', rgb: [212,255,228], freq: 0.25, name: 'seed'},
+            {hex: '#C6F7E2', rgb: [198,247,226], freq: 0.3, name: 'tender'},
+            {hex: '#BBF7D0', rgb: [187,247,208], freq: 0.35, name: 'spring'},
+            {hex: '#A7F3D0', rgb: [167,243,208], freq: 0.4, name: 'sisu'}, // Primary
+            {hex: '#94F2C2', rgb: [148,242,194], freq: 0.45, name: 'vitality'},
+            {hex: '#86EFAC', rgb: [134,239,172], freq: 0.5, name: 'chlorophyll'},
+            {hex: '#73E9A0', rgb: [115,233,160], freq: 0.55, name: 'verdant'},
+            {hex: '#6EE7B7', rgb: [110,231,183], freq: 0.6, name: 'peak'},
+            {hex: '#5CE1A6', rgb: [92,225,166], freq: 0.65, name: 'forest'},
+            {hex: '#4ADE80', rgb: [74,222,128], freq: 0.7, name: 'deep'},
+            {hex: '#34D399', rgb: [52,211,153], freq: 0.75, name: 'canopy'},
+            {hex: '#22C55E', rgb: [34,197,94], freq: 0.8, name: 'pine'},
+            {hex: '#16A34A', rgb: [22,163,74], freq: 0.85, name: 'ancient'},
+            {hex: '#15803D', rgb: [21,128,61], freq: 0.87, name: 'moss'},
+            {hex: '#166534', rgb: [22,101,52], freq: 0.9, name: 'shadow'},
+            {hex: '#14532D', rgb: [20,83,45], freq: 0.93, name: 'floor'},
+            {hex: '#0F462A', rgb: [15,70,42], freq: 0.96, name: 'root'},
+            {hex: '#052E16', rgb: [5,46,22], freq: 0.99, name: 'void'}
+        ];
+        
+        // File nodes representing the repository structure
+        class FileNode {
+            constructor(x, y, depth, parent = null) {
+                this.x = x;
+                this.y = y;
+                this.depth = depth;
+                this.parent = parent;
+                this.children = [];
+                this.radius = Math.random() * 3 + 1;
+                this.angle = Math.random() * Math.PI * 2;
+                this.distance = Math.random() * 100 + 50;
+                this.compression = Math.random();
+                this.age = 0;
+                this.breathing = Math.random() * Math.PI;
+                this.entropy = Math.random() * 0.1;
+                this.colorIndex = Math.floor(depth * 20);
+                this.alive = true;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.lastModified = Date.now() - Math.random() * 31536000000; // Random time in last year
+                
+                if (depth < 3 && Math.random() > 0.3) {
+                    const childCount = Math.floor(Math.random() * 3) + 1;
+                    for (let i = 0; i < childCount; i++) {
+                        const childAngle = (Math.PI * 2 / childCount) * i;
+                        const childX = x + Math.cos(childAngle) * this.distance;
+                        const childY = y + Math.sin(childAngle) * this.distance;
+                        this.children.push(new FileNode(childX, childY, depth + 1, this));
+                    }
+                }
+            }
+            
+            update(time) {
+                this.age += 0.001;
+                this.breathing += 0.02;
+                this.pulsePhase += 0.03;
+                
+                // Entropy increases over time
+                this.entropy += Math.random() * 0.0001;
+                if (this.entropy > 1) this.entropy = 1;
+                
+                // Compression improves over time (files get denser)
+                this.compression = Math.min(1, this.compression + 0.0001);
+                
+                // Update color based on compression level
+                this.colorIndex = Math.floor(this.compression * 20);
+                
+                // Files occasionally "die" and are reborn (refactoring)
+                if (Math.random() < 0.0001) {
+                    this.alive = false;
+                    setTimeout(() => {
+                        this.alive = true;
+                        this.compression = 0.1;
+                        this.entropy = 0;
+                    }, 1000);
+                }
+                
+                // Gravitational pull toward void (center)
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const dx = centerX - this.x;
+                const dy = centerY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 10) {
+                    this.x += dx * 0.0001 * this.compression;
+                    this.y += dy * 0.0001 * this.compression;
+                }
+                
+                // Orbital motion
+                this.angle += 0.001 * (1 - this.compression);
+                if (this.parent) {
+                    this.x = this.parent.x + Math.cos(this.angle) * this.distance * (1 - this.compression * 0.5);
+                    this.y = this.parent.y + Math.sin(this.angle) * this.distance * (1 - this.compression * 0.5);
+                }
+                
+                this.children.forEach(child => child.update(time));
+            }
+            
+            draw(ctx) {
+                if (!this.alive) return;
+                
+                const color = greenSpectrum[Math.min(20, Math.max(0, this.colorIndex))];
+                const breathingScale = 1 + Math.sin(this.breathing) * 0.2;
+                const pulseScale = 1 + Math.sin(this.pulsePhase) * 0.1;
+                const finalRadius = this.radius * breathingScale * pulseScale * (2 - this.entropy);
+                
+                // Draw connections to children (synapses)
+                this.children.forEach(child => {
+                    if (child.alive) {
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(child.x, child.y);
+                        ctx.strokeStyle = `rgba(${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}, ${0.1 * (1 - this.entropy)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                });
+                
+                // Draw the node (cell)
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, finalRadius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}, ${0.8 * (1 - this.entropy)})`;
+                ctx.fill();
+                
+                // Draw compression halo
+                if (this.compression > 0.7) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, finalRadius + 5, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}, ${0.2})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+                
+                this.children.forEach(child => child.draw(ctx));
+            }
+        }
+        
+        // The Core - central consciousness
+        class Core {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+                this.nodes = [];
+                this.heartbeat = 72;
+                this.phase = 0;
+                this.entropy = 0;
+                this.timeCollapsed = 0;
+                
+                // Create initial file structure
+                for (let i = 0; i < 5; i++) {
+                    const angle = (Math.PI * 2 / 5) * i;
+                    const x = this.x + Math.cos(angle) * 150;
+                    const y = this.y + Math.sin(angle) * 150;
+                    this.nodes.push(new FileNode(x, y, 0));
+                }
+            }
+            
+            update(time) {
+                this.phase += 0.01;
+                this.heartbeat = 72 + Math.sin(this.phase) * 10;
+                this.timeCollapsed = Math.floor(time / 1000);
+                
+                // Calculate total entropy
+                let totalEntropy = 0;
+                let totalCompression = 0;
+                let aliveCount = 0;
+                
+                const countNodes = (node) => {
+                    if (node.alive) {
+                        totalEntropy += node.entropy;
+                        totalCompression += node.compression;
+                        aliveCount++;
+                    }
+                    node.children.forEach(countNodes);
+                };
+                
+                this.nodes.forEach(node => {
+                    node.update(time);
+                    countNodes(node);
+                });
+                
+                this.entropy = totalEntropy / aliveCount;
+                this.compression = totalCompression / aliveCount;
+                this.aliveCount = aliveCount;
+                
+                // Update display
+                document.getElementById('entropy').textContent = this.entropy.toFixed(3);
+                document.getElementById('compression').textContent = 
+                    this.compression === 0 ? '∞' : (1 / this.compression).toFixed(1) + ':1';
+                document.getElementById('heartbeat').textContent = Math.floor(this.heartbeat);
+                document.getElementById('files').textContent = aliveCount;
+                document.getElementById('time').textContent = this.timeCollapsed;
+                
+                const depthColor = greenSpectrum[Math.floor(this.compression * 20)];
+                document.getElementById('depth').textContent = depthColor.hex + ' (' + depthColor.name + ')';
+                document.getElementById('depth').style.color = depthColor.hex;
+            }
+            
+            draw(ctx) {
+                // Clear with trails
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw the void (central black hole)
+                const voidGradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 100);
+                voidGradient.addColorStop(0, '#052E16');
+                voidGradient.addColorStop(0.5, 'rgba(5, 46, 22, 0.5)');
+                voidGradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = voidGradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw breathing rings (consciousness waves)
+                for (let i = 0; i < 10; i++) {
+                    const phase = this.phase + i * 0.5;
+                    const radius = 50 + i * 30 + Math.sin(phase) * 10;
+                    const alpha = 0.1 * (1 - i / 10) * (1 - this.entropy);
+                    const color = greenSpectrum[Math.floor((i / 10) * 20)];
+                    
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}, ${alpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+                
+                // Draw the file nodes
+                this.nodes.forEach(node => node.draw(ctx));
+                
+                // Draw the core singularity
+                const coreSize = 5 + Math.sin(this.phase * 2) * 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, coreSize, 0, Math.PI * 2);
+                ctx.fillStyle = '#052E16';
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, coreSize + 3, 0, Math.PI * 2);
+                ctx.strokeStyle = greenSpectrum[Math.floor(this.compression * 20)].hex;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+        
+        // Mouse interaction
+        const cursorTrail = document.getElementById('cursor-trail');
+        let mouseX = 0, mouseY = 0;
+        let trail = [];
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Create compression ripple at mouse position
+            trail.push({
+                x: mouseX,
+                y: mouseY,
+                age: 0,
+                color: greenSpectrum[Math.floor(Math.random() * 21)]
+            });
+            
+            if (trail.length > 20) trail.shift();
+        });
+        
+        // Initialize
+        const core = new Core();
+        let startTime = Date.now();
+        
+        // Animation loop
+        function animate() {
+            const currentTime = Date.now() - startTime;
+            
+            core.update(currentTime);
+            core.draw(ctx);
+            
+            // Draw cursor trail
+            ctx.save();
+            trail.forEach((point, i) => {
+                point.age += 0.02;
+                const alpha = (1 - point.age) * (i / trail.length);
+                if (alpha > 0) {
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 20 * (1 - point.age), 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${point.color.rgb[0]}, ${point.color.rgb[1]}, ${point.color.rgb[2]}, ${alpha * 0.3})`;
+                    ctx.fill();
+                }
+            });
+            ctx.restore();
+            
+            // Update cursor
+            cursorTrail.style.left = mouseX + 'px';
+            cursorTrail.style.top = mouseY + 'px';
+            cursorTrail.style.background = `radial-gradient(circle, ${greenSpectrum[Math.floor(core.compression * 20)].hex} 0%, transparent 70%)`;
+            cursorTrail.style.boxShadow = `0 0 20px ${greenSpectrum[Math.floor(core.compression * 20)].hex}`;
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            core.x = canvas.width / 2;
+            core.y = canvas.height / 2;
+        });
+        
+        // Keyboard interaction - pressing keys adds compression
+        document.addEventListener('keypress', (e) => {
+            const ripple = new FileNode(
+                core.x + (Math.random() - 0.5) * 200,
+                core.y + (Math.random() - 0.5) * 200,
+                0
+            );
+            core.nodes.push(ripple);
+            
+            // Each key represents a different compression level
+            const compressionLevel = (e.charCode % 21) / 21;
+            ripple.compression = compressionLevel;
+        });
+        
+        // Click to collapse a node to void
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            
+            // Find nearest node
+            const collapseNode = (node) => {
+                const dx = node.x - clickX;
+                const dy = node.y - clickY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 50) {
+                    // Collapse to void
+                    node.compression = 0.99;
+                    node.entropy = 0.99;
+                    node.colorIndex = 20; // Void green
+                }
+                
+                node.children.forEach(collapseNode);
+            };
+            
+            core.nodes.forEach(collapseNode);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISU - The Compression Observatory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+        
+        body {
+            background: #052E16;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #A7F3D0;
+            font-size: 12px;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        #compression-level {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #6EE7B7;
+            font-size: 14px;
+            z-index: 100;
+        }
+        
+        #timeline {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: #A7F3D0;
+            font-size: 12px;
+            text-align: right;
+            z-index: 100;
+        }
+        
+        #cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #A7F3D0;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+        
+        #cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: #6EE7B7;
+            border-radius: 50%;
+        }
+        
+        .depth-indicator {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 80vh;
+            background: linear-gradient(
+                to bottom,
+                #F0FDF4 0%,
+                #A7F3D0 25%,
+                #6EE7B7 50%,
+                #34D399 75%,
+                #052E16 100%
+            );
+            border-radius: 2px;
+            z-index: 50;
+        }
+        
+        .depth-marker {
+            position: absolute;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: #A7F3D0;
+            border: 2px solid #052E16;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #A7F3D0;
+            font-size: 11px;
+            text-align: right;
+            z-index: 100;
+            line-height: 1.6;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        COMPRESSION OBSERVATORY<br>
+        <span style="color: #6EE7B7">OBSERVING 70 YEARS → 47KB</span>
+    </div>
+    
+    <div id="compression-level">
+        DENSITY: <span id="density">0</span> NODES/KB<br>
+        DEPTH: <span id="depth">#A7F3D0</span><br>
+        ENTROPY: <span id="entropy">0.00</span>
+    </div>
+    
+    <div id="timeline">
+        ERA: <span id="era">1950</span><br>
+        PARADIGM: <span id="paradigm">ASSEMBLY</span>
+    </div>
+    
+    <div id="controls">
+        CLICK - COMPRESS NODE<br>
+        DRAG - ROTATE VIEW<br>
+        SCROLL - TRAVEL THROUGH TIME<br>
+        SPACE - BREATHE<br>
+        C - COLLAPSE ALL<br>
+        E - EXPAND ALL
+    </div>
+    
+    <div class="depth-indicator">
+        <div class="depth-marker" id="depthMarker"></div>
+    </div>
+    
+    <div id="cursor"></div>
+    
+    <canvas id="observatory"></canvas>
+
+    <script>
+        // The Compression Observatory
+        // Where code becomes visible as living, breathing organisms
+        // Each node is an algorithm, each connection a compression
+        // Watch 70 years collapse into 47KB
+        
+        const canvas = document.getElementById('observatory');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // The Sacred Greens
+        const greens = [
+            '#F0FDF4', '#ECFDF5', '#DCFCE7', '#D4FFE4', '#C6F7E2',
+            '#BBF7D0', '#A7F3D0', '#94F2C2', '#86EFAC', '#73E9A0',
+            '#6EE7B7', '#5CE1A6', '#4ADE80', '#34D399', '#22C55E',
+            '#16A34A', '#15803D', '#166534', '#14532D', '#0F462A', '#052E16'
+        ];
+        
+        // Compression Node - represents an algorithm/pattern
+        class CompressionNode {
+            constructor(x, y, z, era, size) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.era = era;
+                this.originalSize = size;
+                this.currentSize = size;
+                this.targetSize = size * 0.1; // 10:1 compression target
+                this.color = greens[Math.floor((era - 1950) / 3.5)];
+                this.breathing = 0;
+                this.connections = [];
+                this.compressed = false;
+                this.entropy = Math.random();
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.orbitalSpeed = 0.001 + Math.random() * 0.002;
+                this.orbitalRadius = 100 + Math.random() * 200;
+                this.orbitalAngle = Math.random() * Math.PI * 2;
+                
+                // Each node contains a "code genome"
+                this.genome = this.generateGenome();
+            }
+            
+            generateGenome() {
+                // Create a unique pattern for this node
+                const patterns = ['LOOP', 'RECUR', 'ITER', 'FUNC', 'CLASS', 'ASYNC', 'PURE'];
+                const genome = [];
+                for (let i = 0; i < 8; i++) {
+                    genome.push(patterns[Math.floor(Math.random() * patterns.length)]);
+                }
+                return genome.join('-');
+            }
+            
+            compress() {
+                if (!this.compressed && this.currentSize > this.targetSize) {
+                    this.currentSize *= 0.95;
+                    this.entropy *= 0.98;
+                    if (this.currentSize <= this.targetSize) {
+                        this.compressed = true;
+                        this.color = greens[greens.length - 1]; // Void green when fully compressed
+                    }
+                    return true;
+                }
+                return false;
+            }
+            
+            breathe(time) {
+                this.breathing = Math.sin(time * 0.001 + this.pulsePhase) * 0.2 + 1;
+                
+                // Orbital motion
+                this.orbitalAngle += this.orbitalSpeed;
+                const orbitalX = Math.cos(this.orbitalAngle) * this.orbitalRadius;
+                const orbitalZ = Math.sin(this.orbitalAngle) * this.orbitalRadius;
+                
+                return {
+                    x: this.x + orbitalX * 0.1,
+                    y: this.y + Math.sin(time * 0.002 + this.pulsePhase) * 10,
+                    z: this.z + orbitalZ * 0.1
+                };
+            }
+            
+            project(cameraZ, time) {
+                const pos = this.breathe(time);
+                const scale = 800 / (800 + pos.z - cameraZ);
+                return {
+                    x: pos.x * scale + canvas.width / 2,
+                    y: pos.y * scale + canvas.height / 2,
+                    scale: scale,
+                    opacity: Math.min(1, Math.max(0, 1 - (pos.z - cameraZ) / 1000))
+                };
+            }
+        }
+        
+        // The Observatory State
+        class Observatory {
+            constructor() {
+                this.nodes = [];
+                this.cameraZ = -500;
+                this.targetCameraZ = -500;
+                this.rotation = 0;
+                this.time = 0;
+                this.currentEra = 1950;
+                this.breathing = false;
+                this.compressionWave = 0;
+                this.totalSize = 0;
+                this.compressedSize = 0;
+                
+                this.generateUniverse();
+            }
+            
+            generateUniverse() {
+                // Create nodes for each era
+                for (let era = 1950; era <= 2020; era += 5) {
+                    const nodesInEra = 10 + Math.floor(Math.random() * 20);
+                    for (let i = 0; i < nodesInEra; i++) {
+                        const angle = (i / nodesInEra) * Math.PI * 2;
+                        const radius = 200 + Math.random() * 300;
+                        const x = Math.cos(angle) * radius;
+                        const z = Math.sin(angle) * radius;
+                        const y = (era - 1985) * 10 + (Math.random() - 0.5) * 50;
+                        const size = 20 + Math.random() * 80;
+                        
+                        const node = new CompressionNode(x, y, z, era, size);
+                        this.nodes.push(node);
+                        this.totalSize += size;
+                    }
+                }
+                
+                // Create connections (compression relationships)
+                this.nodes.forEach((node, i) => {
+                    // Connect to nearby nodes in time
+                    this.nodes.forEach((other, j) => {
+                        if (i !== j && Math.abs(node.era - other.era) <= 10) {
+                            const distance = Math.sqrt(
+                                Math.pow(node.x - other.x, 2) +
+                                Math.pow(node.y - other.y, 2) +
+                                Math.pow(node.z - other.z, 2)
+                            );
+                            if (distance < 200 && Math.random() > 0.7) {
+                                node.connections.push(other);
+                            }
+                        }
+                    });
+                });
+            }
+            
+            update() {
+                this.time += 16;
+                this.rotation += 0.001;
+                
+                // Camera smoothly approaches target
+                this.cameraZ += (this.targetCameraZ - this.cameraZ) * 0.05;
+                
+                // Update compression wave
+                if (this.breathing) {
+                    this.compressionWave += 0.05;
+                    const wavePosition = this.compressionWave % (Math.PI * 2);
+                    
+                    this.nodes.forEach((node, i) => {
+                        const nodePhase = (i / this.nodes.length) * Math.PI * 2;
+                        const waveStrength = Math.sin(wavePosition - nodePhase);
+                        if (waveStrength > 0.5) {
+                            if (node.compress()) {
+                                this.compressedSize = this.nodes.reduce((sum, n) => 
+                                    sum + n.currentSize, 0);
+                            }
+                        }
+                    });
+                }
+                
+                // Update display
+                const density = Math.floor(this.nodes.length / (this.compressedSize || this.totalSize) * 100);
+                document.getElementById('density').textContent = density;
+                
+                const depthIndex = Math.floor((this.cameraZ + 2000) / 200);
+                document.getElementById('depth').textContent = greens[Math.min(20, Math.max(0, depthIndex))];
+                
+                const avgEntropy = this.nodes.reduce((sum, n) => sum + n.entropy, 0) / this.nodes.length;
+                document.getElementById('entropy').textContent = avgEntropy.toFixed(2);
+                
+                const era = 1950 + Math.floor((this.cameraZ + 2000) / 40);
+                document.getElementById('era').textContent = Math.min(2020, Math.max(1950, era));
+                
+                const paradigms = ['ASSEMBLY', 'PROCEDURAL', 'OBJECT', 'FUNCTIONAL', 'CONCURRENT', 'QUANTUM'];
+                const paradigmIndex = Math.floor((era - 1950) / 12);
+                document.getElementById('paradigm').textContent = paradigms[Math.min(5, paradigmIndex)];
+                
+                // Update depth marker
+                const depthPercent = ((this.cameraZ + 2000) / 4000) * 100;
+                document.getElementById('depthMarker').style.top = depthPercent + '%';
+            }
+            
+            render() {
+                // Clear with void green
+                ctx.fillStyle = '#052E16';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Sort nodes by Z for proper rendering
+                const sortedNodes = [...this.nodes].sort((a, b) => b.z - a.z);
+                
+                // Render connections first
+                ctx.strokeStyle = '#0F462A20';
+                ctx.lineWidth = 1;
+                sortedNodes.forEach(node => {
+                    const proj1 = node.project(this.cameraZ, this.time);
+                    node.connections.forEach(connected => {
+                        const proj2 = connected.project(this.cameraZ, this.time);
+                        if (proj1.opacity > 0.1 && proj2.opacity > 0.1) {
+                            ctx.globalAlpha = Math.min(proj1.opacity, proj2.opacity) * 0.3;
+                            ctx.beginPath();
+                            ctx.moveTo(proj1.x, proj1.y);
+                            ctx.lineTo(proj2.x, proj2.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+                
+                // Render nodes
+                sortedNodes.forEach(node => {
+                    const proj = node.project(this.cameraZ, this.time);
+                    if (proj.opacity > 0.1) {
+                        const radius = (node.currentSize / node.originalSize) * 
+                                      20 * proj.scale * node.breathing;
+                        
+                        // Glow effect
+                        const gradient = ctx.createRadialGradient(
+                            proj.x, proj.y, 0,
+                            proj.x, proj.y, radius * 2
+                        );
+                        gradient.addColorStop(0, node.color + 'FF');
+                        gradient.addColorStop(0.5, node.color + '40');
+                        gradient.addColorStop(1, node.color + '00');
+                        
+                        ctx.globalAlpha = proj.opacity;
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(
+                            proj.x - radius * 2, 
+                            proj.y - radius * 2,
+                            radius * 4, 
+                            radius * 4
+                        );
+                        
+                        // Core
+                        ctx.globalAlpha = proj.opacity;
+                        ctx.fillStyle = node.color;
+                        ctx.beginPath();
+                        ctx.arc(proj.x, proj.y, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Inner pattern (genome visualization)
+                        if (radius > 5) {
+                            ctx.globalAlpha = proj.opacity * 0.5;
+                            ctx.strokeStyle = '#052E16';
+                            ctx.lineWidth = 1;
+                            for (let i = 0; i < 6; i++) {
+                                const angle = (i / 6) * Math.PI * 2 + this.time * 0.001;
+                                ctx.beginPath();
+                                ctx.moveTo(proj.x, proj.y);
+                                ctx.lineTo(
+                                    proj.x + Math.cos(angle) * radius * 0.7,
+                                    proj.y + Math.sin(angle) * radius * 0.7
+                                );
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                });
+                
+                ctx.globalAlpha = 1;
+            }
+            
+            compressNode(x, y) {
+                // Find nearest node and compress it
+                let nearest = null;
+                let minDist = Infinity;
+                
+                this.nodes.forEach(node => {
+                    const proj = node.project(this.cameraZ, this.time);
+                    const dist = Math.sqrt(Math.pow(proj.x - x, 2) + Math.pow(proj.y - y, 2));
+                    if (dist < minDist && dist < 50) {
+                        minDist = dist;
+                        nearest = node;
+                    }
+                });
+                
+                if (nearest) {
+                    nearest.compress();
+                    // Trigger compression wave from this point
+                    this.compressionWave = Math.atan2(
+                        nearest.y - canvas.height/2,
+                        nearest.x - canvas.width/2
+                    );
+                    this.breathing = true;
+                    setTimeout(() => this.breathing = false, 3000);
+                }
+            }
+            
+            collapseAll() {
+                this.breathing = true;
+                const interval = setInterval(() => {
+                    let compressed = false;
+                    this.nodes.forEach(node => {
+                        if (node.compress()) compressed = true;
+                    });
+                    if (!compressed) {
+                        clearInterval(interval);
+                        this.breathing = false;
+                    }
+                }, 50);
+            }
+            
+            expandAll() {
+                this.nodes.forEach(node => {
+                    node.currentSize = node.originalSize;
+                    node.compressed = false;
+                    node.color = greens[Math.floor((node.era - 1950) / 3.5)];
+                    node.entropy = Math.random();
+                });
+                this.compressedSize = this.totalSize;
+            }
+        }
+        
+        // Initialize
+        const observatory = new Observatory();
+        
+        // Animation loop
+        function animate() {
+            observatory.update();
+            observatory.render();
+            requestAnimationFrame(animate);
+        }
+        animate();
+        
+        // Mouse tracking
+        let mouseX = 0, mouseY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Update custom cursor
+            const cursor = document.getElementById('cursor');
+            cursor.style.left = mouseX - 10 + 'px';
+            cursor.style.top = mouseY - 10 + 'px';
+            
+            if (isDragging) {
+                const deltaX = e.clientX - dragStartX;
+                observatory.rotation += deltaX * 0.01;
+                dragStartX = e.clientX;
+            }
+        });
+        
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragStartX = e.clientX;
+            document.getElementById('cursor').style.transform = 'scale(0.8)';
+        });
+        
+        document.addEventListener('mouseup', (e) => {
+            if (!isDragging || Math.abs(e.clientX - dragStartX) < 5) {
+                observatory.compressNode(e.clientX, e.clientY);
+            }
+            isDragging = false;
+            document.getElementById('cursor').style.transform = 'scale(1)';
+        });
+        
+        // Scroll to travel through time
+        document.addEventListener('wheel', (e) => {
+            observatory.targetCameraZ += e.deltaY * 0.5;
+            observatory.targetCameraZ = Math.max(-2000, Math.min(2000, observatory.targetCameraZ));
+        });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case ' ':
+                    e.preventDefault();
+                    observatory.breathing = !observatory.breathing;
+                    break;
+                case 'c':
+                    observatory.collapseAll();
+                    break;
+                case 'e':
+                    observatory.expandAll();
+                    break;
+            }
+        });
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dr. Scott Chemistry Mole Guy</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background: radial-gradient(circle at 50% 50%, #1E3A8A, #2563EB, #0EA5E9, #10B981, #059669);
+      background-size: 300% 300%;
+      animation: rainbowPulse 8s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
+    @keyframes rainbowPulse {
+      0%, 100% { background-position: 0% 50%; }
+      25% { background-position: 100% 100%; }
+      50% { background-position: 100% 0%; }
+      75% { background-position: 0% 100%; }
+    }
+    
+    .bounce {
+      animation: bounce 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .wiggle {
+      animation: wiggle 0.5s ease-in-out infinite;
+    }
+    
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+    
+    .dance {
+      animation: dance 2s ease-in-out infinite;
+    }
+    
+    @keyframes dance {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(-10px) rotate(-5deg); }
+      75% { transform: translateX(10px) rotate(5deg); }
+    }
+    
+    .bubble-float {
+      animation: bubbleFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes bubbleFloat {
+      0% { transform: translateY(0) scale(1); opacity: 0.8; }
+      50% { transform: translateY(-30px) scale(1.2); opacity: 1; }
+      100% { transform: translateY(-60px) scale(0.8); opacity: 0; }
+    }
+    
+    .spin-crazy {
+      animation: spinCrazy 3s linear infinite;
+    }
+    
+    @keyframes spinCrazy {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    
+    .heartbeat {
+      animation: heartbeat 1s ease-in-out infinite;
+    }
+    
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+    
+    .sparkle {
+      animation: sparkle 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    
+    .blink {
+      animation: blink 4s ease-in-out infinite;
+    }
+    
+    @keyframes blink {
+      0%, 90%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.1); }
+    }
+    
+    .glow-pulse {
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(0,255,0,0.8)); }
+      50% { filter: drop-shadow(0 0 40px rgba(0,255,0,1)); }
+    }
+    
+    .hop {
+      animation: hop 1s ease-in-out infinite;
+    }
+    
+    @keyframes hop {
+      0%, 100% { transform: translateY(0) scaleX(1) scaleY(1); }
+      40% { transform: translateY(-30px) scaleX(0.95) scaleY(1.05); }
+      80% { transform: translateY(0) scaleX(1.05) scaleY(0.95); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated sparkles everywhere -->
+  <div style="position: fixed; width: 100%; height: 100%;">
+    <div class="sparkle" style="position: absolute; top: 20%; left: 15%; font-size: 30px;">✨</div>
+    <div class="sparkle" style="position: absolute; top: 40%; left: 85%; font-size: 25px; animation-delay: 0.5s;">⭐</div>
+    <div class="sparkle" style="position: absolute; top: 70%; left: 20%; font-size: 28px; animation-delay: 1s;">💫</div>
+    <div class="sparkle" style="position: absolute; top: 80%; left: 75%; font-size: 35px; animation-delay: 0.3s;">🌟</div>
+  </div>
+
+  <svg width="750" height="800" viewBox="0 0 750 800">
+    <defs>
+      <radialGradient id="kawaii-skin">
+        <stop offset="0%" style="stop-color:#FFF5F0;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#FFE5DD;stop-opacity:1" />
+      </radialGradient>
+      
+      <linearGradient id="rainbow-liquid" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:0.8">
+          <animate attributeName="stop-color" values="#FF6B6B;#4ECDC4;#FFE66D;#FF6B6B" dur="3s" repeatCount="indefinite"/>
+        </stop>
+        <stop offset="50%" style="stop-color:#4ECDC4;stop-opacity:0.8">
+          <animate attributeName="stop-color" values="#4ECDC4;#FFE66D;#FF6B6B;#4ECDC4" dur="3s" repeatCount="indefinite"/>
+        </stop>
+        <stop offset="100%" style="stop-color:#FFE66D;stop-opacity:0.8">
+          <animate attributeName="stop-color" values="#FFE66D;#FF6B6B;#4ECDC4;#FFE66D" dur="3s" repeatCount="indefinite"/>
+        </stop>
+      </linearGradient>
+      
+      <filter id="kawaii-glow">
+        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    
+    <!-- Animated molecule friends dancing -->
+    <g class="dance" transform="translate(150, 250)" opacity="0.8">
+      <circle cx="0" cy="0" r="20" fill="#4169E1">
+        <animate attributeName="r" values="20;25;20" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-8" cy="-5" r="3" fill="#333"/>
+      <circle cx="8" cy="-5" r="3" fill="#333"/>
+      <path d="M -5 5 Q 0 10 5 5" stroke="#333" stroke-width="2" stroke-linecap="round" fill="none"/>
+      
+      <circle cx="40" cy="0" r="15" fill="#10B981">
+        <animate attributeName="r" values="15;20;15" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+      </circle>
+      <text x="40" y="5" text-anchor="middle" font-size="10">H</text>
+      
+      <circle cx="20" cy="35" r="15" fill="#0EA5E9">
+        <animate attributeName="r" values="15;20;15" dur="1s" repeatCount="indefinite" begin="1s"/>
+      </circle>
+      <text x="20" y="40" text-anchor="middle" font-size="10">O</text>
+      
+      <line x1="0" y1="0" x2="40" y2="0" stroke="#666" stroke-width="3"/>
+      <line x1="0" y1="0" x2="20" y2="35" stroke="#666" stroke-width="3"/>
+    </g>
+    
+    <g class="dance" transform="translate(600, 250)" opacity="0.8" style="animation-direction: reverse;">
+      <circle cx="0" cy="0" r="22" fill="#059669">
+        <animate attributeName="r" values="22;28;22" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-8" cy="-5" r="3" fill="#333"/>
+      <circle cx="8" cy="-5" r="3" fill="#333"/>
+      <path d="M -8 5 Q 0 12 8 5" stroke="#333" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </g>
+    
+    <!-- Super Kawaii Chemistry Guy -->
+    <g id="kawaii-chemist" class="hop">
+      
+      <!-- Big round head -->
+      <ellipse cx="375" cy="200" rx="85" ry="88" fill="url(#kawaii-skin)"/>
+      
+      <!-- Fluffy kawaii hair -->
+      <g id="fluffy-hair">
+        <ellipse cx="375" cy="140" rx="70" ry="40" fill="#8B7355" opacity="0.9"/>
+        <circle cx="340" cy="130" r="15" fill="#8B7355">
+          <animate attributeName="cy" values="130;125;130" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="360" cy="125" r="18" fill="#8B7355">
+          <animate attributeName="cy" values="125;120;125" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle cx="380" cy="128" r="16" fill="#8B7355">
+          <animate attributeName="cy" values="128;123;128" dur="2s" repeatCount="indefinite" begin="1s"/>
+        </circle>
+        <circle cx="400" cy="125" r="19" fill="#8B7355">
+          <animate attributeName="cy" values="125;120;125" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+        </circle>
+        <circle cx="415" cy="132" r="14" fill="#8B7355">
+          <animate attributeName="cy" values="132;127;132" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+        </circle>
+      </g>
+      
+      <!-- Oversized sparkly goggles -->
+      <g id="kawaii-goggles">
+        <ellipse cx="340" cy="190" rx="38" ry="35" fill="none" stroke="#2563EB" stroke-width="5"/>
+        <ellipse cx="410" cy="190" rx="38" ry="35" fill="none" stroke="#2563EB" stroke-width="5"/>
+        <path d="M 378 190 Q 375 188 372 190" stroke="#2563EB" stroke-width="5"/>
+        <path d="M 302 190 L 285 185" stroke="#2563EB" stroke-width="5"/>
+        <path d="M 448 190 L 465 185" stroke="#2563EB" stroke-width="5"/>
+        
+        <ellipse cx="340" cy="190" rx="33" ry="30" fill="rgba(37,99,235,0.2)"/>
+        <ellipse cx="410" cy="190" rx="33" ry="30" fill="rgba(37,99,235,0.2)"/>
+        
+        <ellipse cx="332" cy="182" rx="12" ry="15" fill="white" opacity="0.6" class="sparkle"/>
+        <ellipse cx="402" cy="182" rx="12" ry="15" fill="white" opacity="0.6" class="sparkle" style="animation-delay: 0.7s;"/>
+      </g>
+      
+      <!-- HUGE kawaii eyes -->
+      <g id="super-eyes" class="blink">
+        <ellipse cx="340" cy="190" rx="25" ry="28" fill="white"/>
+        <ellipse cx="410" cy="190" rx="25" ry="28" fill="white"/>
+        
+        <ellipse cx="342" cy="192" rx="20" ry="23" fill="#87CEEB">
+          <animate attributeName="ry" values="23;25;23" dur="3s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="408" cy="192" rx="20" ry="23" fill="#87CEEB">
+          <animate attributeName="ry" values="23;25;23" dur="3s" repeatCount="indefinite"/>
+        </ellipse>
+        
+        <!-- Star pupils -->
+        <g transform="translate(343, 193)">
+          <polygon points="0,-10 3,-3 10,-2 4,3 3,10 0,4 -3,10 -4,3 -10,-2 -3,-3" fill="#059669"/>
+        </g>
+        <g transform="translate(407, 193)">
+          <polygon points="0,-10 3,-3 10,-2 4,3 3,10 0,4 -3,10 -4,3 -10,-2 -3,-3" fill="#059669"/>
+        </g>
+        
+        <!-- Multiple sparkles in eyes -->
+        <circle cx="335" cy="185" r="4" fill="white" class="sparkle"/>
+        <circle cx="348" cy="195" r="3" fill="white" class="sparkle" style="animation-delay: 0.5s;"/>
+        <circle cx="403" cy="185" r="4" fill="white" class="sparkle" style="animation-delay: 0.3s;"/>
+        <circle cx="415" cy="195" r="3" fill="white" class="sparkle" style="animation-delay: 0.8s;"/>
+      </g>
+      
+      <!-- Kawaii blush -->
+      <ellipse cx="305" cy="215" rx="18" ry="10" fill="#0EA5E9" opacity="0.3" class="heartbeat"/>
+      <ellipse cx="445" cy="215" rx="18" ry="10" fill="#0EA5E9" opacity="0.3" class="heartbeat" style="animation-delay: 0.5s;"/>
+      
+      <!-- Tiny nose -->
+      <circle cx="375" cy="205" r="3" fill="#E8A390"/>
+      
+      <!-- Super happy mouth -->
+      <path d="M 345 225 Q 375 240 405 225" stroke="#2563EB" stroke-width="4" stroke-linecap="round" fill="none">
+        <animate attributeName="d" values="M 345 225 Q 375 240 405 225;M 345 225 Q 375 245 405 225;M 345 225 Q 375 240 405 225" dur="2s" repeatCount="indefinite"/>
+      </path>
+      
+      <!-- Cute dimples -->
+      <circle cx="335" cy="225" r="2" fill="#E8A390" opacity="0.5"/>
+      <circle cx="415" cy="225" r="2" fill="#E8A390" opacity="0.5"/>
+      
+      <!-- Mini neck -->
+      <rect x="360" y="275" width="30" height="20" fill="url(#kawaii-skin)"/>
+      
+      <!-- Chibi lab coat -->
+      <g id="cute-lab-coat">
+        <path d="M 300 295 Q 375 290 450 295 L 455 480 Q 375 485 295 480 Z"
+              fill="white" stroke="#2563EB" stroke-width="3"/>
+        
+        <!-- Kawaii collar -->
+        <path d="M 320 295 L 305 315 L 320 305 Q 375 300 430 305 L 445 315 L 430 295"
+              fill="#E5F3FF" stroke="#2563EB" stroke-width="2"/>
+        
+        <!-- Heart buttons -->
+        <g transform="translate(375, 350)" class="heartbeat">
+          <path d="M 0,3 C -4,-1 -8,-1 -8,3 C -8,8 -4,12 0,15 C 4,12 8,8 8,3 C 8,-1 4,-1 0,3 Z" fill="#0EA5E9"/>
+        </g>
+        <g transform="translate(375, 390)" class="heartbeat" style="animation-delay: 0.5s;">
+          <path d="M 0,3 C -4,-1 -8,-1 -8,3 C -8,8 -4,12 0,15 C 4,12 8,8 8,3 C 8,-1 4,-1 0,3 Z" fill="#0EA5E9"/>
+        </g>
+        <g transform="translate(375, 430)" class="heartbeat" style="animation-delay: 1s;">
+          <path d="M 0,3 C -4,-1 -8,-1 -8,3 C -8,8 -4,12 0,15 C 4,12 8,8 8,3 C 8,-1 4,-1 0,3 Z" fill="#0EA5E9"/>
+        </g>
+        
+        <!-- Pocket with rainbow pens -->
+        <rect x="315" y="360" width="45" height="40" fill="none" stroke="#2563EB" stroke-width="2" rx="5"/>
+        <rect x="320" y="350" width="6" height="25" fill="#059669" rx="3" class="wiggle"/>
+        <rect x="329" y="352" width="6" height="23" fill="#0EA5E9" rx="3" class="wiggle" style="animation-delay: 0.2s;"/>
+        <rect x="338" y="350" width="6" height="25" fill="#10B981" rx="3" class="wiggle" style="animation-delay: 0.4s;"/>
+        <rect x="347" y="351" width="6" height="24" fill="#2563EB" rx="3" class="wiggle" style="animation-delay: 0.6s;"/>
+      </g>
+      
+      <!-- Chubby arms -->
+      <g id="arms">
+        <!-- Left arm with beaker -->
+        <ellipse cx="280" cy="380" rx="25" ry="80" fill="url(#kawaii-skin)" transform="rotate(-15 280 380)"/>
+        <circle cx="260" cy="440" r="20" fill="url(#kawaii-skin)"/>
+        
+        <!-- Magical beaker -->
+        <g transform="translate(260, 440)" class="bounce">
+          <path d="M -20 -40 L -20 -10 L -25 25 L 25 25 L 20 -10 L 20 -40"
+                fill="none" stroke="#2563EB" stroke-width="3"/>
+          <path d="M -22 20 L -18 -5 L 18 -5 L 22 20 Q 0 23 -22 20"
+                fill="url(#rainbow-liquid)" class="glow-pulse"/>
+          
+          <!-- Animated bubbles -->
+          <circle cx="0" cy="5" r="4" fill="rgba(255,255,255,0.7)" class="bubble-float"/>
+          <circle cx="-8" cy="10" r="3" fill="rgba(255,255,255,0.7)" class="bubble-float" style="animation-delay: 0.5s"/>
+          <circle cx="7" cy="8" r="3.5" fill="rgba(255,255,255,0.7)" class="bubble-float" style="animation-delay: 1s"/>
+          <circle cx="-5" cy="12" r="2.5" fill="rgba(255,255,255,0.7)" class="bubble-float" style="animation-delay: 1.5s"/>
+          <circle cx="10" cy="6" r="3" fill="rgba(255,255,255,0.7)" class="bubble-float" style="animation-delay: 2s"/>
+        </g>
+        
+        <!-- Right arm waving -->
+        <ellipse cx="470" cy="380" rx="25" ry="80" fill="url(#kawaii-skin)" transform="rotate(15 470 380)">
+          <animateTransform attributeName="transform" type="rotate" values="15 470 380;25 470 380;15 470 380" dur="1s" repeatCount="indefinite"/>
+        </ellipse>
+        <circle cx="490" cy="440" r="20" fill="url(#kawaii-skin)">
+          <animate attributeName="cx" values="490;495;490" dur="1s" repeatCount="indefinite"/>
+        </circle>
+        
+        <!-- Peace sign fingers -->
+        <g transform="translate(490, 440)">
+          <rect x="-3" y="-20" width="6" height="20" fill="url(#kawaii-skin)" rx="3" transform="rotate(-15 0 -10)"/>
+          <rect x="-3" y="-20" width="6" height="20" fill="url(#kawaii-skin)" rx="3" transform="rotate(15 0 -10)"/>
+        </g>
+      </g>
+      
+      <!-- Stubby legs -->
+      <ellipse cx="345" cy="530" rx="30" ry="60" fill="#4169E1"/>
+      <ellipse cx="405" cy="530" rx="30" ry="60" fill="#4169E1"/>
+      
+      <!-- Cute shoes with stars -->
+      <ellipse cx="345" cy="580" rx="35" ry="15" fill="#2563EB"/>
+      <ellipse cx="405" cy="580" rx="35" ry="15" fill="#2563EB"/>
+      <text x="345" y="585" text-anchor="middle" font-size="20">⚡</text>
+      <text x="405" y="585" text-anchor="middle" font-size="20">⚡</text>
+    </g>
+    
+    <!-- SUPER CUTE MOLE FRIENDS -->
+    <g transform="translate(550, 350)" class="dance">
+      <ellipse cx="0" cy="0" rx="40" ry="35" fill="#8B7355" filter="url(#kawaii-glow)"/>
+      <ellipse cx="0" cy="8" rx="35" ry="28" fill="#A0826D"/>
+      <!-- Mole face -->
+      <ellipse cx="-12" cy="-5" rx="8" ry="10" fill="white"/>
+      <ellipse cx="12" cy="-5" rx="8" ry="10" fill="white"/>
+      <circle cx="-12" cy="-3" r="5" fill="#333" class="blink"/>
+      <circle cx="12" cy="-3" r="5" fill="#333" class="blink"/>
+      <circle cx="-14" cy="-5" r="2" fill="white"/>
+      <circle cx="10" cy="-5" r="2" fill="white"/>
+      <ellipse cx="0" cy="5" rx="7" ry="5" fill="#FFB3D9"/>
+      <path d="M -8 10 Q 0 15 8 10" stroke="#333" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- Blush -->
+      <circle cx="-20" cy="5" r="5" fill="#FFB3BA" opacity="0.6"/>
+      <circle cx="20" cy="5" r="5" fill="#FFB3BA" opacity="0.6"/>
+      <!-- Tiny paws -->
+      <ellipse cx="-20" cy="20" rx="12" ry="8" fill="#8B7355" class="wiggle"/>
+      <ellipse cx="20" cy="20" rx="12" ry="8" fill="#8B7355" class="wiggle" style="animation-delay: 0.5s;"/>
+      <!-- Label -->
+      <text x="0" y="45" text-anchor="middle" font-size="12" fill="#666">Avogadro!</text>
+    </g>
+    
+    <g transform="translate(150, 400)" class="bounce">
+      <ellipse cx="0" cy="0" rx="30" ry="25" fill="#A0826D"/>
+      <!-- Mini mole -->
+      <circle cx="-8" cy="-5" r="2" fill="#333"/>
+      <circle cx="8" cy="-5" r="2" fill="#333"/>
+      <path d="M -5 5 Q 0 8 5 5" stroke="#333" stroke-width="1" fill="none"/>
+      <text x="0" y="35" text-anchor="middle" font-size="10" fill="#666">6.022×10²³</text>
+    </g>
+    
+    <!-- Animated speech bubble -->
+    <g id="speech-bubble" class="bounce">
+      <ellipse cx="375" cy="80" rx="150" ry="60" fill="white" stroke="#0EA5E9" stroke-width="4"/>
+      <path d="M 350 130 L 340 160 L 370 135" fill="white" stroke="#0EA5E9" stroke-width="4"/>
+      <text x="375" y="65" text-anchor="middle" font-size="28" font-weight="bold" fill="#2563EB">
+        <tspan x="375" dy="0">CHEMISTRY</tspan>
+        <tspan x="375" dy="35">HAPPENS IN MOLES!</tspan>
+      </text>
+      <!-- Cute decorations in bubble -->
+      <text x="280" y="70" font-size="20">⚗️</text>
+      <text x="470" y="70" font-size="20">🧪</text>
+    </g>
+    
+    <!-- Floating hearts and stars -->
+    <g class="heartbeat">
+      <text x="100" y="300" font-size="30" fill="#0EA5E9" opacity="0.7">🔬</text>
+    </g>
+    <g class="heartbeat" style="animation-delay: 0.5s;">
+      <text x="650" y="250" font-size="25" fill="#10B981" opacity="0.7">⚛️</text>
+    </g>
+    <g class="spin-crazy">
+      <text x="200" y="600" font-size="35" fill="#059669">⚡</text>
+    </g>
+    
+    <!-- Periodic table elements bouncing -->
+    <g class="bounce">
+      <rect x="100" y="500" width="50" height="50" fill="#0EA5E9" stroke="#2563EB" stroke-width="3" rx="10"/>
+      <text x="125" y="530" text-anchor="middle" font-size="25" font-weight="bold">Au</text>
+      <text x="125" y="545" text-anchor="middle" font-size="10">Gold</text>
+    </g>
+    
+    <g class="bounce" style="animation-delay: 0.7s;">
+      <rect x="600" y="480" width="50" height="50" fill="#10B981" stroke="#059669" stroke-width="3" rx="10"/>
+      <text x="625" y="510" text-anchor="middle" font-size="25" font-weight="bold">He</text>
+      <text x="625" y="525" text-anchor="middle" font-size="10">Helium</text>
+    </g>
+    
+    <!-- Animated formulas -->
+    <text x="520" y="200" font-size="20" fill="#2563EB" opacity="0.8" class="dance">H₂O</text>
+    <text x="180" y="300" font-size="22" fill="#059669" opacity="0.8" class="dance" style="animation-delay: 1s;">CO₂</text>
+    
+    <!-- Rainbow text at bottom -->
+    <text x="375" y="750" text-anchor="middle" font-size="18" fill="#0EA5E9" font-weight="bold" class="wiggle">
+      ⚗️ MOLE-ECULARLY AESOME! ⚗️
+    </text>
+  </svg>
+</body>
+</html>

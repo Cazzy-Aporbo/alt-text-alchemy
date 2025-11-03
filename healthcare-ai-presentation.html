@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Healthcare: Strategic Implementation & Ethical Considerations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --warning: #fbbc04;
+            --dark: #202124;
+            --light: #f8f9fa;
+            --text: #5f6368;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            overflow-x: hidden;
+            background: var(--light);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(26, 115, 232, 0.1);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 80%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+            25% { transform: translateY(-100px) translateX(50px) scale(1.1); }
+            50% { transform: translateY(-50px) translateX(-30px) scale(0.9); }
+            75% { transform: translateY(-80px) translateX(-50px) scale(1.05); }
+        }
+
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 2;
+            position: relative;
+            padding: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.2);
+            animation: titleGlow 3s ease infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 2px 4px 10px rgba(0,0,0,0.2); }
+            to { text-shadow: 2px 4px 20px rgba(255,255,255,0.4); }
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .hero .author {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+
+        /* Sections */
+        .section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Framework Boxes */
+        .framework-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .framework-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-box:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .framework-letter {
+            font-size: 3rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: letterFloat 3s ease infinite;
+        }
+
+        @keyframes letterFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .framework-title {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .framework-description {
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        /* Interactive Tables */
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin: 30px 0;
+        }
+
+        .data-table thead {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(26, 115, 232, 0.05);
+            transform: scale(1.01);
+        }
+
+        /* Charts Container */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Progress Bars for Metrics */
+        .metric-container {
+            margin: 20px 0;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 15px;
+            transition: width 2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            to { left: 100%; }
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gradient);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 40px 0;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .timeline-item:nth-child(even) {
+            text-align: right;
+            transform: translateX(50px);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+            margin-right: 60px;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 60px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-dot {
+            transform: translateX(-50%) scale(1.5);
+            background: var(--primary);
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            max-width: 45%;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        /* Interactive Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 10px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Key Concepts Grid */
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .concept-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(26,115,232,0.1) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.6s ease;
+        }
+
+        .concept-card:hover::before {
+            transform: scale(1);
+        }
+
+        .concept-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .concept-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: iconPulse 2s ease infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Fairness Dashboard */
+        .dashboard {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            margin: 40px 0;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26,115,232,0.1) 0%, rgba(52,168,83,0.1) 100%);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: countUp 2s ease;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .metric-label {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Citation Links */
+        .citation {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(26,115,232,0.1);
+            color: var(--primary);
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+
+        .citation:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* References Section */
+        .references {
+            background: linear-gradient(135deg, rgba(26,115,232,0.05) 0%, rgba(118,75,162,0.05) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .reference-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .reference-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 80px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { flex-direction: column; gap: 10px; }
+            .timeline::before { left: 30px; }
+            .timeline-item { text-align: left !important; }
+            .timeline-item .timeline-content {
+                margin-left: 60px !important;
+                margin-right: 0 !important;
+                max-width: calc(100% - 60px);
+            }
+            .timeline-dot { left: 30px; }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <strong>AI Healthcare Strategy</strong>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#hero" class="nav-link active">Home</a></li>
+                <li><a href="#frameworks" class="nav-link">Frameworks</a></li>
+                <li><a href="#fairness" class="nav-link">Fairness</a></li>
+                <li><a href="#implementation" class="nav-link">Implementation</a></li>
+                <li><a href="#ethics" class="nav-link">Ethics</a></li>
+                <li><a href="#references" class="nav-link">References</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-particles">
+            <div class="particle" style="width: 30px; height: 30px; top: 10%; left: 10%;"></div>
+            <div class="particle" style="width: 20px; height: 20px; top: 20%; left: 80%;"></div>
+            <div class="particle" style="width: 40px; height: 40px; top: 60%; left: 30%;"></div>
+            <div class="particle" style="width: 15px; height: 15px; top: 80%; left: 70%;"></div>
+            <div class="particle" style="width: 25px; height: 25px; top: 40%; left: 50%;"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Integrated AI Strategy for Healthcare</h1>
+            <p class="subtitle">Building Ethical, Equitable, and Effective AI Systems</p>
+            <p class="author">Cazandra Aporbo, MS</p>
+            <a href="#frameworks" class="btn">Explore Strategy</a>
+            <a href="#implementation" class="btn">View Implementation</a>
+        </div>
+        <div class="scroll-indicator">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+                <path d="M15 20L8 13L9.4 11.6L15 17.2L20.6 11.6L22 13L15 20Z" fill="white"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Frameworks Section -->
+    <section class="section" id="frameworks">
+        <h2 class="section-title">Strategic Frameworks</h2>
+        
+        <div class="card">
+            <h3>The R.O.A.D. Framework</h3>
+            <p>A comprehensive approach to AI implementation in healthcare that addresses both technical and ethical considerations.</p>
+            
+            <div class="framework-container">
+                <div class="framework-box">
+                    <div class="framework-letter">R</div>
+                    <div class="framework-title">Requirements</div>
+                    <div class="framework-description">
+                        Define clinical decisions, costs of errors, and accountability structures. Establish clear governance and success metrics beyond accuracy.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">O</div>
+                    <div class="framework-title">Operationalize Data</div>
+                    <div class="framework-description">
+                        Address data fragmentation, historical bias, and representation gaps. Ensure consistent labeling and quality control processes.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">A</div>
+                    <div class="framework-title">Algorithm Development</div>
+                    <div class="framework-description">
+                        Integrate fairness testing, explainability, and calibration into design. Build for both performance and equity from inception.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">D</div>
+                    <div class="framework-title">Deployment</div>
+                    <div class="framework-description">
+                        Plan for drift monitoring, continuous evaluation, and post-market surveillance. Implement pragmatic RCTs in real-world settings.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Concepts Grid -->
+        <div class="card">
+            <h3>Core Implementation Concepts</h3>
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">🔬</div>
+                    <h4>Pragmatic RCTs</h4>
+                    <p>Embed randomized trials in routine care for real-world validation</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🤝</div>
+                    <h4>Clinician-AI Synergy</h4>
+                    <p>Augment human expertise rather than replacing it</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">⚖️</div>
+                    <h4>Contextual Fairness</h4>
+                    <p>Address bias as both technical and structural challenge</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <h4>Continuous Monitoring</h4>
+                    <p>Track drift, calibration, and subgroup performance</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🔍</div>
+                    <h4>Transparency</h4>
+                    <p>Make uncertainty visible and decisions explainable</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🏥</div>
+                    <h4>Learning Health Systems</h4>
+                    <p>Evolve models through continuous feedback loops</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fairness Section -->
+    <section class="section" id="fairness">
+        <h2 class="section-title">Contextual Fairness & Ethics</h2>
+        
+        <div class="card">
+            <h3>The ADAPT Framework for Fairness</h3>
+            <div class="framework-container">
+                <div class="framework-box">
+                    <div class="framework-letter">A</div>
+                    <div class="framework-title">Awareness</div>
+                    <div class="framework-description">
+                        Recognize bias as inherited from healthcare systems, not just algorithmic flaws. Understand where bias enters and spreads.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">D</div>
+                    <div class="framework-title">Diversify Data</div>
+                    <div class="framework-description">
+                        Ensure representative data collection across demographics, geographies, and care settings. Address missingness as social signal.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">A</div>
+                    <div class="framework-title">Audit</div>
+                    <div class="framework-description">
+                        Continuous subgroup calibration checks, sensitivity/specificity analysis, and drift monitoring across protected classes.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">P</div>
+                    <div class="framework-title">Publish Transparently</div>
+                    <div class="framework-description">
+                        Make bias dashboards visible, report confidence intervals for fairness gaps, and share calibration plots by subgroup.
+                    </div>
+                </div>
+                
+                <div class="framework-box">
+                    <div class="framework-letter">T</div>
+                    <div class="framework-title">Transform Infrastructure</div>
+                    <div class="framework-description">
+                        Reshape data production systems, improve documentation practices, and build accountability into EHR workflows.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fairness Dashboard -->
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <h3 class="dashboard-title">Fairness Monitoring Dashboard</h3>
+                <p>Real-time bias detection and mitigation metrics</p>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">0.92</div>
+                    <div class="metric-label">Calibration Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.05</div>
+                    <div class="metric-label">Disparity Gap</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">98%</div>
+                    <div class="metric-label">Coverage Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.88</div>
+                    <div class="metric-label">Fairness Index</div>
+                </div>
+            </div>
+            
+            <div class="metric-container">
+                <div class="metric-label">
+                    <span>Gender Parity</span>
+                    <span>94%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 94%;">94%</div>
+                </div>
+            </div>
+            
+            <div class="metric-container">
+                <div class="metric-label">
+                    <span>Racial Equity</span>
+                    <span>87%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 87%;">87%</div>
+                </div>
+            </div>
+            
+            <div class="metric-container">
+                <div class="metric-label">
+                    <span>Geographic Coverage</span>
+                    <span>78%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 78%;">78%</div>
+                </div>
+            </div>
+            
+            <div class="metric-container">
+                <div class="metric-label">
+                    <span>Socioeconomic Balance</span>
+                    <span>82%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 82%;">82%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Section -->
+    <section class="section" id="implementation">
+        <h2 class="section-title">Strategic Implementation</h2>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Phase 1: Foundation</h4>
+                    <p>Establish governance structures, define success metrics, and map clinical workflows. Build or buy only what can be validated and explained.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Phase 2: Data Preparation</h4>
+                    <p>Audit data quality, address fragmentation, and ensure representative sampling. Implement bias detection at data collection stage.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Phase 3: Development</h4>
+                    <p>Build with fairness constraints, integrate explainability, and conduct prospective validation with pragmatic RCTs.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Phase 4: Deployment</h4>
+                    <p>Silent runs first, randomized reveal second. Continuous monitoring of drift, calibration, and subgroup performance.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4>Phase 5: Evolution</h4>
+                    <p>Learning health system with embedded evaluation, feedback loops, and continuous improvement cycles.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evidence Table -->
+        <div class="card">
+            <h3>Evidence-Based Best Practices</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Practice Area</th>
+                        <th>Key Evidence</th>
+                        <th>Implementation Strategy</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pragmatic RCTs</td>
+                        <td>Observational studies inflate perceived benefit</td>
+                        <td>Embed trials in routine workflows</td>
+                        <td><a href="#" class="citation">Byrne 2025</a></td>
+                    </tr>
+                    <tr>
+                        <td>Bias Mitigation</td>
+                        <td>Cost as proxy for illness systematically disadvantages minorities</td>
+                        <td>Use clinical outcomes, not utilization metrics</td>
+                        <td><a href="#" class="citation">Obermeyer 2019</a></td>
+                    </tr>
+                    <tr>
+                        <td>Network Effects</td>
+                        <td>Informal leaders drive adoption more than hierarchy</td>
+                        <td>Map influence networks, recruit peer champions</td>
+                        <td><a href="#" class="citation">McCulloh 2025</a></td>
+                    </tr>
+                    <tr>
+                        <td>Transparency</td>
+                        <td>Explainability ≠ understanding</td>
+                        <td>Focus on helping clinicians think better, not just explaining model</td>
+                        <td><a href="#" class="citation">Ghassemi 2021</a></td>
+                    </tr>
+                    <tr>
+                        <td>Continuous Learning</td>
+                        <td>Static models degrade under distribution shift</td>
+                        <td>Implement drift detection and adaptive retraining</td>
+                        <td><a href="#" class="citation">Davis 2020</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Ethics Section -->
+    <section class="section" id="ethics">
+        <h2 class="section-title">Ethical Considerations</h2>
+        
+        <div class="card">
+            <h3>Core Ethical Principles</h3>
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">👥</div>
+                    <h4>Interdependent Ownership</h4>
+                    <p>Models should belong to populations whose data trained them</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🔒</div>
+                    <h4>Ethics of Ephemerality</h4>
+                    <p>Right to be forgotten as central as right to be remembered</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🌍</div>
+                    <h4>Intergenerational Ethics</h4>
+                    <p>Responsibility to future patients who inherit today's biases</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📢</div>
+                    <h4>Transparency as Compassion</h4>
+                    <p>Models that show limits respect clinicians and patients</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>What NOT to Do</h3>
+            <ul style="line-height: 2; padding-left: 20px;">
+                <li>❌ Deploy black-box models without calibrated probabilities</li>
+                <li>❌ Scale algorithms trained on single-site retrospective data</li>
+                <li>❌ Hide sensitive variables to appear "objective"</li>
+                <li>❌ Equate cost efficiency with care quality</li>
+                <li>❌ Ignore subgroup performance in favor of aggregate metrics</li>
+                <li>❌ Rush deployment without prospective validation</li>
+            </ul>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="card">
+            <h3>Key Insights from Research</h3>
+            <blockquote style="border-left: 4px solid var(--primary); padding-left: 20px; margin: 20px 0; font-style: italic;">
+                "Bias is not an algorithmic crime; it's a social inheritance. Fairness is not a checkbox; it's a practice we rehearse until the system learns empathy."
+                <footer style="margin-top: 10px; font-style: normal;">— Cazandra Aporbo, Contextual Fairness</footer>
+            </blockquote>
+            
+            <blockquote style="border-left: 4px solid var(--secondary); padding-left: 20px; margin: 20px 0; font-style: italic;">
+                "The future of medicine is not a dashboard. It's a conversation—one that includes every voice that data once ignored."
+                <footer style="margin-top: 10px; font-style: normal;">— Integrated AI Strategy</footer>
+            </blockquote>
+            
+            <blockquote style="border-left: 4px solid var(--accent); padding-left: 20px; margin: 20px 0; font-style: italic;">
+                "AI's highest role is as an extension of human cognition. At its best it amplifies; it shouldn't constrain; it should expand what it means to think with care."
+                <footer style="margin-top: 10px; font-style: normal;">— Clinician-AI Synergy</footer>
+            </blockquote>
+        </div>
+    </section>
+
+    <!-- References Section -->
+    <section class="section" id="references">
+        <h2 class="section-title">Key References & Sources</h2>
+        
+        <div class="references">
+            <div class="reference-item">
+                <strong>Obermeyer, Z., et al. (2019)</strong><br>
+                "Dissecting racial bias in an algorithm used to manage the health of populations"<br>
+                <em>Science, 366(6464), 447-453</em><br>
+                <a href="https://doi.org/10.1126/science.aax2342" target="_blank" class="btn" style="padding: 5px 15px; font-size: 0.9rem;">View Paper</a>
+            </div>
+            
+            <div class="reference-item">
+                <strong>Byrne, D. W. (2025)</strong><br>
+                "Artificial Intelligence for Improved Patient Outcomes: The Pragmatic Randomized Controlled Trial Is the Secret Sauce"<br>
+                <em>Johns Hopkins Course Material</em>
+            </div>
+            
+            <div class="reference-item">
+                <strong>Rajkomar, A., et al. (2018)</strong><br>
+                "Ensuring fairness in machine learning to advance health equity"<br>
+                <em>Annals of Internal Medicine, 169(12), 866-872</em>
+            </div>
+            
+            <div class="reference-item">
+                <strong>National Academy of Medicine (2022)</strong><br>
+                "Artificial intelligence in health care: The hope, the hype, the promise, the peril"<br>
+                <a href="https://nam.edu/artificial-intelligence-special-publication/" target="_blank" class="btn" style="padding: 5px 15px; font-size: 0.9rem;">View Report</a>
+            </div>
+            
+            <div class="reference-item">
+                <strong>Ghassemi, M., et al. (2021)</strong><br>
+                "The false hope of current approaches to explainable artificial intelligence in health care"<br>
+                <em>The Lancet Digital Health, 3(11), e745-e750</em>
+            </div>
+            
+            <div class="reference-item">
+                <strong>El Arab, R. A., et al. (2025)</strong><br>
+                "Bridging the gap from AI success in clinical trials to real-world healthcare implementation"<br>
+                <em>Healthcare, 13, 701</em>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Cazandra Aporbo, MS | AI Strategy & Communication</p>
+        <p>Building Ethical AI for Equitable Healthcare</p>
+    </footer>
+
+    <script>
+        // Page Load Animation
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 500);
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            
+            // Update active nav link
+            const sections = document.querySelectorAll('section[id]');
+            const scrollY = window.scrollY + 200;
+            
+            sections.forEach(section => {
+                const sectionHeight = section.offsetHeight;
+                const sectionTop = section.offsetTop;
+                const sectionId = section.getAttribute('id');
+                
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    document.querySelector(`.nav-link[href="#${sectionId}"]`)?.classList.add('active');
+                }
+            });
+        });
+
+        // Intersection Observer for Section Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Animate progress bars when fairness section is visible
+                    if (entry.target.id === 'fairness') {
+                        animateProgressBars();
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Timeline Animation
+        const timelineObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 200);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            timelineObserver.observe(item);
+        });
+
+        // Animate Progress Bars
+        function animateProgressBars() {
+            const progressFills = document.querySelectorAll('.progress-fill');
+            progressFills.forEach(fill => {
+                const targetWidth = fill.style.width;
+                fill.style.width = '0';
+                setTimeout(() => {
+                    fill.style.width = targetWidth;
+                }, 100);
+            });
+        }
+
+        // Particle Animation Enhancement
+        function createParticle() {
+            const particlesContainer = document.querySelector('.hero-particles');
+            if (!particlesContainer) return;
+            
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 30 + 10 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            
+            particlesContainer.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 30000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 3000);
+
+        // Interactive Concept Cards
+        document.querySelectorAll('.concept-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.1) rotate(5deg)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 300);
+            });
+        });
+
+        // Counter Animation for Metrics
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = current.toFixed(current < 10 ? 2 : 0) + (element.dataset.suffix || '');
+            }, 16);
+        }
+
+        // Trigger counter animation when metrics are visible
+        const metricsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.dataset.animated) {
+                    const value = parseFloat(entry.target.textContent);
+                    if (!isNaN(value)) {
+                        animateCounter(entry.target, value);
+                        entry.target.dataset.animated = 'true';
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.metric-value').forEach(metric => {
+            metricsObserver.observe(metric);
+        });
+
+        // Dynamic Chart Simulation (Canvas-based)
+        function createChart(containerId, type = 'line') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = container.offsetWidth - 60;
+            canvas.height = 300;
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            const data = generateRandomData(12);
+            
+            if (type === 'line') {
+                drawLineChart(ctx, data, canvas.width, canvas.height);
+            } else if (type === 'bar') {
+                drawBarChart(ctx, data, canvas.width, canvas.height);
+            }
+        }
+
+        function generateRandomData(points) {
+            return Array.from({length: points}, () => Math.random() * 100);
+        }
+
+        function drawLineChart(ctx, data, width, height) {
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            const stepX = width / (data.length - 1);
+            const maxValue = Math.max(...data);
+            
+            data.forEach((value, index) => {
+                const x = index * stepX;
+                const y = height - (value / maxValue * height * 0.8);
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+        }
+
+        function drawBarChart(ctx, data, width, height) {
+            const barWidth = width / data.length * 0.8;
+            const maxValue = Math.max(...data);
+            
+            data.forEach((value, index) => {
+                const x = index * (width / data.length) + barWidth * 0.1;
+                const barHeight = value / maxValue * height * 0.8;
+                const y = height - barHeight;
+                
+                const gradient = ctx.createLinearGradient(0, y, 0, height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, barWidth, barHeight);
+            });
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.concept-card').forEach(card => {
+                    card.style.transform = '';
+                });
+            }
+        });
+
+        // Print Styles
+        window.addEventListener('beforeprint', () => {
+            document.body.classList.add('printing');
+        });
+
+        window.addEventListener('afterprint', () => {
+            document.body.classList.remove('printing');
+        });
+    </script>
+</body>
+</html>

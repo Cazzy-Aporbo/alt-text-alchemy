@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMFP | Bioelectric Morphogenetic Field Programmer</title>
+    
+    <style>
+        /* Nordic-NZ Typography */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&family=Playfair+Display:wght@400;700&display=swap');
+        
+        :root {
+            /* New Zealand Nordic Color Palette */
+            --pounamu-green: #1a3d2e;
+            --forest-mist: #2d5241;
+            --fjord-blue: #1e3a5f;
+            --glacier-ice: #e8f4f8;
+            --volcanic-black: #0a0c0f;
+            --southern-alps: #d4dde1;
+            --manuka-honey: #d4a574;
+            --aurora-green: #00ff9d;
+            --nordic-grey: #9ca3af;
+            --snow-white: #fafbfc;
+            
+            /* Gradients */
+            --bioelectric-gradient: linear-gradient(135deg, #00ff9d, #1e3a5f, #1a3d2e);
+            --morphic-gradient: radial-gradient(circle at 30% 20%, rgba(0, 255, 157, 0.15), transparent 50%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #0a0c0f 0%, #1a3d2e 50%, #1e3a5f 100%);
+            color: var(--glacier-ice);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Particle Field Background */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.6;
+        }
+        
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation - Nordic Minimal */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 12, 15, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--bioelectric-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--glacier-ice);
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--aurora-green);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--aurora-green);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 120px 20px 80px;
+            position: relative;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 200;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+        
+        .hero-title .highlight {
+            font-weight: 600;
+            background: var(--bioelectric-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: var(--nordic-grey);
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+        
+        /* Glass Morphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--morphic-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 157, 0.2);
+        }
+        
+        /* Bioelectric Pattern Visualization */
+        .pattern-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+        
+        #bioelectricCanvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Feature Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--bioelectric-gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--glacier-ice);
+        }
+        
+        .feature-description {
+            color: var(--nordic-grey);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        /* Kingdom Selector */
+        .kingdom-selector {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+        
+        .kingdom-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: var(--glacier-ice);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        .kingdom-btn:hover {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: var(--aurora-green);
+            transform: translateY(-2px);
+        }
+        
+        .kingdom-btn.active {
+            background: var(--bioelectric-gradient);
+            border-color: transparent;
+            color: var(--volcanic-black);
+            font-weight: 600;
+        }
+        
+        /* Control Panel */
+        .control-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+        
+        .slider-container {
+            margin: 30px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--nordic-grey);
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--aurora-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+        
+        /* Status Display */
+        .status-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .status-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        
+        .status-value {
+            font-size: 2rem;
+            font-weight: 600;
+            background: var(--bioelectric-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-label {
+            font-size: 0.85rem;
+            color: var(--nordic-grey);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            padding: 15px 40px;
+            background: var(--bioelectric-gradient);
+            border: none;
+            border-radius: 50px;
+            color: var(--volcanic-black);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(0, 255, 157, 0.3);
+        }
+        
+        /* Morphogenetic Visualization */
+        .morph-viz {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .morph-cell {
+            aspect-ratio: 1;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .morph-cell:hover {
+            background: rgba(0, 255, 157, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .morph-cell.active {
+            background: var(--aurora-green);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--aurora-green), transparent);
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            padding: 20px 40px;
+        }
+        
+        .timeline-marker {
+            width: 20px;
+            height: 20px;
+            background: var(--aurora-green);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 80px 20px 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 100px;
+        }
+        
+        .footer-text {
+            color: var(--nordic-grey);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        /* Māori Pattern Overlay */
+        .koru-pattern {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.05;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 10 Q 80 40 50 70 Q 20 40 50 10" fill="none" stroke="white" stroke-width="1"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-line {
+                left: 20px;
+            }
+            
+            .timeline-item {
+                flex-direction: column !important;
+                margin-left: 40px;
+            }
+            
+            .timeline-marker {
+                left: 20px;
+            }
+        }
+        
+        /* Loading Animation */
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 255, 157, 0.1);
+            border-top-color: var(--aurora-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Field Canvas -->
+    <canvas id="particleCanvas"></canvas>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-content">
+            <div class="logo">BMFP</div>
+            <ul class="nav-links">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#capabilities">Capabilities</a></li>
+                <li><a href="#demonstration">Demo</a></li>
+                <li><a href="#research">Research</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">
+                <span class="highlight">Bioelectric</span> Morphogenetic<br>
+                Field Programmer
+            </h1>
+            <p class="hero-subtitle">
+                Cross-Kingdom Biological Programming Through Integrated Field Manipulation
+            </p>
+            
+            <!-- Status Display -->
+            <div class="status-display">
+                <div class="status-item">
+                    <div class="status-value">7</div>
+                    <div class="status-label">Kingdoms</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">∞</div>
+                    <div class="status-label">Morphologies</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">95%</div>
+                    <div class="status-label">Confidence</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">0ms</div>
+                    <div class="status-label">Latency</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Koru Pattern -->
+        <div class="koru-pattern" style="top: 10%; right: 10%;"></div>
+        <div class="koru-pattern" style="bottom: 10%; left: 10%; animation-delay: -10s;"></div>
+    </section>
+    
+    <!-- Overview Section -->
+    <section id="overview" class="container">
+        <div class="glass-card">
+            <h2 style="font-size: 2.5rem; margin-bottom: 30px; font-weight: 300;">
+                Revolutionary <span style="color: var(--aurora-green);">Biological Control</span>
+            </h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: var(--nordic-grey); margin-bottom: 30px;">
+                The BMFP system represents a paradigm shift in biological engineering, manipulating the fundamental fields 
+                that govern life itself. By integrating bioelectric patterns, epigenetic programming, and cross-kingdom 
+                communication, we can direct biological form and function without genetic modification.
+            </p>
+            
+            <!-- Bioelectric Pattern Visualization -->
+            <div class="pattern-container">
+                <canvas id="bioelectricCanvas"></canvas>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Capabilities Grid -->
+    <section id="capabilities" class="container">
+        <h2 style="text-align: center; font-size: 2.5rem; margin: 60px 0; font-weight: 300;">
+            Core <span style="color: var(--aurora-green);">Capabilities</span>
+        </h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Bioelectric Programming</h3>
+                <p class="feature-description">
+                    Direct morphological outcomes through voltage gradient manipulation. 
+                    Based on Michael Levin's groundbreaking work at Tufts University.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🧬</div>
+                <h3 class="feature-title">Epigenetic Control</h3>
+                <p class="feature-description">
+                    Reprogram gene expression without DNA modification using methylation 
+                    waves and histone remodeling techniques.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔊</div>
+                <h3 class="feature-title">Sonogenetics</h3>
+                <p class="feature-description">
+                    Non-invasive cellular control through ultrasound-responsive proteins 
+                    like Piezo1 and mechanosensitive channels.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌿</div>
+                <h3 class="feature-title">Cross-Kingdom Communication</h3>
+                <p class="feature-description">
+                    Establish biological networks between plants, animals, and fungi using 
+                    universal signaling molecules.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Regeneration Control</h3>
+                <p class="feature-description">
+                    Program complex organ regeneration in non-regenerative species through 
+                    bioelectric pattern templates.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⏳</div>
+                <h3 class="feature-title">Age Reversal</h3>
+                <p class="feature-description">
+                    Reverse biological aging by resetting bioelectric and epigenetic states 
+                    to younger configurations.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Interactive Demonstration -->
+    <section id="demonstration" class="container">
+        <div class="glass-card">
+            <h2 style="font-size: 2rem; margin-bottom: 30px; text-align: center;">
+                Interactive <span style="color: var(--aurora-green);">Morphogenetic Control</span>
+            </h2>
+            
+            <!-- Kingdom Selector -->
+            <div class="kingdom-selector">
+                <button class="kingdom-btn active" data-kingdom="animalia">Animalia</button>
+                <button class="kingdom-btn" data-kingdom="plantae">Plantae</button>
+                <button class="kingdom-btn" data-kingdom="fungi">Fungi</button>
+                <button class="kingdom-btn" data-kingdom="protista">Protista</button>
+                <button class="kingdom-btn" data-kingdom="bacteria">Bacteria</button>
+            </div>
+            
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Voltage Gradient</span>
+                        <span id="voltageValue">-70 mV</span>
+                    </div>
+                    <input type="range" class="slider" id="voltageSlider" min="-120" max="-20" value="-70">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Ion Channel Distribution</span>
+                        <span id="ionValue">50%</span>
+                    </div>
+                    <input type="range" class="slider" id="ionSlider" min="0" max="100" value="50">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Gap Junction Connectivity</span>
+                        <span id="gapValue">75%</span>
+                    </div>
+                    <input type="range" class="slider" id="gapSlider" min="0" max="100" value="75">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Morphogenetic Field Strength</span>
+                        <span id="fieldValue">60%</span>
+                    </div>
+                    <input type="range" class="slider" id="fieldSlider" min="0" max="100" value="60">
+                </div>
+            </div>
+            
+            <!-- Morphogenetic Visualization Grid -->
+            <div class="morph-viz" id="morphGrid"></div>
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px;">
+                <button class="action-btn" onclick="startRegeneration()">Initiate Regeneration</button>
+                <button class="action-btn" onclick="normalizePattern()">Normalize Pattern</button>
+                <button class="action-btn" onclick="reverseAging()">Reverse Aging Protocol</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Research Timeline -->
+    <section id="research" class="container">
+        <h2 style="text-align: center; font-size: 2.5rem; margin: 80px 0 40px; font-weight: 300;">
+            Scientific <span style="color: var(--aurora-green);">Foundation</span>
+        </h2>
+        
+        <div class="timeline">
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>2012 - Bioelectric Code Discovery</h3>
+                    <p>Michael Levin demonstrates bioelectric patterns control anatomical development</p>
+                </div>
+                <div class="timeline-marker"></div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>2016 - Yamanaka Factor Age Reversal</h3>
+                    <p>Partial epigenetic reprogramming reverses aging in mice</p>
+                </div>
+                <div class="timeline-marker"></div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>2020 - Sonogenetics Breakthrough</h3>
+                    <p>Ultrasound-responsive proteins enable non-invasive cell control</p>
+                </div>
+                <div class="timeline-marker"></div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>2023 - Plant Electrome Mapping</h3>
+                    <p>Complete electrical signaling networks discovered in plants</p>
+                </div>
+                <div class="timeline-marker"></div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>2024 - Cross-Kingdom Integration</h3>
+                    <p>BMFP system achieves unified biological field programming</p>
+                </div>
+                <div class="timeline-marker"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <p class="footer-text">
+                Bioelectric Morphogenetic Field Programmer<br>
+                Integrating Nordic minimalism with Aotearoa's natural wisdom<br>
+                <span style="color: var(--aurora-green);">Programming Life • Shaping Evolution</span>
+            </p>
+            <div style="margin-top: 30px;">
+                <p class="footer-text" style="font-size: 0.8rem;">
+                    Based on research from Tufts University, Salk Institute, and leading laboratories worldwide<br>
+                    © 2024 BMFP | Advancing Biological Programming
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Particle Field Animation
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.5 + 0.3;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 255, 157, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+        
+        // Initialize particles
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            // Draw connections
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(0, 255, 157, ${0.1 * (1 - dist/100)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Bioelectric Pattern Visualization
+        const bioCanvas = document.getElementById('bioelectricCanvas');
+        const bioCtx = bioCanvas.getContext('2d');
+        bioCanvas.width = bioCanvas.offsetWidth;
+        bioCanvas.height = bioCanvas.offsetHeight;
+        
+        function drawBioelectricPattern() {
+            const time = Date.now() * 0.001;
+            const imageData = bioCtx.createImageData(bioCanvas.width, bioCanvas.height);
+            
+            for (let x = 0; x < bioCanvas.width; x++) {
+                for (let y = 0; y < bioCanvas.height; y++) {
+                    const index = (y * bioCanvas.width + x) * 4;
+                    
+                    // Create voltage gradient pattern
+                    const voltage = Math.sin(x * 0.02 + time) * Math.cos(y * 0.02 + time) * 127 + 128;
+                    const gradient = Math.sin(Math.sqrt(x*x + y*y) * 0.01 - time) * 127 + 128;
+                    
+                    imageData.data[index] = voltage * 0.1;     // R
+                    imageData.data[index + 1] = gradient * 0.7; // G
+                    imageData.data[index + 2] = voltage * 0.3;  // B
+                    imageData.data[index + 3] = 100;            // A
+                }
+            }
+            
+            bioCtx.putImageData(imageData, 0, 0);
+            requestAnimationFrame(drawBioelectricPattern);
+        }
+        
+        drawBioelectricPattern();
+        
+        // Morphogenetic Grid Initialization
+        const morphGrid = document.getElementById('morphGrid');
+        for (let i = 0; i < 100; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'morph-cell';
+            cell.addEventListener('click', () => {
+                cell.classList.toggle('active');
+                updateFieldPattern();
+            });
+            morphGrid.appendChild(cell);
+        }
+        
+        // Slider Updates
+        document.getElementById('voltageSlider').addEventListener('input', (e) => {
+            document.getElementById('voltageValue').textContent = e.target.value + ' mV';
+            updateFieldPattern();
+        });
+        
+        document.getElementById('ionSlider').addEventListener('input', (e) => {
+            document.getElementById('ionValue').textContent = e.target.value + '%';
+            updateFieldPattern();
+        });
+        
+        document.getElementById('gapSlider').addEventListener('input', (e) => {
+            document.getElementById('gapValue').textContent = e.target.value + '%';
+            updateFieldPattern();
+        });
+        
+        document.getElementById('fieldSlider').addEventListener('input', (e) => {
+            document.getElementById('fieldValue').textContent = e.target.value + '%';
+            updateFieldPattern();
+        });
+        
+        // Kingdom Selector
+        document.querySelectorAll('.kingdom-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.kingdom-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateKingdomParameters(btn.dataset.kingdom);
+            });
+        });
+        
+        function updateKingdomParameters(kingdom) {
+            const params = {
+                animalia: { voltage: -70, ion: 50, gap: 75, field: 60 },
+                plantae: { voltage: -120, ion: 30, gap: 60, field: 70 },
+                fungi: { voltage: -90, ion: 40, gap: 85, field: 80 },
+                protista: { voltage: -60, ion: 60, gap: 40, field: 50 },
+                bacteria: { voltage: -50, ion: 70, gap: 30, field: 40 }
+            };
+            
+            const p = params[kingdom];
+            document.getElementById('voltageSlider').value = p.voltage;
+            document.getElementById('ionSlider').value = p.ion;
+            document.getElementById('gapSlider').value = p.gap;
+            document.getElementById('fieldSlider').value = p.field;
+            
+            document.getElementById('voltageValue').textContent = p.voltage + ' mV';
+            document.getElementById('ionValue').textContent = p.ion + '%';
+            document.getElementById('gapValue').textContent = p.gap + '%';
+            document.getElementById('fieldValue').textContent = p.field + '%';
+            
+            updateFieldPattern();
+        }
+        
+        function updateFieldPattern() {
+            const cells = document.querySelectorAll('.morph-cell');
+            const voltage = parseFloat(document.getElementById('voltageSlider').value);
+            const field = parseFloat(document.getElementById('fieldSlider').value);
+            
+            cells.forEach((cell, i) => {
+                const x = i % 10;
+                const y = Math.floor(i / 10);
+                const distance = Math.sqrt((x-5)**2 + (y-5)**2);
+                const intensity = Math.exp(-distance * 0.3) * field / 100;
+                
+                if (intensity > 0.5 && !cell.classList.contains('active')) {
+                    setTimeout(() => {
+                        cell.style.background = `rgba(0, 255, 157, ${intensity})`;
+                    }, distance * 50);
+                }
+            });
+        }
+        
+        // Action Button Functions
+        function startRegeneration() {
+            const cells = document.querySelectorAll('.morph-cell');
+            cells.forEach((cell, i) => {
+                setTimeout(() => {
+                    cell.classList.add('active');
+                    setTimeout(() => cell.classList.remove('active'), 1000);
+                }, i * 20);
+            });
+        }
+        
+        function normalizePattern() {
+            const cells = document.querySelectorAll('.morph-cell');
+            cells.forEach(cell => {
+                cell.classList.remove('active');
+                cell.style.background = 'rgba(0, 255, 157, 0.1)';
+            });
+        }
+        
+        function reverseAging() {
+            const cells = document.querySelectorAll('.morph-cell');
+            for (let wave = 0; wave < 3; wave++) {
+                setTimeout(() => {
+                    cells.forEach((cell, i) => {
+                        const delay = Math.sin(i * 0.5) * 100;
+                        setTimeout(() => {
+                            cell.style.background = 'rgba(0, 255, 157, 0.8)';
+                            setTimeout(() => {
+                                cell.style.background = 'rgba(0, 255, 157, 0.1)';
+                            }, 200);
+                        }, delay);
+                    });
+                }, wave * 500);
+            }
+        }
+        
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

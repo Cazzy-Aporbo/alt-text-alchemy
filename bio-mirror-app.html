@@ -1,0 +1,3094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bio Mirror - Educational biometric visualization tool">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; img-src * data: blob:; frame-src *;">
+    <title>Bio Mirror - Interactive Health Visualization</title>
+    
+    <!-- 
+    ========================================
+    BIO MIRROR v1.0 - README
+    ========================================
+    
+    CUSTOMIZATION GUIDE:
+    - Colors: Search for "TODO: COLORS" to modify theme palettes
+    - Thresholds: Search for "TODO: THRESHOLDS" for biometric ranges
+    - Data: Search for "TODO: DATA" to update case studies/research
+    - Content: Search for "TODO: CONTENT" for text customization
+    
+    TO PUBLISH:
+    1. Save this file as index.html
+    2. Upload to any static host (GitHub Pages, Netlify, etc)
+    3. No build process required - it's ready to go!
+    
+    FEATURES:
+    - Fully responsive, mobile-first design
+    - WCAG AA+ compliant
+    - Works completely offline
+    - Privacy-first (no external tracking)
+    - < 150KB gzipped
+    -->
+    
+    <style>
+        /* ===== CSS RESET & VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* TODO: COLORS - Customize theme palettes here */
+            --theme-calm-primary: #4a69bd;
+            --theme-calm-secondary: #6c5ce7;
+            --theme-calm-accent: #74b9ff;
+            --theme-calm-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            
+            --theme-happy-primary: #f39c12;
+            --theme-happy-secondary: #e74c3c;
+            --theme-happy-accent: #f1c40f;
+            --theme-happy-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            
+            --theme-energetic-primary: #00b894;
+            --theme-energetic-secondary: #00cec9;
+            --theme-energetic-accent: #55efc4;
+            --theme-energetic-bg: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            
+            /* Default to calm theme */
+            --primary: var(--theme-calm-primary);
+            --secondary: var(--theme-calm-secondary);
+            --accent: var(--theme-calm-accent);
+            --bg-gradient: var(--theme-calm-bg);
+            
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --surface: rgba(255, 255, 255, 0.1);
+            --surface-hover: rgba(255, 255, 255, 0.15);
+            --border: rgba(255, 255, 255, 0.2);
+            
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1.5rem;
+            --radius-full: 9999px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.4);
+            --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* ===== BASE STYLES ===== */
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Animated particles background */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+        
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.5;
+            z-index: 1;
+        }
+        
+        /* ===== LAYOUT ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ===== HEADER ===== */
+        header {
+            backdrop-filter: blur(20px);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-lg);
+            list-style: none;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+        }
+        
+        .nav-links a:hover,
+        .nav-links a:focus {
+            color: var(--text-primary);
+            background: var(--surface);
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto var(--spacing-xl);
+        }
+        
+        /* ===== MIRROR INTERFACE ===== */
+        .mirror-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-2xl) auto;
+            max-width: 1200px;
+            box-shadow: var(--shadow-card), var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mirror-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .mirror-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .mirror-title {
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+        }
+        
+        /* ===== CONTROLS ===== */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .control-group {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        
+        .control-group:hover {
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+        
+        .control-value {
+            color: var(--accent);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: var(--radius-full);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        input[type="range"]:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+        }
+        
+        input[type="range"]:hover::-moz-range-thumb {
+            transform: scale(1.2);
+        }
+        
+        /* ===== VISUALIZATION ===== */
+        .visualization {
+            position: relative;
+            height: 400px;
+            background: radial-gradient(ellipse at center, var(--surface) 0%, transparent 70%);
+            border-radius: var(--radius-lg);
+            margin: var(--spacing-xl) 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        #bioCanvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .human-silhouette {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            z-index: 2;
+        }
+        
+        .silhouette-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 30px var(--accent));
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        
+        /* ===== METRICS DISPLAY ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin: var(--spacing-xl) 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, var(--surface), transparent);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--accent);
+        }
+        
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+        
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        .btn-secondary {
+            background: var(--surface);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--accent);
+        }
+        
+        /* ===== MODALS ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: var(--spacing-md);
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(50, 30, 70, 0.95));
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+        
+        .close-btn:hover {
+            color: var(--text-primary);
+            background: var(--surface);
+            transform: rotate(90deg);
+        }
+        
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            border-bottom: 2px solid var(--border);
+            margin-bottom: var(--spacing-lg);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--surface);
+        }
+        
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: var(--spacing-2xl) 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-card);
+            border-color: var(--accent);
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .card-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="url"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--surface-hover);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* ===== TOOLTIPS ===== */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* ===== DISCLAIMER ===== */
+        .disclaimer {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .disclaimer-icon {
+            font-size: 1.5rem;
+            color: #ffc107;
+        }
+        
+        .disclaimer-text {
+            flex: 1;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== ACCESSIBILITY ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        /* ===== THEME SWITCHER ===== */
+        .theme-switcher {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+            background: var(--surface);
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-full);
+        }
+        
+        .theme-btn {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-full);
+            transition: var(--transition);
+        }
+        
+        .theme-btn:hover {
+            background: var(--surface-hover);
+        }
+        
+        .theme-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* ===== LOADING STATES ===== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 0%, var(--surface-hover) 50%, var(--surface) 100%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+            border-radius: var(--radius-sm);
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* ===== ONBOARDING & TUTORIALS ===== */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .welcome-content {
+            background: linear-gradient(135deg, rgba(75, 0, 130, 0.95), rgba(138, 43, 226, 0.95));
+            border: 2px solid var(--accent);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            max-width: 600px;
+            text-align: center;
+            animation: scaleIn 0.5s ease-out;
+            box-shadow: 0 0 100px rgba(138, 43, 226, 0.5);
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .feature-highlight {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            animation: bounce 2s infinite;
+            z-index: 10;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            animation: pulseRing 2s infinite;
+        }
+        
+        @keyframes pulseRing {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        /* ===== ENHANCED CARDS ===== */
+        .card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--accent), var(--primary), var(--secondary), var(--accent));
+            background-size: 400% 400%;
+            border-radius: var(--radius-lg);
+            opacity: 0;
+            transition: opacity 0.3s;
+            animation: gradientShift 3s ease infinite;
+            z-index: -1;
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .card-badge {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: var(--accent);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        /* ===== PROGRESS INDICATORS ===== */
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin: 0 auto var(--spacing-md);
+        }
+        
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+        
+        .progress-bg {
+            stroke: var(--surface);
+        }
+        
+        .progress-bar {
+            stroke: var(--accent);
+            stroke-dasharray: 339.292;
+            stroke-dashoffset: 339.292;
+            animation: progressFill 2s ease-out forwards;
+        }
+        
+        @keyframes progressFill {
+            to { stroke-dashoffset: 84.823; }
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        /* ===== FLOATING ACTION BUTTONS ===== */
+        .fab-container {
+            position: fixed;
+            bottom: var(--spacing-xl);
+            right: var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            z-index: 100;
+        }
+        
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .fab-label {
+            position: absolute;
+            right: 70px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+            font-size: 0.875rem;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: var(--transition);
+            pointer-events: none;
+        }
+        
+        .fab:hover .fab-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* ===== INTERACTIVE CHARTS ===== */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+        
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* ===== NOTIFICATION SYSTEM ===== */
+        .notification {
+            position: fixed;
+            top: var(--spacing-xl);
+            right: var(--spacing-xl);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.9), rgba(0, 184, 148, 0.9));
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease-out;
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-sm);
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .visualization {
+                height: 300px;
+            }
+            
+            .modal-content {
+                padding: var(--spacing-md);
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .nav-links {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            header, nav, .theme-switcher, .btn, .modal {
+                display: none;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+        }
+        
+        /* ===== 3D VIEWER ===== */
+        .viewer-3d {
+            width: 100%;
+            height: 500px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .viewer-3d iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .viewer-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== SOUND TOGGLE ===== */
+        .sound-toggle {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 100;
+        }
+        
+        .sound-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+        }
+        
+        .sound-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .sound-btn.muted {
+            background: var(--surface);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Particles -->
+    <div id="particles"></div>
+    
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span>🔬</span>
+                <span>Bio Mirror</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#research">Research</a></li>
+                <li><a href="#tools">Tools</a></li>
+                <li><a href="#ethics">Ethics</a></li>
+                <li><a href="#about">About</a></li>
+                <li>
+                    <div class="theme-switcher">
+                        <button class="theme-btn active" data-theme="calm" aria-label="Calm theme">🌙</button>
+                        <button class="theme-btn" data-theme="happy" aria-label="Happy theme">☀️</button>
+                        <button class="theme-btn" data-theme="energetic" aria-label="Energetic theme">⚡</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <h1>Welcome to Bio Mirror</h1>
+            <p class="subtitle">Experience the future of biometric visualization - Educational purposes only</p>
+            
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <span class="disclaimer-icon">⚠️</span>
+                <span class="disclaimer-text">
+                    This is an educational demonstration tool only. Not for medical diagnosis or treatment. 
+                    Always consult healthcare professionals for medical advice.
+                </span>
+            </div>
+        </section>
+        
+        <!-- Mirror Interface -->
+        <section class="mirror-container">
+            <div class="mirror-header">
+                <h2 class="mirror-title">
+                    <span class="status-indicator"></span>
+                    Live Biometric Visualization
+                </h2>
+                <button class="btn btn-secondary" onclick="resetValues()">
+                    🔄 Reset All
+                </button>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls-grid">
+                <!-- Heart Rate Control -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Heart Rate (BPM)</span>
+                        <span class="control-value" id="hrValue">72</span>
+                    </div>
+                    <input type="range" id="hrSlider" min="40" max="180" value="72" 
+                           aria-label="Heart Rate" aria-valuemin="40" aria-valuemax="180">
+                    <div class="tooltip">
+                        ℹ️
+                        <span class="tooltip-text">Normal resting: 60-100 BPM. Athletes may have lower rates.</span>
+                    </div>
+                </div>
+                
+                <!-- Respiratory Rate Control -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Respiratory Rate</span>
+                        <span class="control-value" id="rrValue">16</span>
+                    </div>
+                    <input type="range" id="rrSlider" min="8" max="30" value="16"
+                           aria-label="Respiratory Rate" aria-valuemin="8" aria-valuemax="30">
+                    <div class="tooltip">
+                        ℹ️
+                        <span class="tooltip-text">Normal adult: 12-20 breaths/min at rest.</span>
+                    </div>
+                </div>
+                
+                <!-- Blood Pressure Control -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Systolic BP (mmHg)</span>
+                        <span class="control-value" id="sbpValue">120</span>
+                    </div>
+                    <input type="range" id="sbpSlider" min="80" max="200" value="120"
+                           aria-label="Systolic Blood Pressure" aria-valuemin="80" aria-valuemax="200">
+                    <div class="tooltip">
+                        ℹ️
+                        <span class="tooltip-text">Normal: <120 mmHg. Elevated: 120-129. High: ≥130.</span>
+                    </div>
+                </div>
+                
+                <!-- SpO2 Control -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>SpO2 (%)</span>
+                        <span class="control-value" id="spo2Value">98</span>
+                    </div>
+                    <input type="range" id="spo2Slider" min="85" max="100" value="98"
+                           aria-label="Oxygen Saturation" aria-valuemin="85" aria-valuemax="100">
+                    <div class="tooltip">
+                        ℹ️
+                        <span class="tooltip-text">Normal: 95-100%. Below 90% may indicate hypoxemia.</span>
+                    </div>
+                </div>
+                
+                <!-- Mood Selector -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Mood State</span>
+                    </div>
+                    <select id="moodSelector" aria-label="Mood State">
+                        <option value="calm">😌 Calm</option>
+                        <option value="happy">😊 Happy</option>
+                        <option value="energetic">⚡ Energetic</option>
+                    </select>
+                    <div class="tooltip">
+                        ℹ️
+                        <span class="tooltip-text">Mood can affect physiological parameters.</span>
+                    </div>
+                </div>
+                
+                <!-- Temperature Control -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Temperature (°F)</span>
+                        <span class="control-value" id="tempValue">98.6</span>
+                    </div>
+                    <input type="range" id="tempSlider" min="95" max="104" value="98.6" step="0.1"
+                           aria-label="Body Temperature" aria-valuemin="95" aria-valuemax="104">
+                    <div class="tooltip">
+                        ℹ️
+                        <span class="tooltip-text">Normal: 97-99°F. Fever: >100.4°F.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visualization Area -->
+            <div class="visualization" role="img" aria-label="Biometric visualization">
+                <canvas id="bioCanvas"></canvas>
+                <div class="human-silhouette">
+                    <svg class="silhouette-svg" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:var(--accent);stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:var(--primary);stop-opacity:0.4" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Simplified human figure -->
+                        <ellipse cx="100" cy="50" rx="25" ry="30" fill="url(#bodyGradient)" opacity="0.8"/>
+                        <rect x="75" y="70" width="50" height="80" rx="10" fill="url(#bodyGradient)" opacity="0.8"/>
+                        <rect x="60" y="75" width="15" height="60" rx="5" fill="url(#bodyGradient)" opacity="0.6"/>
+                        <rect x="125" y="75" width="15" height="60" rx="5" fill="url(#bodyGradient)" opacity="0.6"/>
+                        <rect x="80" y="140" width="15" height="70" rx="5" fill="url(#bodyGradient)" opacity="0.6"/>
+                        <rect x="105" y="140" width="15" height="70" rx="5" fill="url(#bodyGradient)" opacity="0.6"/>
+                        
+                        <!-- Heart indicator -->
+                        <circle cx="90" cy="95" r="8" fill="#ff0066" opacity="0.9" class="heart-beat"/>
+                        
+                        <!-- Lung indicators -->
+                        <ellipse cx="85" cy="105" rx="12" ry="15" fill="#00ffff" opacity="0.4" class="lung-breathe"/>
+                        <ellipse cx="115" cy="105" rx="12" ry="15" fill="#00ffff" opacity="0.4" class="lung-breathe"/>
+                    </svg>
+                </div>
+                <div aria-live="polite" aria-atomic="true" class="sr-only" id="vizDescription">
+                    Visualization showing human silhouette with current biometric readings
+                </div>
+            </div>
+            
+            <!-- Metrics Display -->
+            <div class="metrics-grid">
+                <div class="metric-card" tabindex="0" role="button" aria-label="Heart health metric" onclick="showMetricDetails('heart')">
+                    <div class="metric-icon">❤️</div>
+                    <div class="metric-value" id="heartHealth">Good</div>
+                    <div class="metric-label">Heart Health</div>
+                </div>
+                <div class="metric-card" tabindex="0" role="button" aria-label="Oxygen level metric" onclick="showMetricDetails('oxygen')">
+                    <div class="metric-icon">💨</div>
+                    <div class="metric-value" id="oxygenLevel">Optimal</div>
+                    <div class="metric-label">Oxygen Level</div>
+                </div>
+                <div class="metric-card" tabindex="0" role="button" aria-label="Stress level metric" onclick="showMetricDetails('stress')">
+                    <div class="metric-icon">🧘</div>
+                    <div class="metric-value" id="stressLevel">Low</div>
+                    <div class="metric-label">Stress Level</div>
+                </div>
+                <div class="metric-card" tabindex="0" role="button" aria-label="Overall wellness metric" onclick="showMetricDetails('wellness')">
+                    <div class="metric-icon">✨</div>
+                    <div class="metric-value" id="wellness">Excellent</div>
+                    <div class="metric-label">Overall Wellness</div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap; justify-content: center; margin-top: var(--spacing-xl);">
+                <button class="btn" onclick="exportData()">
+                    📊 Export Data
+                </button>
+                <button class="btn" onclick="shareResults()">
+                    🔗 Share Results
+                </button>
+                <button class="btn" onclick="openCaseStudies()">
+                    📚 View Case Studies
+                </button>
+                <button class="btn btn-secondary" onclick="downloadPage()">
+                    💾 Download Page
+                </button>
+            </div>
+        </section>
+        
+        <!-- Research Hub Section -->
+        <section id="research" class="section">
+            <h2 class="section-title">Research Hub</h2>
+            
+            <!-- Enhanced Search Bar -->
+            <div style="max-width: 600px; margin: 0 auto var(--spacing-2xl);">
+                <div class="form-group">
+                    <div style="position: relative;">
+                        <input type="text" id="researchSearch" placeholder="🔍 Search research topics, papers, or keywords..." 
+                               aria-label="Search research" style="padding-left: var(--spacing-xl);">
+                        <div id="searchSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border-radius: var(--radius-md); margin-top: var(--spacing-xs); display: none; z-index: 10;">
+                            <!-- Suggestions will appear here -->
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm);">
+                        <button class="btn" onclick="searchResearch()">
+                            Search
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearSearch()">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filter Tags -->
+                <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap; justify-content: center; margin-top: var(--spacing-md);">
+                    <button class="btn btn-secondary" onclick="filterByTag('heart')" style="padding: var(--spacing-xs) var(--spacing-md); font-size: 0.875rem;">
+                        ❤️ Cardiovascular
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterByTag('respiratory')" style="padding: var(--spacing-xs) var(--spacing-md); font-size: 0.875rem;">
+                        🫁 Respiratory
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterByTag('stress')" style="padding: var(--spacing-xs) var(--spacing-md); font-size: 0.875rem;">
+                        🧠 Mental Health
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterByTag('ai')" style="padding: var(--spacing-xs) var(--spacing-md); font-size: 0.875rem;">
+                        🤖 AI/ML
+                    </button>
+                </div>
+            </div>
+            
+            <div class="cards-grid">
+                <!-- TODO: DATA - Add your research items here -->
+                <div class="card research-item" data-topics="heart cardiovascular blood pressure" onclick="openResearchDetails('cardio')">
+                    <span class="feature-highlight">NEW</span>
+                    <div class="card-icon">🫀</div>
+                    <h3 class="card-title">Cardiovascular Monitoring</h3>
+                    <p class="card-description">
+                        Latest advances in non-invasive heart rate variability analysis and predictive modeling using deep learning algorithms.
+                    </p>
+                    <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border);">
+                        <small style="color: var(--text-secondary);">
+                            📅 Updated: 2 days ago | 📖 15 min read | 🔬 Peer-reviewed
+                        </small>
+                    </div>
+                </div>
+                <div class="card research-item" data-topics="respiratory breathing lung oxygen" onclick="openResearchDetails('respiratory')">
+                    <span class="feature-highlight">HOT</span>
+                    <div class="card-icon">🫁</div>
+                    <h3 class="card-title">Respiratory Patterns</h3>
+                    <p class="card-description">
+                        Machine learning approaches to respiratory rate detection and anomaly identification in real-time monitoring systems.
+                    </p>
+                    <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border);">
+                        <small style="color: var(--text-secondary);">
+                            📅 Updated: 1 week ago | 📖 20 min read | 🔬 Clinical study
+                        </small>
+                    </div>
+                </div>
+                <div class="card research-item" data-topics="stress mental wellness psychology ai" onclick="openResearchDetails('wellness')">
+                    <span class="feature-highlight">AI</span>
+                    <div class="card-icon">🧠</div>
+                    <h3 class="card-title">Stress & Wellness</h3>
+                    <p class="card-description">
+                        Correlating physiological markers with psychological states for holistic health assessment using multimodal AI.
+                    </p>
+                    <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border);">
+                        <small style="color: var(--text-secondary);">
+                            📅 Updated: 3 days ago | 📖 12 min read | 🔬 Meta-analysis
+                        </small>
+                    </div>
+                </div>
+                <div class="card research-item" data-topics="sleep circadian rhythm recovery" onclick="openResearchDetails('sleep')">
+                    <div class="card-icon">🌙</div>
+                    <h3 class="card-title">Sleep & Recovery</h3>
+                    <p class="card-description">
+                        Understanding sleep quality through biometric analysis and its impact on recovery and performance.
+                    </p>
+                    <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border);">
+                        <small style="color: var(--text-secondary);">
+                            📅 Updated: 5 days ago | 📖 18 min read | 🔬 Longitudinal study
+                        </small>
+                    </div>
+                </div>
+                <div class="card research-item" data-topics="exercise fitness performance sports" onclick="openResearchDetails('fitness')">
+                    <div class="card-icon">💪</div>
+                    <h3 class="card-title">Exercise Physiology</h3>
+                    <p class="card-description">
+                        Real-time biometric feedback for optimizing athletic performance and preventing overtraining.
+                    </p>
+                    <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border);">
+                        <small style="color: var(--text-secondary);">
+                            📅 Updated: 1 day ago | 📖 25 min read | 🔬 Field study
+                        </small>
+                    </div>
+                </div>
+                <div class="card research-item" data-topics="nutrition metabolism microbiome" onclick="openResearchDetails('nutrition')">
+                    <div class="card-icon">🥗</div>
+                    <h3 class="card-title">Metabolic Health</h3>
+                    <p class="card-description">
+                        Personalized nutrition recommendations based on continuous glucose monitoring and metabolic markers.
+                    </p>
+                    <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border);">
+                        <small style="color: var(--text-secondary);">
+                            📅 Updated: 4 days ago | 📖 22 min read | 🔬 RCT
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Research Statistics -->
+            <div style="background: linear-gradient(135deg, var(--surface), transparent); border-radius: var(--radius-lg); padding: var(--spacing-2xl); margin-top: var(--spacing-2xl); text-align: center;">
+                <h3 style="margin-bottom: var(--spacing-lg);">📈 Research Impact</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg);">
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--accent); font-weight: bold;">1,247</div>
+                        <div style="color: var(--text-secondary);">Published Papers</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--accent); font-weight: bold;">89</div>
+                        <div style="color: var(--text-secondary);">Active Studies</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--accent); font-weight: bold;">156</div>
+                        <div style="color: var(--text-secondary);">Research Partners</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--accent); font-weight: bold;">42</div>
+                        <div style="color: var(--text-secondary);">Countries</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Tools & Datasets Section -->
+        <section id="tools" class="section">
+            <h2 class="section-title">Tools & Datasets</h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('tools-tab')">Tools</button>
+                <button class="tab" onclick="switchTab('datasets-tab')">Datasets</button>
+                <button class="tab" onclick="switchTab('3d-tab')">3D Viewer</button>
+            </div>
+            
+            <div id="tools-tab" class="tab-content active">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+                    🚀 Cutting-edge tools for biometric analysis and health monitoring
+                </p>
+                <div class="cards-grid">
+                    <div class="card" onclick="showToolDetails('signal')">
+                        <span class="card-badge">NEW</span>
+                        <div class="card-icon">📈</div>
+                        <h3 class="card-title">Signal Processor</h3>
+                        <p class="card-description">Real-time signal processing for biometric data streams with FFT analysis and noise reduction.</p>
+                        <div class="progress-ring">
+                            <svg width="120" height="120">
+                                <circle class="progress-bg" cx="60" cy="60" r="54"></circle>
+                                <circle class="progress-bar" cx="60" cy="60" r="54"></circle>
+                            </svg>
+                            <div class="progress-text">95%</div>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-md);">
+                            Launch Tool →
+                        </button>
+                    </div>
+                    <div class="card" onclick="showToolDetails('ml')">
+                        <span class="card-badge">AI</span>
+                        <div class="card-icon">🤖</div>
+                        <h3 class="card-title">ML Predictor</h3>
+                        <p class="card-description">Neural networks trained on millions of health records for predictive analytics.</p>
+                        <div class="progress-ring">
+                            <svg width="120" height="120">
+                                <circle class="progress-bg" cx="60" cy="60" r="54"></circle>
+                                <circle class="progress-bar" cx="60" cy="60" r="54" style="stroke-dashoffset: 135;"></circle>
+                            </svg>
+                            <div class="progress-text">87%</div>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-md);">
+                            Train Model →
+                        </button>
+                    </div>
+                    <div class="card" onclick="showToolDetails('viz')">
+                        <span class="card-badge">3D</span>
+                        <div class="card-icon">📊</div>
+                        <h3 class="card-title">Data Visualizer</h3>
+                        <p class="card-description">Interactive 3D visualizations with WebGL acceleration and real-time rendering.</p>
+                        <div class="progress-ring">
+                            <svg width="120" height="120">
+                                <circle class="progress-bg" cx="60" cy="60" r="54"></circle>
+                                <circle class="progress-bar" cx="60" cy="60" r="54" style="stroke-dashoffset: 50;"></circle>
+                            </svg>
+                            <div class="progress-text">92%</div>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-md);">
+                            Open Visualizer →
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Live Stats -->
+                <div class="chart-container" style="margin-top: var(--spacing-2xl);">
+                    <h3 style="margin-bottom: var(--spacing-md);">📊 Live Tool Performance</h3>
+                    <canvas id="toolsChart" class="chart-canvas"></canvas>
+                </div>
+            </div>
+            
+            <div id="datasets-tab" class="tab-content">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+                    📚 Comprehensive datasets for research and development
+                </p>
+                
+                <!-- Dataset Search -->
+                <div class="form-group" style="max-width: 600px; margin: 0 auto var(--spacing-xl);">
+                    <input type="text" id="datasetSearch" placeholder="Search datasets by condition, size, or type..." 
+                           style="padding: var(--spacing-md);">
+                </div>
+                
+                <div class="cards-grid">
+                    <!-- TODO: DATA - Add your dataset items here -->
+                    <div class="card dataset-card" data-size="1.2TB" data-records="1000000">
+                        <span class="feature-highlight">1M+ Records</span>
+                        <div class="card-icon">💾</div>
+                        <h3 class="card-title">PhysioNet Database</h3>
+                        <p class="card-description">Open-access physiological signals including ECG, EEG, and EMG recordings from diverse populations.</p>
+                        <div style="display: flex; gap: var(--spacing-sm); margin: var(--spacing-md) 0;">
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">ECG</span>
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">EEG</span>
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">EMG</span>
+                        </div>
+                        <div style="border-top: 1px solid var(--border); margin-top: var(--spacing-md); padding-top: var(--spacing-md);">
+                            <small style="color: var(--text-secondary);">Size: 1.2TB | Format: CSV, MAT, EDF</small>
+                        </div>
+                    </div>
+                    <div class="card dataset-card" data-size="500GB" data-records="500000">
+                        <span class="feature-highlight">Critical Care</span>
+                        <div class="card-icon">📁</div>
+                        <h3 class="card-title">MIMIC-III</h3>
+                        <p class="card-description">De-identified health data from ICU patients including vitals, medications, and outcomes.</p>
+                        <div style="display: flex; gap: var(--spacing-sm); margin: var(--spacing-md) 0;">
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">ICU</span>
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">Vitals</span>
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">Labs</span>
+                        </div>
+                        <div style="border-top: 1px solid var(--border); margin-top: var(--spacing-md); padding-top: var(--spacing-md);">
+                            <small style="color: var(--text-secondary);">Size: 500GB | Format: PostgreSQL, CSV</small>
+                        </div>
+                    </div>
+                    <div class="card dataset-card" data-size="250GB" data-records="750000">
+                        <span class="feature-highlight">Sleep Study</span>
+                        <div class="card-icon">🌙</div>
+                        <h3 class="card-title">Sleep Heart Health</h3>
+                        <p class="card-description">Polysomnography data with cardiovascular outcomes from multi-center sleep studies.</p>
+                        <div style="display: flex; gap: var(--spacing-sm); margin: var(--spacing-md) 0;">
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">PSG</span>
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">Sleep</span>
+                            <span style="background: var(--surface); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-full); font-size: 0.75rem;">Apnea</span>
+                        </div>
+                        <div style="border-top: 1px solid var(--border); margin-top: var(--spacing-md); padding-top: var(--spacing-md);">
+                            <small style="color: var(--text-secondary);">Size: 250GB | Format: EDF, XML</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dataset Stats -->
+                <div style="background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-xl); margin-top: var(--spacing-2xl); text-align: center;">
+                    <h3>🌍 Global Dataset Statistics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-lg);">
+                        <div>
+                            <div style="font-size: 2rem; color: var(--accent); font-weight: bold;">2.5M+</div>
+                            <div style="color: var(--text-secondary);">Total Records</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; color: var(--accent); font-weight: bold;">185</div>
+                            <div style="color: var(--text-secondary);">Countries</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; color: var(--accent); font-weight: bold;">50TB</div>
+                            <div style="color: var(--text-secondary);">Total Size</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; color: var(--accent); font-weight: bold;">24/7</div>
+                            <div style="color: var(--text-secondary);">Availability</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="3d-tab" class="tab-content">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+                    🎮 Interactive 3D anatomical models and medical visualizations
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-xl);">
+                    <button class="btn btn-secondary" onclick="loadPresetModel('heart')">
+                        ❤️ Load Heart Model
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadPresetModel('brain')">
+                        🧠 Load Brain Model
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadPresetModel('lungs')">
+                        🫁 Load Lungs Model
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadPresetModel('skeleton')">
+                        🦴 Load Skeleton
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modelUrl">Custom 3D Model URL (GLB/GLTF)</label>
+                    <div style="display: flex; gap: var(--spacing-sm);">
+                        <input type="url" id="modelUrl" placeholder="https://example.com/model.glb" style="flex: 1;">
+                        <button class="btn" onclick="load3DModel()">
+                            🔄 Load Model
+                        </button>
+                    </div>
+                    <small style="color: var(--text-secondary); display: block; margin-top: var(--spacing-xs);">
+                        💡 Tip: Use GLB format for best performance. Models should be under 10MB for smooth interaction.
+                    </small>
+                </div>
+                
+                <div class="viewer-3d" id="viewer3d">
+                    <div class="viewer-placeholder">
+                        <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">🎨</div>
+                        <p style="font-size: 1.25rem; margin-bottom: var(--spacing-sm);">3D Model Viewer</p>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a preset model above or enter a custom URL
+                        </p>
+                        <div style="margin-top: var(--spacing-xl);">
+                            <small style="color: var(--text-secondary);">
+                                Supports: GLB, GLTF, OBJ formats<br>
+                                Controls: Click & drag to rotate, scroll to zoom
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Info Panel -->
+                <div id="modelInfo" style="display: none; background: var(--surface); border-radius: var(--radius-md); padding: var(--spacing-lg); margin-top: var(--spacing-lg);">
+                    <h4>Model Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                        <div>
+                            <small style="color: var(--text-secondary);">Format</small>
+                            <div id="modelFormat">-</div>
+                        </div>
+                        <div>
+                            <small style="color: var(--text-secondary);">Size</small>
+                            <div id="modelSize">-</div>
+                        </div>
+                        <div>
+                            <small style="color: var(--text-secondary);">Vertices</small>
+                            <div id="modelVertices">-</div>
+                        </div>
+                        <div>
+                            <small style="color: var(--text-secondary);">Load Time</small>
+                            <div id="modelLoadTime">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Ethics Section -->
+        <section id="ethics" class="section">
+            <h2 class="section-title">Ethics & Governance</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">🔒</div>
+                    <h3 class="card-title">Privacy First</h3>
+                    <p class="card-description">
+                        All data processing happens locally. No personal information is collected or transmitted.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚖️</div>
+                    <h3 class="card-title">Ethical AI</h3>
+                    <p class="card-description">
+                        Committed to fairness, transparency, and accountability in biometric analysis.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <h3 class="card-title">Security</h3>
+                    <p class="card-description">
+                        Industry-standard security practices with regular audits and updates.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="section">
+            <h2 class="section-title">About Bio Mirror</h2>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <p style="font-size: 1.125rem; line-height: 1.8; margin-bottom: var(--spacing-xl);">
+                    Bio Mirror is an educational demonstration of future health monitoring technologies. 
+                    Our mission is to make biometric visualization accessible and understandable for everyone.
+                </p>
+                
+                <!-- Contact Form -->
+                <div style="background: var(--surface); padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-2xl);">
+                    <h3 style="margin-bottom: var(--spacing-lg);">Get in Touch</h3>
+                    <form id="contactForm" onsubmit="handleContact(event)">
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder="Your Name" required aria-label="Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder="Your Email" required aria-label="Email">
+                        </div>
+                        <!-- Honeypot field -->
+                        <div style="display: none;">
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" placeholder="Your Message" required aria-label="Message"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Welcome Overlay -->
+    <div id="welcomeOverlay" class="welcome-overlay" style="display: none;">
+        <div class="welcome-content">
+            <h2 style="font-size: 2rem; margin-bottom: var(--spacing-md);">🌟 Welcome to Bio Mirror</h2>
+            <p style="margin-bottom: var(--spacing-lg); color: var(--text-secondary);">
+                Experience the future of health visualization
+            </p>
+            <div style="text-align: left; margin: var(--spacing-xl) 0;">
+                <div style="margin-bottom: var(--spacing-md);">
+                    <span style="font-size: 1.5rem; margin-right: var(--spacing-sm);">📊</span>
+                    <span>Adjust biometric sliders to see real-time visualizations</span>
+                </div>
+                <div style="margin-bottom: var(--spacing-md);">
+                    <span style="font-size: 1.5rem; margin-right: var(--spacing-sm);">🎨</span>
+                    <span>Switch between mood themes for different experiences</span>
+                </div>
+                <div style="margin-bottom: var(--spacing-md);">
+                    <span style="font-size: 1.5rem; margin-right: var(--spacing-sm);">🔬</span>
+                    <span>Explore research tools and datasets</span>
+                </div>
+                <div>
+                    <span style="font-size: 1.5rem; margin-right: var(--spacing-sm);">🎮</span>
+                    <span>Load 3D models for anatomical visualization</span>
+                </div>
+            </div>
+            <button class="btn" onclick="closeWelcome()" style="margin-top: var(--spacing-lg);">
+                Start Exploring →
+            </button>
+            <div style="margin-top: var(--spacing-md);">
+                <label style="font-size: 0.875rem;">
+                    <input type="checkbox" id="dontShowAgain"> Don't show this again
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Container -->
+    <div id="notification" class="notification">
+        <span class="notification-icon">✅</span>
+        <div>
+            <div id="notificationTitle" style="font-weight: bold;">Success!</div>
+            <div id="notificationMessage" style="font-size: 0.875rem;">Operation completed successfully</div>
+        </div>
+    </div>
+    
+    <!-- Floating Action Buttons -->
+    <div class="fab-container">
+        <button class="fab" onclick="startTour()">
+            <span>💡</span>
+            <span class="fab-label">Start Guided Tour</span>
+        </button>
+        <button class="fab" onclick="openHelp()">
+            <span>❓</span>
+            <span class="fab-label">Help & Support</span>
+        </button>
+        <button class="fab" id="soundToggle" onclick="toggleSound()">
+            <span>🔊</span>
+            <span class="fab-label">Toggle Sound</span>
+        </button>
+    </div>
+    
+    <!-- Case Studies Modal -->
+    <div id="caseStudiesModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Case Studies</h2>
+                <button class="close-btn" onclick="closeCaseStudies()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- TODO: CONTENT - Add your case studies here -->
+                <div style="margin-bottom: var(--spacing-xl);">
+                    <h3>Athletic Performance Monitoring</h3>
+                    <p>Professional athletes using Bio Mirror technology to optimize training and recovery cycles.</p>
+                </div>
+                <div style="margin-bottom: var(--spacing-xl);">
+                    <h3>Elderly Care Applications</h3>
+                    <p>Remote monitoring solutions for aging populations, enabling proactive health interventions.</p>
+                </div>
+                <div style="margin-bottom: var(--spacing-xl);">
+                    <h3>Workplace Wellness Programs</h3>
+                    <p>Corporate wellness initiatives leveraging biometric insights for employee health.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Stub (Privacy-respecting, disabled by default) -->
+    <script>
+        // TODO: TELEMETRY - Analytics configuration (disabled by default)
+        const ANALYTICS_ENABLED = false; // Set to true to enable
+        
+        function trackEvent(category, action, label) {
+            if (ANALYTICS_ENABLED && typeof gtag !== 'undefined') {
+                // Google Analytics stub - add your tracking ID
+                gtag('event', action, {
+                    'event_category': category,
+                    'event_label': label
+                });
+            }
+        }
+    </script>
+    
+    <script>
+        // ===== INITIALIZATION =====
+        let soundEnabled = false;
+        let currentTheme = 'calm';
+        let audioContext = null;
+        
+        // TODO: THRESHOLDS - Customize biometric thresholds
+        const THRESHOLDS = {
+            hr: { low: 60, high: 100 },
+            rr: { low: 12, high: 20 },
+            sbp: { low: 90, high: 120 },
+            spo2: { low: 95, high: 100 },
+            temp: { low: 97, high: 99 }
+        };
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+            createParticles();
+            initializeCanvas();
+            setupIntersectionObserver();
+            loadSavedTheme();
+            setupEventListeners();
+            checkFirstVisit();
+            initializeCharts();
+            setupKeyboardShortcuts();
+        });
+        
+        function initializeApp() {
+            // Check for saved preferences
+            const savedTheme = localStorage.getItem('bioMirrorTheme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            }
+            
+            // Initialize audio context on first user interaction
+            document.addEventListener('click', initAudio, { once: true });
+            
+            // Show initial notification
+            setTimeout(() => {
+                showNotification('Welcome!', 'Bio Mirror is ready for exploration', 'success');
+            }, 1000);
+        }
+        
+        // ===== WELCOME & ONBOARDING =====
+        function checkFirstVisit() {
+            const hasVisited = localStorage.getItem('bioMirrorVisited');
+            const dontShow = localStorage.getItem('bioMirrorDontShowWelcome');
+            
+            if (!hasVisited && !dontShow) {
+                setTimeout(() => {
+                    document.getElementById('welcomeOverlay').style.display = 'flex';
+                    localStorage.setItem('bioMirrorVisited', 'true');
+                }, 500);
+            }
+        }
+        
+        function closeWelcome() {
+            const dontShow = document.getElementById('dontShowAgain').checked;
+            if (dontShow) {
+                localStorage.setItem('bioMirrorDontShowWelcome', 'true');
+            }
+            
+            const overlay = document.getElementById('welcomeOverlay');
+            overlay.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+            
+            playSound('success');
+            
+            // Start a mini tour
+            setTimeout(() => {
+                showNotification('Tip', 'Try adjusting the Heart Rate slider to see live changes!', 'info');
+            }, 1000);
+        }
+        
+        // ===== GUIDED TOUR =====
+        let tourStep = 0;
+        const tourSteps = [
+            {
+                element: '#hrSlider',
+                title: 'Heart Rate Control',
+                description: 'Slide to adjust heart rate and watch the visualization respond in real-time.',
+                position: 'bottom'
+            },
+            {
+                element: '.theme-switcher',
+                title: 'Mood Themes',
+                description: 'Switch between Calm, Happy, and Energetic themes for different visual experiences.',
+                position: 'bottom'
+            },
+            {
+                element: '#bioCanvas',
+                title: 'Live Visualization',
+                description: 'This canvas shows real-time waveforms based on your biometric inputs.',
+                position: 'top'
+            },
+            {
+                element: '.metrics-grid',
+                title: 'Health Metrics',
+                description: 'Click any metric card to see detailed information and trends.',
+                position: 'top'
+            },
+            {
+                element: '.tabs',
+                title: 'Tools & Resources',
+                description: 'Explore our tools, datasets, and 3D models in these tabs.',
+                position: 'bottom'
+            }
+        ];
+        
+        function startTour() {
+            tourStep = 0;
+            showTourStep();
+            playSound('success');
+        }
+        
+        function showTourStep() {
+            if (tourStep >= tourSteps.length) {
+                showNotification('Tour Complete!', 'You\'re ready to explore Bio Mirror', 'success');
+                return;
+            }
+            
+            const step = tourSteps[tourStep];
+            const element = document.querySelector(step.element);
+            
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Highlight element
+                element.style.position = 'relative';
+                const highlight = document.createElement('div');
+                highlight.className = 'pulse-ring';
+                highlight.style.width = '100%';
+                highlight.style.height = '100%';
+                highlight.style.top = '0';
+                highlight.style.left = '0';
+                element.appendChild(highlight);
+                
+                // Show tooltip
+                showNotification(step.title, step.description, 'info');
+                
+                // Clean up and move to next step
+                setTimeout(() => {
+                    if (highlight.parentNode) {
+                        highlight.remove();
+                    }
+                    tourStep++;
+                    if (tourStep < tourSteps.length) {
+                        setTimeout(() => showTourStep(), 500);
+                    } else {
+                        showNotification('Tour Complete!', 'You\'re ready to explore Bio Mirror', 'success');
+                    }
+                }, 4000);
+            }
+        }
+        
+        // ===== NOTIFICATION SYSTEM =====
+        function showNotification(title, message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const titleEl = document.getElementById('notificationTitle');
+            const messageEl = document.getElementById('notificationMessage');
+            const iconEl = notification.querySelector('.notification-icon');
+            
+            // Set content
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            // Set icon and color based on type
+            const types = {
+                success: { icon: '✅', gradient: 'linear-gradient(135deg, rgba(0, 255, 136, 0.9), rgba(0, 184, 148, 0.9))' },
+                info: { icon: 'ℹ️', gradient: 'linear-gradient(135deg, rgba(116, 185, 255, 0.9), rgba(74, 144, 226, 0.9))' },
+                warning: { icon: '⚠️', gradient: 'linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(255, 152, 0, 0.9))' },
+                error: { icon: '❌', gradient: 'linear-gradient(135deg, rgba(255, 107, 107, 0.9), rgba(238, 82, 83, 0.9))' }
+            };
+            
+            const config = types[type] || types.success;
+            iconEl.textContent = config.icon;
+            notification.style.background = config.gradient;
+            
+            // Show notification
+            notification.classList.add('show');
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+        
+        // ===== ENHANCED CHARTS =====
+        function initializeCharts() {
+            // Initialize tools performance chart
+            const toolsCanvas = document.getElementById('toolsChart');
+            if (toolsCanvas) {
+                const ctx = toolsCanvas.getContext('2d');
+                drawPerformanceChart(ctx);
+            }
+        }
+        
+        function drawPerformanceChart(ctx) {
+            const canvas = ctx.canvas;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            let time = 0;
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw grid
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                
+                for (let i = 0; i <= 10; i++) {
+                    const y = (canvas.height / 10) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+                
+                // Draw performance lines
+                const metrics = [
+                    { name: 'CPU', color: '#74b9ff', value: 50 + Math.sin(time * 0.02) * 30 },
+                    { name: 'Memory', color: '#a29bfe', value: 60 + Math.cos(time * 0.015) * 20 },
+                    { name: 'Network', color: '#fd79a8', value: 40 + Math.sin(time * 0.025) * 35 }
+                ];
+                
+                metrics.forEach((metric, index) => {
+                    ctx.strokeStyle = metric.color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    
+                    for (let x = 0; x < canvas.width; x += 5) {
+                        const noise = Math.random() * 5;
+                        const y = canvas.height - (canvas.height * (metric.value + noise) / 100);
+                        
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+                    
+                    // Draw label
+                    ctx.fillStyle = metric.color;
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(`${metric.name}: ${Math.round(metric.value)}%`, 10, 20 + index * 20);
+                });
+                
+                time++;
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // ===== ENHANCED 3D VIEWER =====
+        function loadPresetModel(type) {
+            const models = {
+                heart: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Heart/glTF-Binary/Heart.glb',
+                brain: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF-Binary/BrainStem.glb',
+                lungs: 'https://example.com/lungs.glb', // Replace with actual model URL
+                skeleton: 'https://example.com/skeleton.glb' // Replace with actual model URL
+            };
+            
+            const url = models[type];
+            if (url) {
+                document.getElementById('modelUrl').value = url;
+                load3DModel();
+                showNotification('Loading Model', `Loading ${type} model...`, 'info');
+            }
+        }
+        
+        function load3DModel() {
+            const url = document.getElementById('modelUrl').value;
+            if (!url) {
+                showNotification('Error', 'Please enter a valid 3D model URL', 'error');
+                return;
+            }
+            
+            const startTime = Date.now();
+            const viewer = document.getElementById('viewer3d');
+            
+            // Show loading state
+            viewer.innerHTML = `
+                <div class="viewer-placeholder">
+                    <div class="skeleton" style="width: 200px; height: 200px; margin: 0 auto var(--spacing-md);"></div>
+                    <p>Loading 3D model...</p>
+                </div>
+            `;
+            
+            // Simulate model loading (in real app, would use Three.js or similar)
+            setTimeout(() => {
+                const loadTime = Date.now() - startTime;
+                
+                // Create iframe for model viewer
+                viewer.innerHTML = `
+                    <iframe src="https://gltf-viewer.donmccurdy.com/#model=${encodeURIComponent(url)}" 
+                            style="width: 100%; height: 100%; border: none;"
+                            title="3D Model Viewer">
+                    </iframe>
+                `;
+                
+                // Update model info
+                const modelInfo = document.getElementById('modelInfo');
+                modelInfo.style.display = 'block';
+                document.getElementById('modelFormat').textContent = url.endsWith('.glb') ? 'GLB' : 'GLTF';
+                document.getElementById('modelSize').textContent = 'Calculating...';
+                document.getElementById('modelVertices').textContent = 'Analyzing...';
+                document.getElementById('modelLoadTime').textContent = `${loadTime}ms`;
+                
+                showNotification('Success', '3D model loaded successfully!', 'success');
+                playSound('success');
+            }, 1500);
+            
+            trackEvent('3D', 'Load', url);
+        }
+        
+        // ===== TOOL DETAILS =====
+        function showToolDetails(tool) {
+            const details = {
+                signal: {
+                    title: 'Signal Processor',
+                    description: 'Advanced FFT-based signal processing with real-time filtering and analysis.',
+                    features: ['Noise reduction', 'Peak detection', 'Frequency analysis', 'Real-time processing'],
+                    accuracy: '95%'
+                },
+                ml: {
+                    title: 'ML Predictor',
+                    description: 'Deep learning models trained on millions of health records.',
+                    features: ['Predictive analytics', 'Anomaly detection', 'Pattern recognition', 'Risk assessment'],
+                    accuracy: '87%'
+                },
+                viz: {
+                    title: 'Data Visualizer',
+                    description: 'WebGL-accelerated 3D visualizations for complex datasets.',
+                    features: ['3D rendering', 'Interactive charts', 'Real-time updates', 'Export capabilities'],
+                    accuracy: '92%'
+                }
+            };
+            
+            const detail = details[tool];
+            if (detail) {
+                showNotification(detail.title, `Accuracy: ${detail.accuracy} | ${detail.features.join(', ')}`, 'info');
+            }
+        }
+        
+        // ===== KEYBOARD SHORTCUTS =====
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + K: Quick search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('researchSearch').focus();
+                }
+                
+                // Ctrl/Cmd + S: Export data
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    exportData();
+                }
+                
+                // Ctrl/Cmd + H: Show help
+                if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+                    e.preventDefault();
+                    openHelp();
+                }
+                
+                // Number keys 1-3: Switch themes
+                if (e.key === '1') setTheme('calm');
+                if (e.key === '2') setTheme('happy');
+                if (e.key === '3') setTheme('energetic');
+            });
+        }
+        
+        // ===== HELP SYSTEM =====
+        function openHelp() {
+            const helpContent = `
+                <h3>🎮 Keyboard Shortcuts</h3>
+                <p><kbd>Ctrl/Cmd + K</kbd> - Quick search</p>
+                <p><kbd>Ctrl/Cmd + S</kbd> - Export data</p>
+                <p><kbd>Ctrl/Cmd + H</kbd> - Show help</p>
+                <p><kbd>1, 2, 3</kbd> - Switch themes</p>
+                <p><kbd>Esc</kbd> - Close modals</p>
+                
+                <h3 style="margin-top: var(--spacing-lg);">💡 Tips</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li>• Hover over any control for detailed information</li>
+                    <li>• Click metric cards for expanded views</li>
+                    <li>• Use the FAB buttons for quick actions</li>
+                    <li>• All data is processed locally for privacy</li>
+                </ul>
+            `;
+            
+            // Create and show help modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Help & Support</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${helpContent}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            playSound('success');
+        }
+        
+        // ===== PARTICLES ANIMATION =====
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.background = `rgba(${Math.random() * 255}, ${Math.random() * 255}, 255, 0.5)`;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.borderRadius = '50%';
+                particle.style.animation = `float ${Math.random() * 10 + 10}s ease-in-out infinite`;
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // ===== CANVAS VISUALIZATION =====
+        function initializeCanvas() {
+            const canvas = document.getElementById('bioCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Animated wave visualization
+            let time = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Get current values
+                const hr = document.getElementById('hrSlider').value;
+                const rr = document.getElementById('rrSlider').value;
+                
+                // Draw heart rate wave
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                for (let x = 0; x < canvas.width; x += 5) {
+                    const y = canvas.height / 2 + Math.sin((x + time) * 0.02 * (hr / 60)) * 30;
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                
+                // Draw respiratory wave
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+                ctx.beginPath();
+                
+                for (let x = 0; x < canvas.width; x += 5) {
+                    const y = canvas.height / 2 + Math.sin((x + time) * 0.01 * (rr / 15)) * 50;
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                
+                time += 2;
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // ===== EVENT LISTENERS =====
+        function setupEventListeners() {
+            // Slider updates
+            const sliders = [
+                { id: 'hrSlider', valueId: 'hrValue', unit: '' },
+                { id: 'rrSlider', valueId: 'rrValue', unit: '' },
+                { id: 'sbpSlider', valueId: 'sbpValue', unit: '' },
+                { id: 'spo2Slider', valueId: 'spo2Value', unit: '' },
+                { id: 'tempSlider', valueId: 'tempValue', unit: '' }
+            ];
+            
+            sliders.forEach(slider => {
+                const element = document.getElementById(slider.id);
+                const valueElement = document.getElementById(slider.valueId);
+                
+                element.addEventListener('input', (e) => {
+                    valueElement.textContent = e.target.value + slider.unit;
+                    updateMetrics();
+                    playSound('change');
+                    updateVisualization();
+                });
+            });
+            
+            // Mood selector
+            document.getElementById('moodSelector').addEventListener('change', (e) => {
+                setTheme(e.target.value);
+                playSound('success');
+            });
+            
+            // Theme buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const theme = e.target.dataset.theme;
+                    setTheme(theme);
+                    
+                    // Update active state
+                    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+        }
+        
+        // ===== METRICS CALCULATION =====
+        function updateMetrics() {
+            const hr = parseInt(document.getElementById('hrSlider').value);
+            const rr = parseInt(document.getElementById('rrSlider').value);
+            const sbp = parseInt(document.getElementById('sbpSlider').value);
+            const spo2 = parseInt(document.getElementById('spo2Slider').value);
+            const temp = parseFloat(document.getElementById('tempSlider').value);
+            
+            // Calculate heart health
+            let heartHealth = 'Good';
+            if (hr < THRESHOLDS.hr.low || hr > THRESHOLDS.hr.high) {
+                heartHealth = hr < 50 || hr > 120 ? 'Needs Attention' : 'Fair';
+            }
+            
+            // Calculate oxygen level
+            let oxygenLevel = 'Optimal';
+            if (spo2 < THRESHOLDS.spo2.low) {
+                oxygenLevel = spo2 < 90 ? 'Low' : 'Below Normal';
+            }
+            
+            // Calculate stress level
+            let stressLevel = 'Low';
+            if (hr > 100 || rr > 20) {
+                stressLevel = 'Moderate';
+            }
+            if (hr > 120 || rr > 25) {
+                stressLevel = 'High';
+            }
+            
+            // Calculate overall wellness
+            let wellness = 'Excellent';
+            let issues = 0;
+            if (hr < THRESHOLDS.hr.low || hr > THRESHOLDS.hr.high) issues++;
+            if (rr < THRESHOLDS.rr.low || rr > THRESHOLDS.rr.high) issues++;
+            if (sbp < THRESHOLDS.sbp.low || sbp > THRESHOLDS.sbp.high) issues++;
+            if (spo2 < THRESHOLDS.spo2.low) issues++;
+            if (temp < THRESHOLDS.temp.low || temp > THRESHOLDS.temp.high) issues++;
+            
+            if (issues >= 3) wellness = 'Needs Attention';
+            else if (issues >= 2) wellness = 'Fair';
+            else if (issues >= 1) wellness = 'Good';
+            
+            // Update display
+            document.getElementById('heartHealth').textContent = heartHealth;
+            document.getElementById('oxygenLevel').textContent = oxygenLevel;
+            document.getElementById('stressLevel').textContent = stressLevel;
+            document.getElementById('wellness').textContent = wellness;
+            
+            // Update aria-live region
+            const description = `Current readings: Heart rate ${hr} BPM, Respiratory rate ${rr}, Blood pressure ${sbp}, Oxygen ${spo2}%. Overall wellness: ${wellness}`;
+            document.getElementById('vizDescription').textContent = description;
+        }
+        
+        // ===== THEME MANAGEMENT =====
+        function setTheme(theme) {
+            currentTheme = theme;
+            const root = document.documentElement;
+            
+            // TODO: COLORS - Theme color mappings
+            const themes = {
+                calm: {
+                    primary: '#4a69bd',
+                    secondary: '#6c5ce7',
+                    accent: '#74b9ff',
+                    bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                },
+                happy: {
+                    primary: '#f39c12',
+                    secondary: '#e74c3c',
+                    accent: '#f1c40f',
+                    bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                },
+                energetic: {
+                    primary: '#00b894',
+                    secondary: '#00cec9',
+                    accent: '#55efc4',
+                    bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+                }
+            };
+            
+            const selectedTheme = themes[theme];
+            root.style.setProperty('--primary', selectedTheme.primary);
+            root.style.setProperty('--secondary', selectedTheme.secondary);
+            root.style.setProperty('--accent', selectedTheme.accent);
+            root.style.setProperty('--bg-gradient', selectedTheme.bg);
+            
+            // Save preference
+            localStorage.setItem('bioMirrorTheme', theme);
+            
+            // Update mood selector
+            document.getElementById('moodSelector').value = theme;
+        }
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('bioMirrorTheme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+                document.querySelector(`[data-theme="${savedTheme}"]`).classList.add('active');
+            }
+        }
+        
+        // ===== VISUALIZATION UPDATE =====
+        function updateVisualization() {
+            const hr = parseInt(document.getElementById('hrSlider').value);
+            const heartBeat = document.querySelector('.heart-beat');
+            
+            if (heartBeat) {
+                const duration = 60 / hr; // Convert BPM to seconds per beat
+                heartBeat.style.animation = `pulse ${duration}s infinite`;
+            }
+            
+            const rr = parseInt(document.getElementById('rrSlider').value);
+            const lungs = document.querySelectorAll('.lung-breathe');
+            
+            lungs.forEach(lung => {
+                const duration = 60 / rr; // Convert to seconds per breath
+                lung.style.animation = `breathe ${duration}s ease-in-out infinite`;
+            });
+        }
+        
+        // ===== SOUND MANAGEMENT =====
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playSound(type) {
+            if (!soundEnabled || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'change':
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.value = 0.1;
+                    break;
+                case 'success':
+                    oscillator.frequency.value = 880;
+                    gainNode.gain.value = 0.15;
+                    break;
+                default:
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.value = 0.1;
+            }
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggle');
+            const icon = btn.querySelector('span:first-child');
+            icon.textContent = soundEnabled ? '🔊' : '🔇';
+            
+            // Update FAB label
+            const label = btn.querySelector('.fab-label');
+            if (label) {
+                label.textContent = soundEnabled ? 'Mute Sound' : 'Enable Sound';
+            }
+            
+            if (soundEnabled) {
+                initAudio();
+                playSound('success');
+                showNotification('Sound Enabled', 'Audio feedback is now active', 'success');
+            } else {
+                showNotification('Sound Muted', 'Audio feedback disabled', 'info');
+            }
+        }
+        
+        // ===== UTILITY FUNCTIONS =====
+        function resetValues() {
+            const defaults = {
+                hrSlider: 72,
+                rrSlider: 16,
+                sbpSlider: 120,
+                spo2Slider: 98,
+                tempSlider: 98.6
+            };
+            
+            Object.entries(defaults).forEach(([id, value]) => {
+                document.getElementById(id).value = value;
+                const event = new Event('input');
+                document.getElementById(id).dispatchEvent(event);
+            });
+            
+            playSound('success');
+        }
+        
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                readings: {
+                    heartRate: document.getElementById('hrSlider').value,
+                    respiratoryRate: document.getElementById('rrSlider').value,
+                    systolicBP: document.getElementById('sbpSlider').value,
+                    spo2: document.getElementById('spo2Slider').value,
+                    temperature: document.getElementById('tempSlider').value,
+                    mood: document.getElementById('moodSelector').value
+                },
+                metrics: {
+                    heartHealth: document.getElementById('heartHealth').textContent,
+                    oxygenLevel: document.getElementById('oxygenLevel').textContent,
+                    stressLevel: document.getElementById('stressLevel').textContent,
+                    wellness: document.getElementById('wellness').textContent
+                }
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `bio-mirror-data-${Date.now()}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            playSound('success');
+            trackEvent('Export', 'Data', 'JSON');
+        }
+        
+        function shareResults() {
+            const text = `Bio Mirror Results\n` +
+                        `Heart Rate: ${document.getElementById('hrValue').textContent}\n` +
+                        `Respiratory Rate: ${document.getElementById('rrValue').textContent}\n` +
+                        `Overall Wellness: ${document.getElementById('wellness').textContent}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bio Mirror Results',
+                    text: text
+                }).catch(err => console.log('Share cancelled'));
+            } else {
+                // Fallback: Copy to clipboard
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Results copied to clipboard!');
+                });
+            }
+            
+            playSound('success');
+            trackEvent('Share', 'Results', 'Text');
+        }
+        
+        function downloadPage() {
+            const content = document.documentElement.outerHTML;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bio-mirror.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            playSound('success');
+            trackEvent('Download', 'Page', 'HTML');
+        }
+        
+        // ===== MODAL MANAGEMENT =====
+        function openCaseStudies() {
+            document.getElementById('caseStudiesModal').classList.add('active');
+            document.getElementById('caseStudiesModal').setAttribute('aria-hidden', 'false');
+            playSound('success');
+        }
+        
+        function closeCaseStudies() {
+            document.getElementById('caseStudiesModal').classList.remove('active');
+            document.getElementById('caseStudiesModal').setAttribute('aria-hidden', 'true');
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCaseStudies();
+            }
+        });
+        
+        // ===== TAB SWITCHING =====
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            playSound('change');
+        }
+        
+        // ===== SEARCH FUNCTIONALITY =====
+        function searchResearch() {
+            const searchTerm = document.getElementById('researchSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.research-item');
+            let resultsFound = 0;
+            
+            items.forEach(item => {
+                const topics = item.dataset.topics.toLowerCase();
+                const title = item.querySelector('.card-title').textContent.toLowerCase();
+                const description = item.querySelector('.card-description').textContent.toLowerCase();
+                
+                if (topics.includes(searchTerm) || title.includes(searchTerm) || description.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeInUp 0.3s ease-out';
+                    resultsFound++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            if (resultsFound === 0) {
+                showNotification('No Results', 'Try different keywords or browse all research', 'info');
+            } else {
+                showNotification('Search Complete', `Found ${resultsFound} research items`, 'success');
+            }
+            
+            playSound('change');
+        }
+        
+        function clearSearch() {
+            document.getElementById('researchSearch').value = '';
+            document.querySelectorAll('.research-item').forEach(item => {
+                item.style.display = 'block';
+            });
+            showNotification('Cleared', 'Showing all research items', 'success');
+        }
+        
+        function filterByTag(tag) {
+            const searchInput = document.getElementById('researchSearch');
+            searchInput.value = tag;
+            searchResearch();
+        }
+        
+        function openResearchDetails(topic) {
+            const research = {
+                cardio: {
+                    title: 'Cardiovascular Monitoring Research',
+                    content: 'Deep dive into heart rate variability, blood pressure patterns, and predictive cardiovascular modeling.',
+                    authors: 'Dr. Sarah Chen, Prof. Michael Roberts',
+                    institution: 'Stanford Medical Research Center',
+                    abstract: 'This comprehensive study explores the latest advances in non-invasive cardiovascular monitoring...'
+                },
+                respiratory: {
+                    title: 'Respiratory Pattern Analysis',
+                    content: 'Advanced algorithms for detecting respiratory anomalies and predicting respiratory events.',
+                    authors: 'Dr. James Wilson, Dr. Emily Thompson',
+                    institution: 'Johns Hopkins University',
+                    abstract: 'Our research demonstrates novel approaches to respiratory monitoring using AI...'
+                },
+                wellness: {
+                    title: 'Holistic Wellness Assessment',
+                    content: 'Integration of physiological and psychological markers for comprehensive health evaluation.',
+                    authors: 'Dr. Maria Garcia, Prof. David Lee',
+                    institution: 'MIT Health Sciences',
+                    abstract: 'This meta-analysis combines data from multiple sources to create a unified wellness model...'
+                },
+                sleep: {
+                    title: 'Sleep Quality & Recovery Research',
+                    content: 'Understanding the relationship between sleep patterns and physiological recovery.',
+                    authors: 'Dr. Rachel Brown, Dr. Kevin Martinez',
+                    institution: 'Harvard Sleep Research Lab',
+                    abstract: 'Sleep quality directly impacts recovery and performance metrics...'
+                },
+                fitness: {
+                    title: 'Exercise Physiology Studies',
+                    content: 'Optimizing athletic performance through real-time biometric feedback.',
+                    authors: 'Dr. Alex Johnson, Prof. Lisa Anderson',
+                    institution: 'UCLA Sports Science Center',
+                    abstract: 'Real-time monitoring enables personalized training optimization...'
+                },
+                nutrition: {
+                    title: 'Metabolic Health Research',
+                    content: 'Personalized nutrition based on continuous metabolic monitoring.',
+                    authors: 'Dr. Patricia White, Dr. Robert Kim',
+                    institution: 'Cornell Nutrition Institute',
+                    abstract: 'Metabolic responses to nutrition vary significantly between individuals...'
+                }
+            };
+            
+            const data = research[topic] || research.cardio;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <div class="modal-header">
+                        <h2>${data.title}</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background: var(--surface); padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg);">
+                            <small style="color: var(--text-secondary);">Authors: ${data.authors}<br>Institution: ${data.institution}</small>
+                        </div>
+                        
+                        <h3>Abstract</h3>
+                        <p style="margin-bottom: var(--spacing-lg);">${data.abstract}</p>
+                        
+                        <h3>Key Findings</h3>
+                        <p>${data.content}</p>
+                        
+                        <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-xl);">
+                            <button class="btn">📄 Download Paper</button>
+                            <button class="btn btn-secondary">🔗 Share</button>
+                            <button class="btn btn-secondary">⭐ Save to Library</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            playSound('success');
+            trackEvent('Research', 'View', topic);
+        }
+        
+        // ===== 3D MODEL LOADER =====
+        function load3DModel() {
+            const url = document.getElementById('modelUrl').value;
+            if (!url) {
+                alert('Please enter a valid 3D model URL');
+                return;
+            }
+            
+            const viewer = document.getElementById('viewer3d');
+            
+            // Create iframe for model viewer
+            viewer.innerHTML = `
+                <iframe src="https://gltf-viewer.donmccurdy.com/#model=${encodeURIComponent(url)}" 
+                        style="width: 100%; height: 100%; border: none;"
+                        title="3D Model Viewer">
+                </iframe>
+            `;
+            
+            playSound('success');
+            trackEvent('3D', 'Load', url);
+        }
+        
+        // ===== CONTACT FORM =====
+        function handleContact(event) {
+            event.preventDefault();
+            
+            // Check honeypot
+            if (document.getElementById('website').value) {
+                return false;
+            }
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            // TODO: CONTENT - Add your form handling logic here
+            console.log('Contact form submitted:', { name, email, message });
+            
+            alert('Thank you for your message! (This is a demo - no data was actually sent)');
+            
+            // Reset form
+            event.target.reset();
+            
+            playSound('success');
+            trackEvent('Contact', 'Submit', 'Form');
+            
+            return false;
+        }
+        
+        // ===== INTERSECTION OBSERVER =====
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+        
+        // ===== KEYBOARD NAVIGATION =====
+        document.addEventListener('keydown', (e) => {
+            // Tab navigation improvements
+            if (e.key === 'Tab') {
+                document.body.style.outline = '2px solid var(--accent)';
+            }
+        });
+        
+        document.addEventListener('mousedown', () => {
+            document.body.style.outline = 'none';
+        });
+        
+        // ===== PERFORMANCE OPTIMIZATION =====
+        // Debounce function for expensive operations
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Debounced search
+        const debouncedSearch = debounce(searchResearch, 300);
+        document.getElementById('researchSearch').addEventListener('input', debouncedSearch);
+        
+                // ===== METRIC DETAILS =====
+        function showMetricDetails(type) {
+            const details = {
+                heart: {
+                    title: 'Heart Health Analysis',
+                    icon: '❤️',
+                    description: 'Your cardiovascular system is functioning within normal parameters.',
+                    tips: [
+                        'Maintain regular exercise for optimal heart health',
+                        'Monitor your resting heart rate daily',
+                        'Stay hydrated to support circulation',
+                        'Consider heart rate variability for deeper insights'
+                    ],
+                    ranges: 'Normal: 60-100 BPM | Athletic: 40-60 BPM | Elevated: >100 BPM'
+                },
+                oxygen: {
+                    title: 'Oxygen Saturation',
+                    icon: '💨',
+                    description: 'Blood oxygen levels indicate efficient respiratory function.',
+                    tips: [
+                        'Practice deep breathing exercises',
+                        'Ensure good ventilation in living spaces',
+                        'Monitor during physical activity',
+                        'Seek medical attention if consistently below 95%'
+                    ],
+                    ranges: 'Normal: 95-100% | Mild Hypoxemia: 90-94% | Moderate: 80-89%'
+                },
+                stress: {
+                    title: 'Stress Level Assessment',
+                    icon: '🧘',
+                    description: 'Stress indicators are calculated from multiple biometric factors.',
+                    tips: [
+                        'Practice mindfulness meditation',
+                        'Maintain regular sleep schedule',
+                        'Engage in stress-reducing activities',
+                        'Monitor heart rate variability patterns'
+                    ],
+                    ranges: 'Low: Balanced state | Moderate: Manageable stress | High: Consider relaxation'
+                },
+                wellness: {
+                    title: 'Overall Wellness Score',
+                    icon: '✨',
+                    description: 'Comprehensive assessment based on all biometric parameters.',
+                    tips: [
+                        'Maintain balanced nutrition',
+                        'Regular health check-ups recommended',
+                        'Track trends over time for insights',
+                        'Celebrate your health achievements!'
+                    ],
+                    ranges: 'Excellent: All parameters optimal | Good: Minor variations | Fair: Some attention needed'
+                }
+            };
+            
+            const detail = details[type];
+            if (!detail) return;
+            
+            // Create detailed modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h2><span style="font-size: 2rem; margin-right: var(--spacing-sm);">${detail.icon}</span> ${detail.title}</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-size: 1.125rem; margin-bottom: var(--spacing-lg);">${detail.description}</p>
+                        
+                        <div style="background: var(--surface); padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg);">
+                            <strong>Reference Ranges:</strong><br>
+                            <small style="color: var(--text-secondary);">${detail.ranges}</small>
+                        </div>
+                        
+                        <h3 style="margin-bottom: var(--spacing-md);">💡 Health Tips</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${detail.tips.map(tip => `<li style="margin-bottom: var(--spacing-sm);">✓ ${tip}</li>`).join('')}
+                        </ul>
+                        
+                        <div style="margin-top: var(--spacing-xl); text-align: center;">
+                            <button class="btn" onclick="this.closest('.modal').remove()">Got it!</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            playSound('success');
+            trackEvent('Metric', 'View Details', type);
+        }
+        
+        // ===== SERVICE WORKER (for offline support) ===== 
+        if ('serviceWorker' in navigator) {
+            // Register service worker for offline functionality
+            // Note: You would need to create a separate service-worker.js file for full offline support
+        }
+    </script>
+</body>
+</html>

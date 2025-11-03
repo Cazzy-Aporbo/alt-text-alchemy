@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cazandra Aporbo — ML + Bio Models Portfolio</title>
+<meta name="description" content="Single-file portfolio: classical→advanced ML plus complex biological & mechanistic models. Interactive search, filters, comparison, metrics, leadership." />
+
+<style>
+:root{
+  --bg:#ffffff; --bg-soft:#f7f7fb; --text:#141218; --muted:#595565;
+  --card:#ffffff; --border:#e7e7ef; --accent:#5a48e3; --accent-2:#ffd36a;
+  --good:#0b8f5a; --warn:#d48806; --bad:#b12a34; --shadow:0 10px 24px rgba(16,12,60,.08);
+}
+[data-theme="dark"]{
+  --bg:#0e0e13; --bg-soft:#14141d; --text:#f2f2f7; --muted:#b0abbf;
+  --card:#14141d; --border:#2a2a36; --accent:#a894ff; --accent-2:#ffd36a;
+  --shadow:0 10px 24px rgba(0,0,0,.45);
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font:400 16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue","Noto Sans",sans-serif;}
+*{box-sizing:border-box}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,Monaco,monospace;font-size:13px}
+.container{max-width:1200px;margin:0 auto;padding:24px}
+.grid{display:grid;gap:16px}
+.grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:1180px){.grid.cols-4{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:980px){.grid.cols-3{grid-template-columns:repeat(2,1fr)} .grid.cols-4{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:680px){.grid.cols-4,.grid.cols-3,.grid.cols-2{grid-template-columns:1fr}}
+
+.header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--bg),rgba(0,0,0,0));border-bottom:1px solid var(--border);backdrop-filter:saturate(120%) blur(6px)}
+.nav{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:12px 24px}
+.nav .title{font-weight:700;letter-spacing:.2px}
+.nav .links{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--border);background:var(--card);padding:8px 12px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow)}
+.btn.inline{padding:6px 10px;border-radius:8px;box-shadow:none}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:var(--bg-soft);color:var(--muted);font-size:12px}
+
+.hero{display:grid;gap:14px;padding:28px 0}
+.hero h1{font-size:32px;margin:0}
+.hero p{margin:0;color:var(--muted)}
+.kpis .card, .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin:6px 0 8px;font-size:18px}
+.card .muted{color:var(--muted);font-size:14px}
+
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:8px 0 18px}
+.input{display:flex;align-items:center;border:1px solid var(--border);background:var(--card);border-radius:10px;padding:8px 10px;gap:8px;min-width:260px}
+.input input{border:none;outline:none;background:transparent;color:var(--text);width:220px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 10px;border-radius:999px;border:1px solid var(--border);cursor:pointer;background:var(--bg-soft)}
+.chip.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(90,72,227,.2)}
+
+.model-card header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.details{display:grid;gap:12px}
+.code-block{position:relative;border:1px solid var(--border);border-radius:12px;background:var(--bg-soft);padding:12px;overflow:auto}
+.copy{position:absolute;top:8px;right:8px}
+.metrics{display:flex;gap:12px;flex-wrap:wrap}
+.metrics svg{border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.assumptions{border-top:1px dashed var(--border);padding-top:10px;color:var(--muted);font-size:14px}
+
+.section{padding:24px 0}
+.section h2{margin:6px 0 4px;font-size:24px}
+.section .sub{margin:0 0 12px;color:var(--muted)}
+
+.form-grid{display:grid;gap:12px;grid-template-columns:repeat(3, minmax(0,1fr))}
+@media (max-width:820px){ .form-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){ .form-grid{grid-template-columns:1fr}}
+select, .select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+.results{display:grid;gap:8px;margin-top:10px}
+
+.timeline{display:flex;align-items:center;justify-content:center}
+.timeline svg{width:100%;max-width:900px;height:120px}
+
+footer{margin:24px 0 48px;color:var(--muted)}
+.float-top{position:fixed;bottom:16px;right:16px;z-index:50;display:none}
+.float-top.show{display:block}
+
+.checklist li{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+.checklist input{margin-top:3px}
+.tag{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:2px 8px;margin-left:6px;font-size:12px;background:var(--bg-soft);color:var(--muted)}
+
+@media print{
+  .header,.toolbar,.btn, .float-top{display:none !important}
+  a::after{content:" (" attr(href) ")";font-size:10px;color:var(--muted)}
+  body{background:white;color:#000}
+}
+:focus{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto;animation:none;transition:none}}
+</style>
+</head>
+<body>
+<header class="header" role="banner" aria-label="Primary">
+  <nav class="nav container" aria-label="Main">
+    <div class="title"><strong>Cazandra Aporbo</strong> · <span class="muted">Head of Data, FoXX Health</span></div>
+    <div class="links">
+      <a class="btn inline" href="#impact">Impact</a>
+      <a class="btn inline" href="#skills">Skills</a>
+      <a class="btn inline" href="#education">Education</a>
+      <a class="btn inline" href="#portfolio">Models</a>
+      <a class="btn inline" href="#compare">Compare</a>
+      <a class="btn inline" href="#leadership">Leadership</a>
+      <a class="btn inline" href="#cons">Cons.</a>
+      <a class="btn inline" href="#notes">Notes</a>
+      <a class="btn inline" href="#projects">Projects</a>
+      <a class="btn inline" href="#about">About</a>
+      <button class="btn inline" id="themeToggle" aria-pressed="false" title="Toggle dark mode">Dark</button>
+      <button class="btn inline" id="printBtn" title="Download as PDF">Print</button>
+    </div>
+  </nav>
+</header>
+
+<main id="top" class="container" role="main">
+  <section class="hero" id="hero">
+    <h1>Human-centered, trustworthy ML—end to end.</h1>
+    <p>Designing safe, measurable AI systems from data governance to deployment.</p>
+    <div class="chips" aria-label="Quick Links">
+      <a class="chip" href="https://www.linkedin.com/in/cazandra-aporbo" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a class="chip" href="https://github.com/Cazzy-Aporbo" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="chip" href="mailto:[[your.email@domain]]">Email</a>
+      <span class="badge">Single-file • No CDNs</span>
+    </div>
+  </section>
+
+  <!-- Impact + Timeline + Trust & Safety -->
+  <section id="impact" class="section">
+    <h2>Value & Impact</h2>
+    <p class="sub">Example metrics (editable) highlighting production outcomes and reliability.</p>
+    <div class="grid cols-4 kpis">
+      <div class="card"><div class="muted">Models Deployed</div><h3>12</h3><div class="muted">last 18 months</div></div>
+      <div class="card"><div class="muted">Latency SLAs Met</div><h3>99.3%</h3><div class="muted">p95 ≤ 120 ms</div></div>
+      <div class="card"><div class="muted">Annual Cost Saved</div><h3>$420k</h3><div class="muted">through optimization</div></div>
+      <div class="card"><div class="muted">Uptime / MTTR</div><h3>99.9% / 12m</h3><div class="muted">observability-driven</div></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="timeline" role="img" aria-label="Impact timeline: FoXX launch, Better Life forecasting, Thermo Fisher automation">
+        <svg viewBox="0 0 900 120" aria-hidden="true">
+          <defs><linearGradient id="g1" x1="0" x2="1" y1="0" y2="0">
+            <stop stop-color="var(--accent)" offset="0"/><stop stop-color="var(--accent-2)" offset="1"/>
+          </linearGradient></defs>
+          <rect x="40" y="56" width="820" height="4" fill="url(#g1)" rx="2"/>
+          <circle cx="120" cy="58" r="6" fill="var(--accent)"/>
+          <circle cx="330" cy="58" r="6" fill="var(--accent)"/>
+          <circle cx="560" cy="58" r="6" fill="var(--accent)"/>
+          <circle cx="790" cy="58" r="6" fill="var(--accent)"/>
+          <g font-size="12" fill="var(--muted)">
+            <text x="90" y="30">Thermo Fisher</text><text x="90" y="45">Automation ↑3×</text>
+            <text x="300" y="30">Better Life Appliance</text><text x="300" y="45">Forecasting +90% acc</text>
+            <text x="530" y="30">FoXX Health</text><text x="530" y="45">Privacy-first AI infra</text>
+            <text x="760" y="30">FoXX Launch</text><text x="760" y="45">LLM features live</text>
+          </g>
+        </svg>
+      </div>
+      <div class="grid cols-2">
+        <div>
+          <h3 style="margin-top:0">Business Value</h3>
+          <p class="muted">Shipped models that reduce cycle time, increase revenue capture, and improve user safety. Focus on latency, interpretability, and fairness with measurable outcomes and roll-back plans.</p>
+        </div>
+        <div>
+          <h3 style="margin-top:0">Trust & Safety</h3>
+          <ul>
+            <li>Bias checks & calibration; class-weighting or rebalancing when needed.</li>
+            <li>HIPAA/GDPR-aligned pipelines; automated PII redaction & audit logs.</li>
+            <li>Data drift & performance monitoring; alerting with safe fallbacks.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills" class="section">
+    <h2>Technical Skills</h2>
+    <div class="grid cols-3">
+      <div class="card">
+        <h3>Programming</h3>
+        <p class="muted">Python, R, SQL, C++, Java</p>
+        <h3>ML/DL</h3>
+        <p class="muted">scikit-learn, TensorFlow, PyTorch, Keras, XGBoost, LightGBM, HuggingFace Transformers</p>
+      </div>
+      <div class="card">
+        <h3>Cloud & Data</h3>
+        <p class="muted">AWS (SageMaker, S3), Azure ML, Google Cloud (Vertex AI)</p>
+        <p class="muted">Pandas, NumPy, BeautifulSoup, Scrapy, Selenium</p>
+      </div>
+      <div class="card">
+        <h3>Visualization / DB / Tools</h3>
+        <p class="muted">Tableau, Power BI, Matplotlib, Seaborn</p>
+        <p class="muted">MySQL, PostgreSQL, MongoDB, Oracle</p>
+        <p class="muted">Jupyter, Git, Colab, Streamlit, Dash</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education -->
+  <section id="education" class="section">
+    <h2>Education</h2>
+    <div class="grid cols-2">
+      <div class="card"><strong>M.S. Data Science</strong>, University of Denver, 2024 <span class="badge">with honors</span></div>
+      <div class="card"><strong>B.S. Biology & Chemistry</strong>, Oregon State University, 2022 <span class="badge">Cum Laude</span></div>
+    </div>
+    <h2 style="margin-top:20px">Leadership & Community</h2>
+    <div class="grid cols-3">
+      <div class="card">Founder — <em>At Your PACE</em> (student org for academic growth)</div>
+      <div class="card">Member — Women in STEM (University of Denver), Thermo Fisher Women’s ERG</div>
+      <div class="card">Volunteer — Saving Grace; Volunteers of Medicine</div>
+    </div>
+  </section>
+
+  <!-- Model Portfolio (cards) -->
+  <section id="portfolio" class="section">
+    <h2>Model Portfolio</h2>
+    <p class="sub">Search & filter across ML and biologically grounded models. Each card expands; code blocks have copy buttons.</p>
+    <div class="toolbar" role="region" aria-label="Search and filter">
+      <div class="input" role="search" aria-label="Search models">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" fill="none" stroke-width="2"/><line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="2"/></svg>
+        <input id="q" type="text" placeholder="Search 'classification', 'metabolic', 'diffusion', etc."/>
+      </div>
+      <div class="chips" id="chipRow">
+        <!-- ML task chips -->
+        <button class="chip" data-filter="Classification">Classification</button>
+        <button class="chip" data-filter="Regression">Regression</button>
+        <button class="chip" data-filter="Clustering">Clustering</button>
+        <button class="chip" data-filter="Dim-Red">Dim-Red</button>
+        <button class="chip" data-filter="Time-Series">Time-Series</button>
+        <button class="chip" data-filter="Recommender">Recommender</button>
+        <button class="chip" data-filter="NLP">NLP</button>
+        <button class="chip" data-filter="Graph">Graph</button>
+        <button class="chip" data-filter="RL">RL</button>
+        <!-- Bio/Mechanistic tags -->
+        <button class="chip" data-filter="Mechanistic">Mechanistic</button>
+        <button class="chip" data-filter="Biophysical">Biophysical</button>
+        <button class="chip" data-filter="Neuro">Neuro</button>
+        <button class="chip" data-filter="Physiology">Physiology</button>
+        <button class="chip" data-filter="Metabolic">Metabolic</button>
+        <button class="chip" data-filter="Genetics">Genetics</button>
+        <button class="chip" data-filter="Molecular">Molecular</button>
+        <button class="chip" data-filter="Behavior">Behavior</button>
+        <button class="chip" data-filter="Social">Social</button>
+        <button class="chip" data-filter="Simulation">Simulation</button>
+        <button class="chip" data-filter="Optimization">Optimization</button>
+      </div>
+      <button class="btn inline" id="expandAll">Expand all</button>
+      <button class="btn inline" id="collapseAll">Collapse all</button>
+      <button class="btn inline" id="clearFilters">Clear filters</button>
+    </div>
+    <div id="modelGrid" class="grid cols-3" role="list"></div>
+  </section>
+
+  <!-- Interactive comparison tool -->
+  <section id="compare" class="section">
+    <h2>Interactive Model Comparison</h2>
+    <p class="sub">Transparent rule-based suggestions across ML and mechanistic models.</p>
+    <div class="card">
+      <div class="form-grid">
+        <label>Task
+          <select id="selTask" class="select" aria-label="Task">
+            <option>Classification</option><option>Regression</option><option>Clustering</option><option>Dim-Red</option>
+            <option>Time-Series</option><option>Recommender</option><option>NLP</option><option>Graph</option><option>RL</option>
+            <option>Mechanistic</option><option>Behavioral</option><option>Social</option>
+          </select>
+        </label>
+        <label>Data / System Type
+          <select id="selFeat" class="select">
+            <option>Tabular</option><option>Images</option><option>Text</option><option>Time-series</option><option>Graph</option><option>Simulation</option>
+          </select>
+        </label>
+        <label>Data Size
+          <select id="selSize" class="select"><option>Small</option><option>Medium</option><option>Large</option></select>
+        </label>
+        <label>Latency Budget
+          <select id="selLatency" class="select"><option>Low (edge)</option><option>Moderate</option><option>High OK</option></select>
+        </label>
+        <label>Interpretability
+          <select id="selInterp" class="select"><option>High</option><option>Medium</option><option>Low OK</option></select>
+        </label>
+        <label>Fairness/Safety Priority
+          <select id="selFair" class="select"><option>Critical</option><option>Important</option><option>Standard</option></select>
+        </label>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn" id="btnCompare">Recommend</button>
+        <span class="muted">Scoring: +task fit, +type fit, −latency cost, +interpretability on demand.</span>
+      </div>
+      <div id="cmpResults" class="results" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="section">
+    <h2>Selected Projects</h2>
+    <div class="grid cols-2">
+      <div class="card"><h3>Revenue Forecasting</h3><p class="muted">Linear Regression (example: 90% MAPE accuracy). <a href="#model-Linear-Regression">Jump</a></p></div>
+      <div class="card"><h3>Fraud / Anomaly Detection</h3><p class="muted">XGBoost (+30% vs baseline). <a href="#model-Gradient-Boosting">Jump</a></p></div>
+      <div class="card"><h3>Image Classification</h3><p class="muted">CNNs (example: 92% accuracy). <a href="#model-CNN">Jump</a></p></div>
+      <div class="card"><h3>NLP Maintenance Logs</h3><p class="muted">Transformers (-50% review time). <a href="#model-Transformer">Jump</a></p></div>
+      <div class="card"><h3>Time Series Forecasting</h3><p class="muted">ARIMA/Prophet (example: −87% forecast error). <a href="#model-ARIMA">Jump</a></p></div>
+    </div>
+  </section>
+
+  <!-- Leadership highlights -->
+  <section id="leadership" class="section">
+    <h2>Leadership Highlights (Head of Data)</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <ul>
+          <li>Built privacy-first AI infrastructure (HIPAA/GDPR aligned) end to end.</li>
+          <li>Automated PII redaction pipelines with compliance tracking and audits.</li>
+          <li>Fine-tuned domain-specific LLMs on Azure/GCP with safety guardrails.</li>
+          <li>Roadmapped investor-facing plans and internal governance frameworks.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="badge">Org & Collaboration</div>
+        <p class="muted">Partnered with engineering, compliance, product; mentored data scientists; instituted evaluation rubric for fairness, robustness, and clarity.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Constraints & Considerations -->
+  <section id="cons" class="section">
+    <h2>Constraints & Considerations (“Cons.”)</h2>
+    <p class="sub">Governance, bias/fairness, interpretability, robustness/drift, MLOps, latency, carbon/cost, and evaluation pitfalls. Use the checklist when shipping.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn inline" id="checkAll">Check all</button>
+      <button class="btn inline" id="uncheckAll">Uncheck all</button>
+    </div>
+    <div class="grid cols-3">
+      <div class="card">
+        <h3>Governance <span class="tag">HIPAA/GDPR</span></h3>
+        <ul class="checklist">
+          <li><input type="checkbox"> Data inventory & lineage documented</li>
+          <li><input type="checkbox"> Access controls & audit logs</li>
+          <li><input type="checkbox"> Purpose limitation & retention rules</li>
+        </ul>
+        <p class="muted"><strong>What I do:</strong> DSR playbooks, DPIAs, automated PII redaction pipelines.</p>
+      </div>
+      <div class="card">
+        <h3>Bias & Fairness</h3>
+        <ul class="checklist">
+          <li><input type="checkbox"> Slice metrics (TPR/FPR, calibration)</li>
+          <li><input type="checkbox"> Representative sampling / reweighting</li>
+          <li><input type="checkbox"> Stakeholder review for harms</li>
+        </ul>
+        <p class="muted"><strong>What I do:</strong> Threshold audits + monotonic constraints where appropriate.</p>
+      </div>
+      <div class="card">
+        <h3>Interpretability</h3>
+        <ul class="checklist"><li><input type="checkbox"> Model cards & feature attributions</li><li><input type="checkbox"> Counterfactuals / ICE plots</li></ul>
+        <p class="muted"><strong>What I do:</strong> Human-readable summaries and risk disclaimers.</p>
+      </div>
+      <div class="card">
+        <h3>Robustness & Drift</h3>
+        <ul class="checklist"><li><input type="checkbox"> Backtesting & stress tests</li><li><input type="checkbox"> Data/label drift monitors</li><li><input type="checkbox"> Safe fallbacks & rollbacks</li></ul>
+        <p class="muted"><strong>What I do:</strong> Canary deploys with rollback triggers on KPIs.</p>
+      </div>
+      <div class="card">
+        <h3>MLOps</h3>
+        <ul class="checklist"><li><input type="checkbox"> Reproducible pipelines</li><li><input type="checkbox"> Model registry & versioning</li><li><input type="checkbox"> CI/CD with tests</li></ul>
+        <p class="muted"><strong>What I do:</strong> Automated eval jobs & model signatures.</p>
+      </div>
+      <div class="card">
+        <h3>Latency & UX</h3>
+        <ul class="checklist"><li><input type="checkbox"> p95/p99 budgets</li><li><input type="checkbox"> Async & batching plans</li><li><input type="checkbox"> Graceful degradation</li></ul>
+        <p class="muted"><strong>What I do:</strong> Cache + quantization where safe.</p>
+      </div>
+      <div class="card">
+        <h3>Carbon & Cost</h3>
+        <ul class="checklist"><li><input type="checkbox"> Train/infer cost estimates</li><li><input type="checkbox"> Cloud power/region choices</li><li><input type="checkbox"> Decommission stale models</li></ul>
+        <p class="muted"><strong>What I do:</strong> Budget caps + scheduled scale-to-zero.</p>
+      </div>
+      <div class="card">
+        <h3>Evaluation Pitfalls</h3>
+        <ul class="checklist"><li><input type="checkbox"> Leakage checks</li><li><input type="checkbox"> Robust CV strategy</li><li><input type="checkbox"> Human-in-the-loop validation</li></ul>
+        <p class="muted"><strong>What I do:</strong> Audit datasets and pre/post-deployment gates.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Study Notes (unchanged, collapsible) would go here if desired -->
+
+  <section id="about" class="section">
+    <h2>About & Philosophy</h2>
+    <p class="card">I build ML systems that respect constraints first—privacy, interpretability, latency—then scale. I favor transparent metrics, clear failure modes, and staged rollouts with guardrails so models serve people reliably.</p>
+  </section>
+
+  <section class="section" aria-labelledby="qc-h">
+    <h2 id="qc-h">Quality Checklist</h2>
+    <div id="qc" class="grid cols-3"></div>
+  </section>
+</main>
+
+<button class="btn float-top" id="backTop" title="Back to top">↑ Top</button>
+
+<footer class="container">
+  <div>Contact: <a href="mailto:[[your.email@domain]]">[[your.email@domain]]</a> · Last updated <span id="lastUpdated"></span></div>
+  <div class="muted">© <span id="year"></span> Cazandra Aporbo. MIT license for this file’s structure; example code is illustrative.</div>
+</footer>
+
+<script>
+const $ = (q, el=document) => el.querySelector(q);
+const $$ = (q, el=document) => [...el.querySelectorAll(q)];
+const state = {
+  theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+  filters: new Set(), q: ''
+};
+document.documentElement.setAttribute('data-theme', state.theme);
+$('#themeToggle').setAttribute('aria-pressed', state.theme==='dark');
+$('#themeToggle').addEventListener('click', () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  localStorage.setItem('theme', state.theme);
+  $('#themeToggle').setAttribute('aria-pressed', state.theme==='dark');
+});
+$('#printBtn').addEventListener('click', ()=> window.print());
+$('#year').textContent = new Date().getFullYear();
+$('#lastUpdated').textContent = new Date().toLocaleDateString();
+
+/* Tiny syntax highlighter */
+function highlight(code, lang='py'){
+  const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const KW = lang==='py'
+    ? /\b(def|class|import|from|return|if|elif|else|for|while|with|as|try|except|finally|yield|lambda|pass|break|continue|True|False|None)\b/g
+    : /\b(IF|ELSE|FOR|WHILE|FUNCTION|RETURN|INPUT|OUTPUT|INIT|UPDATE|PREDICT)\b/g;
+  return esc.replace(KW,'<span style="color:var(--accent);font-weight:600">$1</span>')
+            .replace(/(#.*)$/gm,'<span style="color:var(--muted)">$1</span>')
+            .replace(/(\b\d+(\.\d+)?\b)/g,'<span style="color:var(--good)">$1</span>');
+}
+
+/* ======== MODELS: ML + Biological/Mechanistic ======== */
+const models = [
+  /* ---------- Classical/ML (shortened here; unchanged content from previous build) ---------- */
+  {name:'Linear Regression', level:'Level 1', id:'Linear-Regression', tags:['Regression','Tabular','Interpretability','Low-Data'],
+   use:'Continuous targets with linear-ish relationships; strong baseline.',
+   strengths:'Fast, interpretable coefficients, small data friendly.',
+   failures:'Outliers, multicollinearity, nonlinearity without features.',
+   complexity:'O(n·p²) normal eq; SGD ~ linear', hyper:'alpha (L2), fit_intercept, normalize',
+   prep:'Scaling, one-hot; check VIF/condition number', loss:'MSE/MAE; Huber for robustness', eval:'RMSE/MAE, R², residual diagnostics',
+   monitor:'Residual std & population shift; alert on MAPE ↑',
+   pseudo:`FUNCTION FitLinear(X,y):
+  Xb <- AddBias(X)
+  beta <- (Xb^T Xb)^(-1) Xb^T y`, py:`from sklearn.linear_model import Ridge
+Ridge().fit(X_train,y_train)`, metrics:'residuals'},
+
+  {name:'Logistic Regression', level:'Level 1', id:'Logistic-Regression',
+   tags:['Classification','Tabular','Interpretability','Calibration'],
+   use:'Binary/one-vs-rest classification with calibrated probabilities.',
+   strengths:'Convex, fast; class weights for imbalance.',
+   failures:'Nonlinear boundaries; needs features.', complexity:'~O(n·p)',
+   hyper:'C, penalty (l1/l2), class_weight', prep:'Scale; one-hot; calibration if needed.',
+   loss:'Log loss', eval:'ROC/PR-AUC, F1, Brier score', monitor:'KS/PSI shift; threshold audits',
+   pseudo:`REPEAT: w = w - lr * grad_logloss(sigmoid(Xw),y)`,
+   py:`from sklearn.linear_model import LogisticRegression
+LogisticRegression(max_iter=1000, class_weight='balanced').fit(X_train,y_train)`, metrics:'decision'},
+
+  {name:'Naive Bayes', level:'Level 1', id:'Naive-Bayes', tags:['Classification','Text','Low-Data'],
+   use:'Text/email classification on bag-of-words/TF-IDF.',
+   strengths:'Tiny data works; extremely fast.',
+   failures:'Independence assumption; poor calibration.',
+   complexity:'O(n·p)', hyper:'alpha (Laplace), fit_prior', prep:'Tokenize → TF-IDF',
+   loss:'NLL', eval:'Accuracy/F1, PR-AUC', monitor:'Vocabulary drift / OOV rate',
+   pseudo:`score[c] = log P(c) + Σ log P(x_i|c); return argmax_c`, py:`from sklearn.naive_bayes import MultinomialNB
+MultinomialNB().fit(X_train,y_train)`},
+
+  {name:'k-Nearest Neighbors', level:'Level 1', id:'kNN', tags:['Classification','Regression','Tabular'],
+   use:'Local similarity tasks; prototype-based.',
+   strengths:'No training; flexible boundaries.',
+   failures:'Slow inference; curse of dimensionality.',
+   complexity:'Query O(n·p)', hyper:'k, distance, weights', prep:'Scale features',
+   loss:'Majority vote/L2', eval:'Accuracy/F1 or RMSE', monitor:'Neighborhood density drift',
+   pseudo:`Predict(x): return majority(k nearest(x))`, py:`from sklearn.neighbors import KNeighborsClassifier
+KNeighborsClassifier(n_neighbors=7).fit(X_train,y_train)`},
+
+  {name:'Decision Tree', level:'Level 2', id:'Decision-Tree', tags:['Classification','Regression','Interpretability','Tabular'],
+   use:'Nonlinear rules; mixed types.',
+   strengths:'Readable splits; minimal scaling.',
+   failures:'Overfitting without constraints.',
+   complexity:'~O(n·p log n)', hyper:'max_depth, min_samples_leaf, criterion',
+   prep:'Handle missing appropriately.', loss:'Gini/Entropy or MSE',
+   eval:'Accuracy/F1 or RMSE', monitor:'Leaf distribution drift',
+   pseudo:`GrowTree: pick split with max info gain; recurse`, py:`from sklearn.tree import DecisionTreeClassifier
+DecisionTreeClassifier(max_depth=6).fit(X_train,y_train)`},
+
+  {name:'Random Forest', level:'Level 2', id:'Random-Forest', tags:['Classification','Regression','Tabular','Robust'],
+   use:'Strong tabular baseline.',
+   strengths:'Robust; handles nonlinearity; importance.',
+   failures:'Less interpretable; large models.',
+   complexity:'O(T·n log n)', hyper:'n_estimators, max_depth, max_features',
+   prep:'Class balancing as needed.', loss:'Ensemble of trees',
+   eval:'OOB/ROC-AUC/F1', monitor:'Feature drift; OOB vs prod',
+   pseudo:`Trees on bootstraps with feature subsampling`, py:`from sklearn.ensemble import RandomForestClassifier
+RandomForestClassifier(n_estimators=300).fit(X_train,y_train)`},
+
+  {name:'Gradient Boosting (XGBoost/LightGBM/CatBoost)', level:'Level 2', id:'Gradient-Boosting', tags:['Classification','Regression','Tabular','Latency'],
+   use:'High-accuracy tabular.', strengths:'Great performance with tuning.',
+   failures:'Leakage & overfit risk.', complexity:'O(T·n log n)',
+   hyper:'learning_rate, max_depth, n_estimators', prep:'Categoricals (CatBoost native).',
+   loss:'Additive trees minimizing differentiable loss', eval:'ROC/PR-AUC; calibration',
+   monitor:'Latency/cost; SHAP drift', pseudo:`F_m = F_{m-1} + η h_m (fit to negative gradient)`,
+   py:`from xgboost import XGBClassifier
+XGBClassifier(n_estimators=500).fit(X_train,y_train)`},
+
+  {name:'Support Vector Machine', level:'Level 2', id:'SVM', tags:['Classification','Tabular','Kernel'],
+   use:'High-dimensional spaces; margins matter.',
+   strengths:'Effective with RBF; robust to outliers.',
+   failures:'Scaling to very large n; calibration.',
+   complexity:'O(n^2..n^3)', hyper:'C, kernel, gamma', prep:'Scale features.',
+   loss:'Hinge + margin', eval:'Accuracy/F1; calibration curve', monitor:'Support vector count',
+   pseudo:`min ||w||² s.t. y_i(w·x_i+b) ≥ 1-ξ_i`, py:`from sklearn.svm import SVC
+SVC(kernel='rbf', probability=True).fit(X_train,y_train)`},
+
+  {name:'K-Means', level:'Level 2', id:'K-Means', tags:['Clustering','Tabular','Dim-Red'],
+   use:'Spherical clusters baseline.', strengths:'Fast/simple.',
+   failures:'Needs k; sensitive to scale/outliers.', complexity:'O(n·k·t)',
+   hyper:'k, init, n_init', prep:'Scale; remove outliers.', loss:'Within-cluster SSE',
+   eval:'Silhouette/Davies–Bouldin', monitor:'Centroid drift', pseudo:`assign ↔ update until stable`,
+   py:`from sklearn.cluster import KMeans
+KMeans(n_clusters=8,n_init=10).fit(X)`},
+
+  {name:'DBSCAN', level:'Level 2', id:'DBSCAN', tags:['Clustering','Tabular','Anomaly'],
+   use:'Arbitrary shapes & outliers.', strengths:'No k; detects noise.',
+   failures:'eps/minPts sensitive; high-dim issues.', complexity:'~O(n log n)',
+   hyper:'eps, min_samples', prep:'Scale; k-dist plot for eps.', loss:'Density connectivity',
+   eval:'#clusters, noise %, silhouette', monitor:'Noise rate change', pseudo:`expand cluster when density ≥ minPts`,
+   py:`from sklearn.cluster import DBSCAN
+DBSCAN(eps=0.5,min_samples=10).fit(X)`},
+
+  {name:'Gaussian Mixture', level:'Level 2', id:'GMM', tags:['Clustering','Density'],
+   use:'Soft/elliptical clusters.', strengths:'Probabilistic responsibilities.',
+   failures:'Local minima; pick k.', complexity:'EM O(n·k·t)',
+   hyper:'n_components, covariance_type', prep:'Scale features.',
+   loss:'Log-likelihood', eval:'BIC/AIC; entropy', monitor:'Component collapse',
+   pseudo:`EM: E-step γ(z); M-step maximize E[log p]`, py:`from sklearn.mixture import GaussianMixture
+GaussianMixture(n_components=4).fit(X)`},
+
+  {name:'PCA', level:'Level 2', id:'PCA', tags:['Dim-Red','Preprocessing'],
+   use:'Variance capture / denoise.', strengths:'Visualization; compression.',
+   failures:'Linear only; hard to interpret.', complexity:'SVD',
+   hyper:'n_components', prep:'Scale & center.', loss:'Reconstruction error',
+   eval:'Explained variance ratio', monitor:'EVR drift', pseudo:`SVD: X=UΣV^T; Z=XV_k`,
+   py:`from sklearn.decomposition import PCA
+PCA(n_components=10).fit(X)`},
+
+  {name:'ARIMA', level:'Level 3', id:'ARIMA', tags:['Time-Series'],
+   use:'Stationary series baseline.', strengths:'Interpretable; SARIMA for seasonality.',
+   failures:'Regime shifts; exogenous effects.', complexity:'order dependent',
+   hyper:'p,d,q; P,D,Q,s', prep:'Differencing; stationarity tests.', loss:'Log-likelihood',
+   eval:'MAPE/RMSE; walk-forward', monitor:'Residual ACF; alarms', pseudo:`φ(B)(1-B)^d y_t = θ(B) ε_t`,
+   py:`import pmdarima as pm
+pm.auto_arima(y, seasonal=True, m=12).fit(y)`},
+
+  {name:'Matrix Factorization', level:'Level 3', id:'MF', tags:['Recommender'],
+   use:'User–item implicit/explicit feedback.', strengths:'Compact latent space.',
+   failures:'Cold start.', complexity:'ALS/SGD', hyper:'rank, reg, lr',
+   prep:'Normalize; implicit tweaks (α)', loss:'Squared error or BPR', eval:'Recall@k, NDCG, MAP',
+   monitor:'Popularity bias; cold-start rate', pseudo:`min ||R-UV^T||^2 + λ(||U||^2+||V||^2)`,
+   py:`# ALS/SGD sketch`},
+
+  {name:'MLP (Tabular)', level:'Level 3', id:'MLP', tags:['Tabular','Neural','Regression','Classification'],
+   use:'Nonlinear tabular interactions.', strengths:'Flexible approximator.',
+   failures:'Overfitting / calibration.', complexity:'O(n·params)',
+   hyper:'layers,width,dropout,lr', prep:'Scale features.', loss:'MSE or CE',
+   eval:'AUC/F1 or RMSE; ECE', monitor:'Embedding drift', pseudo:`a1=ReLU(XW1+b1); y=W2 a1 + b2`,
+   py:`import torch.nn as nn
+nn.Sequential(nn.Linear(p,64), nn.ReLU(), nn.Linear(64,1))`},
+
+  {name:'CNN', level:'Level 3', id:'CNN', tags:['Images','Neural','Classification'],
+   use:'Image/local pattern recognition.', strengths:'Translation equivariance.',
+   failures:'Data/compute hungry.', complexity:'O(n·k·h·w)',
+   hyper:'filters,kernel,stride', prep:'Normalize; augment.', loss:'Cross-entropy',
+   eval:'Top-1/Top-5; by class', monitor:'Throughput & VRAM', pseudo:`Conv→ReLU→Pool→Dense→Softmax`,
+   py:`import torch.nn as nn
+nn.Sequential(nn.Conv2d(3,16,3,1,1), nn.ReLU(), nn.AdaptiveAvgPool2d(1), nn.Flatten(), nn.Linear(16,10))`},
+
+  {name:'RNN/LSTM/GRU', level:'Level 3', id:'RNN', tags:['Sequences','Neural','Time-Series','NLP'],
+   use:'Temporal dependencies.', strengths:'Short/medium memory.',
+   failures:'Vanishing gradients; long-range.', complexity:'O(T·hidden²)',
+   hyper:'hidden,layers,dropout', prep:'Padding/truncation.', loss:'CE/MSE',
+   eval:'Perplexity/AUC/RMSE', monitor:'Exploding grads', pseudo:`h_t=f(Wx_t + Uh_{t-1})`,
+   py:`import torch.nn as nn
+nn.LSTM(128,256,batch_first=True)`},
+
+  {name:'Transformer', level:'Level 3', id:'Transformer', tags:['NLP','Sequences','Neural'],
+   use:'Long-range dependencies; attention.', strengths:'Parallelism; SOTA NLP.',
+   failures:'Compute & prompt sensitivity.', complexity:'O(T²·d)',
+   hyper:'layers,heads,d_model', prep:'Tokenization, PEs.', loss:'Cross-entropy',
+   eval:'BLEU/ROUGE/Accuracy; ECE', monitor:'Toxicity/PII guardrails', pseudo:`Self-attn softmax(QK^T/√d)V`,
+   py:`# tiny block omitted`},
+
+  {name:'Graph Neural Network', level:'Expert', id:'GNN', tags:['Graph','Neural'],
+   use:'Relational / topology-aware learning.', strengths:'Message passing.',
+   failures:'Oversmoothing; scaling.', complexity:'O(E)', hyper:'layers, aggregation',
+   prep:'Node/edge features.', loss:'Task dependent', eval:'AUC/Acc (node/edge/link)',
+   monitor:'Hub overfit; degree drift', pseudo:`h_v^{(l+1)} = AGG_{u∈N(v)}(W h_u^{(l)})`, py:`# use PyG/DGL`},
+
+  {name:'Reinforcement Learning (DQN)', level:'Expert', id:'DQN', tags:['RL','Sequences'],
+   use:'Sequential decision-making.', strengths:'Off-policy; replay buffer.',
+   failures:'Instability; reward hacking.', complexity:'Env dependent',
+   hyper:'γ, ε, target_update', prep:'Reward design; exploration schedule.', loss:'TD error (Huber)',
+   eval:'Return, success rate, safety constraints', monitor:'Replay distribution shift',
+   pseudo:`θ ← θ + α (r + γ max_a' Q(s',a';θ^-) - Q(s,a;θ)) ∇θ`, py:`# conceptual loop`},
+
+  /* ---------- Biological / Mechanistic (no “layer” headings, just models) ---------- */
+  {name:'Hodgkin–Huxley (HH)', level:'Biophysical', id:'HH',
+   tags:['Mechanistic','Biophysical','Neuro','Simulation','Differential-Equations'],
+   use:'Ion-channel dynamics; single-neuron spiking.',
+   strengths:'Biophysically grounded; reproduces action potentials.',
+   failures:'Parameter heavy; stiff ODEs; single-cell scope.', complexity:'Stiff ODE integration',
+   hyper:'g_Na, g_K, g_L, E_*, C_m', prep:'Choose stepper (RK4/implicit).',
+   loss:'Fit to voltage clamp traces', eval:'Spike timing, ISI distribution', monitor:'Parameter drift vs lab data',
+   pseudo:`Integrate:
+  C dV/dt = -g_Na m^3 h (V-E_Na) - g_K n^4 (V-E_K) - g_L (V-E_L) + I`,
+   py:`import numpy as np
+from scipy.integrate import solve_ivp
+# define dstate/dt = f(t,state,params); solve_ivp(f,[0,T],y0)`},
+
+  {name:'Izhikevich Spiking Neuron', level:'Biophysical', id:'Izhikevich',
+   tags:['Mechanistic','Biophysical','Neuro','Simulation'],
+   use:'Computationally cheap spiking approximation.',
+   strengths:'Scalable networks; reproduces many firing patterns.',
+   failures:'Less biophysical interpretability.', complexity:'2D ODEs per neuron',
+   hyper:'a,b,c,d', prep:'Euler or RK; reset rule.',
+   loss:'Match spike patterns', eval:'Spike count/freq; ISI CV', monitor:'Network stability',
+   pseudo:`v' = 0.04v^2 + 5v + 140 - u + I;  u' = a(bv - u)
+if v >= 30: v ← c; u ← u + d`, py:`# vectorize v,u update over neurons`},
+
+  {name:'Wilson–Cowan', level:'Neurodynamics', id:'Wilson-Cowan',
+   tags:['Mechanistic','Neuro','Simulation','Differential-Equations'],
+   use:'Population-level excitatory/inhibitory activity.',
+   strengths:'Explains oscillations/seizures; low-dimensional.',
+   failures:'Coarse granularity; parameter-sensitive.', complexity:'Coupled ODEs',
+   hyper:'τ_E, τ_I, w_*, external input', prep:'Nonlinearity S(x) choice.',
+   loss:'Fit to LFP/EEG power', eval:'Oscillation freq/amplitude', monitor:'Bifurcation regime changes',
+   pseudo:`E' = -E/τ_E + (1-E) S(w_EE E - w_EI I + P)
+I' = -I/τ_I + (1-I) S(w_IE E - w_II I + Q)`, py:`# integrate two ODEs; sweep parameters`},
+
+  {name:'Dynamic Causal Modeling (DCM)', level:'Bayesian', id:'DCM',
+   tags:['Mechanistic','Neuro','Bayesian','Simulation'],
+   use:'Estimate directed connectivity among brain regions from fMRI/EEG.',
+   strengths:'Bayesian uncertainty; model comparison.',
+   failures:'Strong priors; computationally intensive.', complexity:'State-space + variational Bayes',
+   hyper:'Connectivity matrices A,B,C', prep:'Region selection; priors.',
+   loss:'Variational free energy', eval:'Bayes factors; posterior checks', monitor:'Priors/posteriors drift',
+   pseudo:`Infer θ maximizing model evidence via VB on state-space model`,
+   py:`# sketch: build state eqns; run variational inference`},
+
+  {name:'Global Workspace Theory (computational)', level:'Cognitive', id:'GWT',
+   tags:['Mechanistic','Neuro','Cognitive','Simulation'],
+   use:'Simulate conscious access via broadcast across modules.',
+   strengths:'Explains access/report; task-level predictions.',
+   failures:'High-level abstractions; many design choices.', complexity:'Agent with global broadcast bus',
+   hyper:'broadcast threshold, module gains', prep:'Define competing modules.',
+   loss:'Task performance vs human', eval:'RT/accuracy patterns', monitor:'Module dominance oscillations',
+   pseudo:`When evidence crosses threshold → broadcast to all modules`, py:`# agent loop with global broadcast`},
+
+  {name:'Guyton Circulatory Model', level:'Physiology', id:'Guyton',
+   tags:['Mechanistic','Physiology','Simulation','Differential-Equations'],
+   use:'System of equations for BP, CO, kidney function.',
+   strengths:'Whole-body interactions; classic validation.',
+   failures:'Large parameter space; identifiability.', complexity:'Large ODE system',
+   hyper:'vascular resistances, compliances, renal params', prep:'Scale/units carefully.',
+   loss:'Fit to BP/CO series', eval:'MAP, CO, pressure waveforms', monitor:'Stability of equilibrium',
+   pseudo:`Integrate cardiovascular + renal ODE blocks with feedback`, py:`# modular ODE compartments + feedback`},
+
+  {name:'Windkessel (Arterial) Model', level:'Physiology', id:'Windkessel',
+   tags:['Mechanistic','Physiology','Simulation'],
+   use:'Arterial elasticity & blood flow; BP waveform analysis.',
+   strengths:'Simple; interpretable parameters.', failures:'Misses wave reflections.',
+   complexity:'1–3 element ODEs', hyper:'R,C (±L)', prep:'Estimate from pulses.',
+   loss:'Fit pulse contour', eval:'Systolic/diastolic error', monitor:'R/C drift (arterial stiffness)',
+   pseudo:`C dP/dt = Q_in - P/R  (2- or 3-element variants)`, py:`# fit R,C via least squares on BP trace`},
+
+  {name:'Lumped Lung Model', level:'Physiology', id:'Lung',
+   tags:['Mechanistic','Physiology','Simulation'],
+   use:'Ventilation & gas exchange compartments.',
+   strengths:'Useful for ventilator simulations.', failures:'Compartment simplifications.',
+   complexity:'ODE compartments', hyper:'compliance, resistance, shunt', prep:'Patient-specific params.',
+   loss:'Fit to tidal volumes/gases', eval:'PaO2/PaCO2, compliance', monitor:'Vent settings vs predicted',
+   pseudo:`Compartment pressure/flow balance with gas exchange`, py:`# couple flows with gas partial pressures`},
+
+  {name:'Hovorka (Glucose–Insulin)', level:'Endocrine', id:'Hovorka',
+   tags:['Mechanistic','Metabolic','Physiology','Simulation'],
+   use:'Artificial-pancreas research; glucose-insulin dynamics.',
+   strengths:'Captures bolus/basal effects.', failures:'Meal/absorption variability.',
+   complexity:'Multi-compartment ODEs', hyper:'insulin sensitivity, absorption rates',
+   prep:'Meal & insulin inputs; patient params.', loss:'RMSE glucose', eval:'Time-in-range',
+   monitor:'Hypo/hyper alarms', pseudo:`dG/dt = -SI*I*G + meal(t) - uptake(t)`,
+   py:`# ODE with exogenous insulin/meal inputs`},
+
+  {name:'Copenhagen Model of Metabolism', level:'Cellular', id:'Copenhagen-Metabolism',
+   tags:['Mechanistic','Metabolic','Simulation'],
+   use:'Mechanistic pathways: glycolysis, TCA, OXPHOS.',
+   strengths:'Detailed pathway kinetics.', failures:'Parameter identifiability.',
+   complexity:'Large ODE network', hyper:'enzyme Vmax/Km', prep:'Stoichiometry & compartments.',
+   loss:'Fit to fluxomics', eval:'ATP yield, flux distributions', monitor:'Sensitivity to Vmax',
+   pseudo:`Mass-action/Michaelis–Menten ODEs across pathway graph`, py:`# assemble ODEs from pathway topology`},
+
+  {name:'Minimal Model (Bergman)', level:'Metabolic', id:'Bergman-Minimal',
+   tags:['Mechanistic','Metabolic','Physiology','Time-Series'],
+   use:'Simplified glucose–insulin interaction (IVGTT).',
+   strengths:'Widely used; identifiable.', failures:'Simplifications for meals.',
+   complexity:'Low-dim ODEs', hyper:'SI, SG', prep:'IVGTT protocol data.',
+   loss:'RMSE glucose', eval:'SI/SG estimates', monitor:'Parameter stability by session',
+   pseudo:`dG/dt = -SG(G-Gb) - X(G-Gb);  dX/dt = -p2 X + p3(I-Ib)`,
+   py:`# fit SI, SG by least squares on IVGTT time-series`},
+
+  {name:'Flux Balance Analysis (FBA)', level:'Optimization', id:'FBA',
+   tags:['Mechanistic','Metabolic','Optimization'],
+   use:'Genome-scale metabolic networks as LP optimal fluxes.',
+   strengths:'Scales to huge networks.', failures:'Steady-state assumption.',
+   complexity:'Linear programming', hyper:'objective (biomass), bounds',
+   prep:'Stoichiometric matrix S.', loss:'Objective optimum', eval:'Flux distribution; gene KO sims',
+   monitor:'Objective sensitivity to bounds', pseudo:`maximize c^T v  s.t.  S v = 0,  lb ≤ v ≤ ub`,
+   py:`# use pulp/cvxopt/cobra to solve LP`},
+
+  {name:'Sharma–Mittal Energy Balance', level:'Metabolic', id:'Sharma-Mittal',
+   tags:['Mechanistic','Metabolic','Time-Series'],
+   use:'Long-term weight change via intake, activity, metabolism.',
+   strengths:'Captures adaptation over weeks/months.',
+   failures:'Person-specific uncertainty.', complexity:'Discrete-time update',
+   hyper:'intake, activity, metabolic adapt.', prep:'Baseline BMR & body comp.',
+   loss:'MAPE weight', eval:'Trajectory error', monitor:'Drift vs logs',
+   pseudo:`W_{t+1} = W_t + (intake - exp)/ρ  with adaptive exp`, py:`# simulate daily Δweight with adaptive expenditure`},
+
+  {name:'Boolean Gene Regulatory Networks', level:'Genetics', id:'Boolean-GRN',
+   tags:['Mechanistic','Genetics','Molecular','Simulation'],
+   use:'On/off switching in gene networks.',
+   strengths:'Simple; qualitative insights.', failures:'Ignores graded expression.',
+   complexity:'Boolean updates on DAG', hyper:'update rules, noise',
+   prep:'Define interactions (AND/OR/NOT).', loss:'Match attractor states',
+   eval:'Attractor stability', monitor:'Perturbation responses',
+   pseudo:`x_i(t+1) = f_i(x_pa(i)(t))  (synchronous/asynchronous)`, py:`# iterate boolean update rules over nodes`},
+
+  {name:'Stochastic Reaction–Diffusion (Gillespie)', level:'Molecular', id:'Gillespie',
+   tags:['Mechanistic','Molecular','Stochastic','Simulation'],
+   use:'Noisy molecular interactions & diffusion.',
+   strengths:'Exact SSA in well-mixed; stochastic realism.',
+   failures:'Slow for large systems; spatial adds cost.',
+   complexity:'Event-driven simulation', hyper:'propensities, diffusion rates',
+   prep:'List reactions; compute hazards.', loss:'Match variance over time',
+   eval:'Moments vs experiment', monitor:'Propensity drift',
+   pseudo:`while t<T: sample next reaction/time via propensities; update state`, py:`# implement SSA; or use StochPy-like pattern`},
+
+  {name:'Michaelis–Menten Kinetics', level:'Enzymes', id:'Michaelis-Menten',
+   tags:['Mechanistic','Molecular','Metabolic'],
+   use:'Enzyme dynamics (foundational).',
+   strengths:'Interpretable Vmax/Km.', failures:'Assumes quasi-steady state.',
+   complexity:'Nonlinear ODE', hyper:'Vmax, Km', prep:'Initial substrate/enzyme.',
+   loss:'Fit to rate curves', eval:'Vmax/Km CI', monitor:'Temperature/pH effects',
+   pseudo:`v = (Vmax [S])/(Km + [S])`, py:`# fit Vmax,Km via nonlinear least squares`},
+
+  {name:'Lotka–Volterra (Microbiome)', level:'Population', id:'Lotka-Volterra',
+   tags:['Mechanistic','Metabolic','Molecular','Simulation'],
+   use:'Interacting microbial populations (predator-prey style).',
+   strengths:'Captures competition & mutualism.', failures:'No spatial/strain detail.',
+   complexity:'Coupled ODEs', hyper:'growth & interaction matrix',
+   prep:'Log-abundance scale helpful.', loss:'Fit to time-series',
+   eval:'Stability/attractors', monitor:'Regime shifts', pseudo:`dx_i/dt = x_i (r_i + Σ_j A_{ij} x_j)`,
+   py:`# integrate with scipy; estimate A by regression`},
+
+  {name:'Rescorla–Wagner', level:'Behavior', id:'Rescorla-Wagner',
+   tags:['Behavior','Mechanistic','RL','Time-Series'],
+   use:'Associative learning; basis of RL value update.',
+   strengths:'Simple; predictive.', failures:'Extinction/partial-reinforcement limits.',
+   complexity:'Δ-rule', hyper:'learning rate α, salience β',
+   prep:'Define stimuli & reward schedule.', loss:'NLL on choices',
+   eval:'Acquisition curves', monitor:'Parameter stability',
+   pseudo:`ΔV = αβ (λ - ΣV); V ← V + ΔV`, py:`# update value per trial`},
+
+  {name:'Drift Diffusion Model (DDM)', level:'Behavior', id:'DDM',
+   tags:['Behavior','Decision','Mechanistic','Time-Series'],
+   use:'Two-choice decisions via noisy evidence accumulation.',
+   strengths:'Explains RT & accuracy distributions.',
+   failures:'Two-choice simplification.', complexity:'SDE/first-passage time',
+   hyper:'drift v, boundary a, noise σ, non-dec t0',
+   prep:'Trial-wise regressors on drift.', loss:'Likelihood of RT/choice',
+   eval:'Quantile-prob plots', monitor:'Parameter drift across sessions',
+   pseudo:`dx = v dt + σ dW_t; stop when |x| ≥ a`, py:`# simulate many paths; fit via MLE/quantile matching`},
+
+  {name:'COM-B (Capability-Opportunity-Motivation→Behavior)', level:'Behavior', id:'COM-B',
+   tags:['Behavior','Agent-Based','Mechanistic','Social'],
+   use:'Formalize behavior change in agent frameworks.',
+   strengths:'Actionable levers; policy modeling.',
+   failures:'Abstract constructs; calibration needed.', complexity:'ABM with state machine',
+   hyper:'transition probs, effect sizes', prep:'Map interventions to transitions.',
+   loss:'Fit to adoption curves', eval:'Behavior prevalence', monitor:'Intervention counterfactuals',
+   pseudo:`Agent state=(C,O,M); behavior if f(C,O,M)>θ; interventions modify C/O/M`, py:`# agent step updates C,O,M then acts`},
+
+  {name:'Theory of Planned Behavior (Ajzen)', level:'Behavior', id:'TPB',
+   tags:['Behavior','Agent-Based','Social'],
+   use:'Intentions → actions via attitudes/norms/control.',
+   strengths:'Survey-driven modeling.', failures:'Intention–action gap.',
+   complexity:'Structural equations/ABM', hyper:'path weights',
+   prep:'Calibrate from surveys.', loss:'Fit intention/action rates',
+   eval:'Predictive accuracy', monitor:'Path weight stability',
+   pseudo:`Intention = w1*Att + w2*Norm + w3*Control; Action if Intention>θ`, py:`# SEM or ABM rule`},
+
+  {name:'Affective Circumplex (Valence×Arousal)', level:'Emotion', id:'Affective-Circumplex',
+   tags:['Behavior','Mechanistic','Time-Series'],
+   use:'Emotion dynamics on valence/arousal plane.',
+   strengths:'Continuous state transitions.', failures:'Culture/person variability.',
+   complexity:'2D dynamical system', hyper:'attractor locations, damping',
+   prep:'Map stimuli to target zones.', loss:'Trajectory error',
+   eval:'Self-report vs predicted', monitor:'State occupancy',
+   pseudo:`dV/dt, dA/dt = f(V,A,stimuli)`, py:`# integrate 2D ODE with stimuli inputs`},
+
+  {name:'Agent-Based Modeling (ABM)', level:'Social', id:'ABM',
+   tags:['Social','Agent-Based','Simulation','Mechanistic'],
+   use:'Simulate individuals with rules (epidemics, crowds).',
+   strengths:'Heterogeneity & interactions.', failures:'Calibration & runtime.',
+   complexity:'O(agents×steps)', hyper:'rules, contact nets',
+   prep:'Define landscape & interactions.', loss:'Fit macro curves',
+   eval:'Emergent patterns', monitor:'Sensitivity to rules',
+   pseudo:`for t: for agent: sense→decide→act`, py:`# grid/graph world loop`},
+
+  {name:'Network Diffusion', level:'Social', id:'Network-Diffusion',
+   tags:['Social','Mechanistic','Graph','Simulation'],
+   use:'Spread of ideas/diseases/behaviors.',
+   strengths:'Captures thresholds & topology.', failures:'Static network assumption.',
+   complexity:'O(E) per step', hyper:'β, γ, thresholds',
+   prep:'Network construction.', loss:'Fit incidence curves',
+   eval:'R_t, cascade size', monitor:'Edge/activity drift',
+   pseudo:`S/I/R (or IC/LT) updates on graph each step`, py:`# simulate SIR or Independent Cascade on graph`},
+
+  {name:'Granovetter Threshold Model', level:'Social', id:'Granovetter',
+   tags:['Social','Mechanistic','Threshold','Simulation'],
+   use:'Collective behavior tipping points.',
+   strengths:'Explains cascades/non-cascades.', failures:'Simplistic thresholds.',
+   complexity:'O(N) per step', hyper:'individual thresholds',
+   prep:'Threshold distribution.', loss:'Fit adoption curves',
+   eval:'Cascade probability', monitor:'Threshold drift',
+   pseudo:`Agent adopts if fraction_adopters >= θ_i`, py:`# iterate adoption given thresholds`}
+];
+
+/* ======== Micro charts ======== */
+function metricSVG(kind='roc'){
+  if(kind==='residuals'){
+    const pts=Array.from({length:24},(_,i)=>[i*10+10,30+(Math.sin(i)*8)+(i%3?-3:3)]);
+    const path=pts.map((p,i)=>(i?'L':'M')+p[0]+','+p[1]).join(' ');
+    return `<svg viewBox="0 0 260 80" aria-label="Residuals sparkline"><path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>`;
+  }
+  if(kind==='decision'){
+    return `<svg viewBox="0 0 260 80" aria-label="Sigmoid curve"><path d="M10,70 C60,70 120,10 250,10" fill="none" stroke="var(--accent)" stroke-width="2"/><line x1="150" y1="10" x2="150" y2="70" stroke="var(--border)"/></svg>`;
+  }
+  return `<svg viewBox="0 0 260 80" aria-label="ROC micro-chart"><rect x="10" y="10" width="60" height="60" fill="var(--bg-soft)" stroke="var(--border)"/><path d="M10,70 L70,10 L70,70 Z" fill="rgba(90,72,227,0.15)"/><polyline points="10,70 28,52 40,40 55,25 70,10" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>`;
+}
+
+/* ======== Card renderer ======== */
+function cardTemplate(m){
+  const id = `model-${m.id}`;
+  return `<article class="card model-card" id="${id}" role="listitem" data-tags="${m.tags.join(' ')}">
+    <header>
+      <div><div class="badge">${m.level}</div><h3 style="margin:6px 0">${m.name}</h3></div>
+      <div>
+        <button class="btn inline linkcopy" data-anchor="#${id}" title="Copy link to this card">Link</button>
+        <button class="btn inline toggle" aria-controls="${id}-panel" aria-expanded="false">Expand</button>
+      </div>
+    </header>
+    <div id="${id}-panel" class="details" hidden>
+      <div class="metrics">${metricSVG(m.metrics)} ${metricSVG()}</div>
+      <p><strong>When to use:</strong> ${m.use}</p>
+      <p><strong>Strengths:</strong> ${m.strengths}</p>
+      <p><strong>Failure modes:</strong> ${m.failures}</p>
+      <p class="muted"><strong>Complexity:</strong> ${m.complexity} · <strong>Key hyperparameters:</strong> ${m.hyper} · <strong>Setup:</strong> ${m.prep}</p>
+      ${m.loss?`<p><strong>Objective/Calibration:</strong> ${m.loss}</p>`:''}
+      ${m.eval?`<p><strong>Evaluate with:</strong> ${m.eval}</p>`:''}
+      ${m.monitor?`<p><strong>Prod/Sim monitoring:</strong> ${m.monitor}</p>`:''}
+      <div class="code-block" aria-label="Pseudocode"><button class="btn inline copy" data-copy="pseudo">Copy</button>
+        <div class="muted" style="margin-bottom:6px">Pseudocode</div>
+        <pre><code class="pseudo">${highlight(m.pseudo||'# see notes','pseudo')}</code></pre>
+      </div>
+      <div class="code-block" aria-label="Python"><button class="btn inline copy" data-copy="python">Copy</button>
+        <div class="muted" style="margin-bottom:6px">Python</div>
+        <pre><code class="python">${highlight(m.py||'# sketch','py')}</code></pre>
+      </div>
+      <div class="assumptions"><strong>Notes:</strong> Example code/metrics are illustrative. Validate with appropriate domain data, units, and safety checks.</div>
+    </div>
+    <div class="tags" style="margin-top:8px">${m.tags.map(t=>`<span class="badge">${t}</span>`).join(' ')}</div>
+  </article>`;
+}
+
+function render(){
+  const grid = $('#modelGrid');
+  const q = state.q.toLowerCase();
+  const act = [...state.filters];
+  grid.innerHTML = models
+    .filter(m=>{
+      const hay = (m.name+' '+m.tags.join(' ')+' '+(m.use||'')+' '+(m.strengths||'')+' '+(m.failures||'')+' '+(m.eval||'')+' '+(m.loss||'')).toLowerCase();
+      const passQ = !q || hay.includes(q);
+      const passF = !act.length || act.every(f => m.tags.includes(f));
+      return passQ && passF;
+    })
+    .map(cardTemplate).join('');
+}
+render();
+
+/* Search & filter */
+$('#q').addEventListener('input', e=>{ state.q = e.target.value; render(); attachCardHandlers(); });
+$('#chipRow').addEventListener('click', e=>{
+  if(!e.target.classList.contains('chip')) return;
+  const f = e.target.dataset.filter;
+  if(state.filters.has(f)){ state.filters.delete(f); e.target.classList.remove('active'); }
+  else { state.filters.add(f); e.target.classList.add('active'); }
+  render(); attachCardHandlers();
+});
+$('#clearFilters').addEventListener('click', ()=>{
+  state.filters.clear(); $$('#chipRow .chip').forEach(ch=>ch.classList.remove('active'));
+  state.q=''; $('#q').value=''; render(); attachCardHandlers();
+});
+
+/* Card controls */
+function attachCardHandlers(){
+  $$('.toggle').forEach(btn=>{
+    btn.onclick = () => {
+      const panel = document.getElementById(btn.getAttribute('aria-controls'));
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      btn.textContent = open ? 'Expand' : 'Collapse';
+      panel.hidden = open;
+    };
+  });
+  $$('.copy').forEach(b=> b.onclick = (e)=>{
+    const block = e.currentTarget.closest('.code-block');
+    const code = block.querySelector('code').textContent.replace(/\u00A0/g,' ');
+    navigator.clipboard.writeText(code).then(()=>{e.currentTarget.textContent='Copied'; setTimeout(()=>e.currentTarget.textContent='Copy',1100);});
+  });
+  $$('.linkcopy').forEach(b=> b.onclick = ()=>{
+    const href = location.origin + location.pathname + b.dataset.anchor;
+    navigator.clipboard.writeText(href).then(()=>{b.textContent='Linked'; setTimeout(()=>b.textContent='Link',900);});
+  });
+}
+attachCardHandlers();
+
+/* Expand/Collapse all */
+$('#expandAll').addEventListener('click', ()=> $$('.toggle').forEach(btn=>{ if(btn.getAttribute('aria-expanded')==='false'){ btn.click(); }}));
+$('#collapseAll').addEventListener('click', ()=> $$('.toggle').forEach(btn=>{ if(btn.getAttribute('aria-expanded')==='true'){ btn.click(); }}));
+
+/* Comparison tool (now includes mechanistic domains) */
+function scoreModel(m, prefs){
+  let s = 0;
+  if(m.tags.includes(prefs.task) || (prefs.task==='Behavioral' && m.tags.includes('Behavior'))) s += 5;
+  if(prefs.feat==='Images' && m.tags.includes('Images')) s += 3;
+  if(prefs.feat==='Text' && (m.tags.includes('NLP') || /Naive Bayes|Transformer/.test(m.name))) s += 3;
+  if(prefs.feat==='Tabular' && m.tags.includes('Tabular')) s += 2;
+  if(prefs.feat==='Time-series' && (m.tags.includes('Time-Series') || /RNN|ARIMA|Bergman/.test(m.id))) s += 3;
+  if(prefs.feat==='Graph' && m.tags.includes('Graph')) s += 3;
+  if(prefs.feat==='Simulation' && m.tags.includes('Simulation')) s += 4;
+
+  if(prefs.size==='Small' && (m.tags.includes('Low-Data') || /Naive Bayes|Logistic|Linear/.test(m.name))) s += 2;
+  if(prefs.size==='Large' && (m.tags.includes('Neural') || m.tags.includes('Simulation') || m.tags.includes('Optimization'))) s += 2;
+
+  if(prefs.latency==='Low (edge)'){
+    if(m.tags.includes('Neural') || /Transformer|kNN/.test(m.name) || m.tags.includes('Simulation')) s -= 2;
+    if(/Logistic|Linear|Naive Bayes/.test(m.name)) s += 2;
+  }
+  if(prefs.interp==='High'){
+    if(m.tags.some(t=>['Interpretability','Mechanistic','Biophysical','Physiology','Metabolic','Genetics','Molecular','Behavior','Social'].includes(t))) s += 3;
+    if(m.tags.includes('Neural')) s -= 1;
+  }
+  if(prefs.fair==='Critical' && (m.tags.includes('Interpretability') || m.tags.includes('Mechanistic'))) s += 1;
+  return s;
+}
+
+$('#btnCompare').addEventListener('click', ()=>{
+  const prefs = {
+    task: $('#selTask').value, size: $('#selSize').value, feat: $('#selFeat').value,
+    latency: $('#selLatency').value, interp: $('#selInterp').value, fair: $('#selFair').value
+  };
+  const ranked = models.map(m=>({m, s: scoreModel(m, prefs)})).sort((a,b)=>b.s-a.s).slice(0,6);
+  $('#cmpResults').innerHTML = ranked.map(({m,s})=>`
+    <div class="card">
+      <strong>${m.name}</strong> — score ${s}
+      <div class="muted">Why: task fit ${m.tags.includes(prefs.task)?'+5':''} · type ${m.tags.includes(prefs.feat)?'+3':''} · latency ${prefs.latency==='Low (edge)'?(m.tags.includes('Neural')||m.tags.includes('Simulation')?'-2':'+2'):''} · interpretability ${prefs.interp==='High'?(m.tags.includes('Mechanistic')||m.tags.includes('Interpretability')?'+3':''):''}</div>
+      <a class="btn inline" href="#model-${m.id}">Jump to card</a>
+    </div>`).join('');
+});
+
+/* Cons checklist controls */
+$('#checkAll').addEventListener('click', ()=> $$('.checklist input').forEach(c=>c.checked=true));
+$('#uncheckAll').addEventListener('click', ()=> $$('.checklist input').forEach(c=>c.checked=false));
+
+/* Back to top */
+const back = $('#backTop');
+window.addEventListener('scroll', ()=>{ if(window.scrollY > 600) back.classList.add('show'); else back.classList.remove('show'); });
+back.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+/* Quality checklist */
+function qualityCheck(){
+  const checks = [
+    ['Dark mode', !!document.querySelector('#themeToggle')],
+    ['Search', true], ['Filter chips', true], ['Copy buttons', true],
+    ['Expand/Collapse', true], ['Print to PDF', true], ['Comparison tool', true]
+  ];
+  $('#qc').innerHTML = checks.map(([label, ok])=>`<div class="card"><strong>${ok?'✔':'✖'}</strong> ${label}</div>`).join('');
+}
+qualityCheck();
+
+/* Scroll spy */
+const sections = ['impact','skills','education','portfolio','compare','leadership','cons','projects','about'];
+const navLinks = sections.map(id=>[id, [...$$(`a[href="#${id}"]`)] ]);
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(([id,links])=>links.forEach(a=>a.classList.remove('active')));
+      const act = navLinks.find(([id])=>id===e.target.id);
+      if(act) act[1].forEach(a=>a.classList.add('active'));
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px', threshold:0.01});
+sections.forEach(id=>{const el=document.getElementById(id); if(el) obs.observe(el);});
+
+window.portfolio = { version: '3.0.0', lastUpdated: new Date().toISOString() };
+</script>
+</body>
+</html>

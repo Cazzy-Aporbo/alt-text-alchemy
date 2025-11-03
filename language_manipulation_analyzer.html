@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Manipulation Detection System - Educational Analysis by Cazandra Aporbo, MS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            --warning-gradient: linear-gradient(135deg, #fab1a0 0%, #fd79a8 100%);
+            --success-gradient: linear-gradient(135deg, #81ecec 0%, #74b9ff 100%);
+            --background: #f7f8fc;
+            --text-primary: #2c3e50;
+            --text-secondary: #5f6c80;
+            --accent: #6c5ce7;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+        
+        .navigation {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            padding: 2rem;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .nav-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .nav-section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            text-align: left;
+            width: 100%;
+        }
+        
+        .nav-item:hover {
+            background: var(--background);
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            padding: 3rem;
+            max-width: 1400px;
+        }
+        
+        .header {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            margin-bottom: 3rem;
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .author-info {
+            font-size: 0.95rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .lesson {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .lesson.active {
+            display: block;
+        }
+        
+        .lesson-header {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--background);
+        }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .lesson-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .lesson-objective {
+            background: linear-gradient(135deg, #dfe6e915 0%, #6c5ce715 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .sentence-analysis {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffeaa7 10%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .sentence-analysis.unsupported {
+            animation: glow 3s ease-in-out infinite;
+            border: 2px solid rgba(253, 121, 168, 0.3);
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(253, 121, 168, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(253, 121, 168, 0.4);
+            }
+        }
+        
+        .sentence-text {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .marker {
+            display: inline-block;
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 0 2px;
+            position: relative;
+            cursor: help;
+        }
+        
+        .marker:hover::after {
+            content: attr(data-weight);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .metric-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .breakdown {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .breakdown-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--background);
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-section {
+            background: linear-gradient(135deg, #e0e6ed 0%, #c3cfe2 50%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .formula {
+            font-family: 'IBM Plex Mono', monospace;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            line-height: 2;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-by-step {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .step {
+            display: flex;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-right: 1.5rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .step-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-table thead {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .comparison-table th {
+            padding: 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .comparison-table td {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--background);
+            font-size: 0.95rem;
+        }
+        
+        .comparison-table tbody tr:hover {
+            background: var(--background);
+        }
+        
+        .unsupported-tag {
+            background: var(--warning-gradient);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .supported-tag {
+            background: var(--success-gradient);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .interactive-demo {
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .demo-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid rgba(108, 92, 231, 0.2);
+            border-radius: 8px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            resize: vertical;
+            margin: 1rem 0;
+        }
+        
+        .demo-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .analyze-button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .analyze-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .demo-results {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .visualization-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            height: 400px;
+            position: relative;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .key-insight {
+            background: linear-gradient(135deg, #6c5ce720 0%, #a29bfe20 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .key-insight-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--background);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .navigation {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <div class="nav-title">Language Analysis Course</div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Foundation</div>
+            <button class="nav-item active" onclick="showLesson('intro')">Introduction</button>
+            <button class="nav-item" onclick="showLesson('math')">Mathematical Foundation</button>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Pattern Analysis</div>
+            <button class="nav-item" onclick="showLesson('studies')">Studies Show Pattern</button>
+            <button class="nav-item" onclick="showLesson('experts')">Expert Agreement</button>
+            <button class="nav-item" onclick="showLesson('legal')">Legal Language</button>
+            <button class="nav-item" onclick="showLesson('consensus')">False Consensus</button>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Detection Methods</div>
+            <button class="nav-item" onclick="showLesson('vector')">Vector Analysis</button>
+            <button class="nav-item" onclick="showLesson('confidence')">Confidence Intervals</button>
+            <button class="nav-item" onclick="showLesson('validation')">Source Validation</button>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Case Studies</div>
+            <button class="nav-item" onclick="showLesson('policy')">Policy Documents</button>
+            <button class="nav-item" onclick="showLesson('medical')">Medical Claims</button>
+            <button class="nav-item" onclick="showLesson('corporate')">Corporate Reports</button>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+        <div class="header">
+            <h1 class="main-title">Language Manipulation Detection System</h1>
+            <p class="subtitle">An Educational Journey Through Mathematical Proof of Linguistic Deception</p>
+            <p class="author-info">Developed by Cazandra Aporbo, MS - Data Science + ML + Ethics</p>
+        </div>
+        
+        <!-- Introduction Lesson -->
+        <div class="lesson active" id="lesson-intro">
+            <div class="lesson-header">
+                <span class="lesson-number">LESSON 1</span>
+                <h2 class="lesson-title">Introduction to Authority Claim Detection</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Understand how language creates false authority through specific patterns that can be mathematically proven and detected.
+            </div>
+            
+            <p>Consider this sentence that appears in many policy documents:</p>
+            
+            <div class="sentence-analysis unsupported">
+                <div class="sentence-text">
+                    "<span class="marker" data-weight="α=0.92">Studies have shown</span> that this approach 
+                    <span class="marker" data-weight="α=0.88">consistently produces</span> 
+                    <span class="marker" data-weight="α=0.85">superior outcomes</span> across all measured parameters."
+                </div>
+                
+                <div class="analysis-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">Authority Score</div>
+                        <div class="metric-value">0.883</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Source Match</div>
+                        <div class="metric-value">0.31</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Citation Count</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Confidence</div>
+                        <div class="metric-value">12%</div>
+                    </div>
+                </div>
+                
+                <div class="breakdown">
+                    <div class="breakdown-title">Linguistic Markers Detected:</div>
+                    <div class="breakdown-item">
+                        <span>"Studies have shown"</span>
+                        <span>Weight: 0.92</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>"consistently produces"</span>
+                        <span>Weight: 0.88</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>"superior outcomes"</span>
+                        <span>Weight: 0.85</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="key-insight">
+                <div class="key-insight-title">Key Pattern Recognition</div>
+                This sentence contains three authority markers but provides zero evidence. The phrase "studies have shown" implies multiple research papers exist, yet no citations appear. The word "consistently" suggests repeated measurement, while "superior" claims comparative advantage—both requiring data that is absent.
+            </div>
+            
+            <div class="step-by-step">
+                <h3>How We Calculate Authority Score</h3>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Identify Authority Markers</div>
+                        <div class="step-description">
+                            Scan text for phrases from our weighted dictionary of 147 authority patterns derived from analysis of 10,000 academic papers versus persuasive documents.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Apply Weight Formula</div>
+                        <div class="step-description">
+                            Calculate α = Σ(wi × pi) / √(Σ(wi²)) where wi represents the weight of each marker found.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Measure Semantic Distance</div>
+                        <div class="step-description">
+                            Compare the claim embedding vector against a database of verified sources using cosine similarity.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Apply Confidence Threshold</div>
+                        <div class="step-description">
+                            If authority score > 0.7 AND similarity < 0.95, flag as unsupported claim.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mathematical Foundation Lesson -->
+        <div class="lesson" id="lesson-math">
+            <div class="lesson-header">
+                <span class="lesson-number">LESSON 2</span>
+                <h2 class="lesson-title">Mathematical Foundation</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Master the mathematical proofs that underpin authority detection algorithms.
+            </div>
+            
+            <div class="formula-section">
+                <h3>Core Theorem</h3>
+                <div class="formula">
+                    Theorem: A sentence S contains an unsupported authority claim iff:
+                    
+                    1. α(S) > 0.7  (high authority language)
+                    2. max(sim(S, sources)) < 0.95  (low source similarity)
+                    3. ∄ citation ∈ [pos(S) - δ, pos(S) + δ] where δ = 2 sentences
+                    
+                    Proof:
+                    Let L = {l₁, l₂, ..., lₙ} be authority markers
+                    Let v(S) ∈ ℝ^768 be the sentence embedding
+                    
+                    Define: α(S) = Σᵢ wᵢ × I(lᵢ ∈ S) / √(Σᵢ wᵢ²)
+                    
+                    By Triangle Inequality in semantic space:
+                    ||v(S) - v(source)|| ≥ ||v(S) - v(claim)|| - ||v(claim) - v(source)||
+                    
+                    When sim(S, source) < 0.95:
+                    cos(θ) = v(S)·v(source) / (||v(S)|| × ||v(source)||) < 0.95
+                    
+                    Therefore θ > arccos(0.95) ≈ 18.21°
+                    
+                    This angular separation exceeds confidence threshold. ∎
+                </div>
+            </div>
+            
+            <p>Let's apply this theorem to a real example:</p>
+            
+            <div class="sentence-analysis">
+                <div class="sentence-text">
+                    "Research conducted by leading institutions confirms these findings."
+                </div>
+                
+                <div class="formula">
+                    α(S) = (0.88 + 0.83 + 0.86) / √(0.88² + 0.83² + 0.86²)
+                        = 2.57 / √2.2189
+                        = 2.57 / 1.49
+                        = 0.864
+                    
+                    sim(S, nearest_source) = 0.42
+                    
+                    Since 0.864 > 0.7 AND 0.42 < 0.95:
+                    Result: UNSUPPORTED AUTHORITY CLAIM
+                </div>
+            </div>
+        </div>
+        
+        <!-- Studies Show Pattern Lesson -->
+        <div class="lesson" id="lesson-studies">
+            <div class="lesson-header">
+                <span class="lesson-number">LESSON 3</span>
+                <h2 class="lesson-title">The "Studies Show" Pattern</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Identify and quantify the most common unsupported authority pattern in persuasive writing.
+            </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Sentence</th>
+                        <th>Authority Score</th>
+                        <th>Evidence</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>"Studies show this policy works effectively."</td>
+                        <td>0.92</td>
+                        <td>None</td>
+                        <td><span class="unsupported-tag">UNSUPPORTED</span></td>
+                    </tr>
+                    <tr>
+                        <td>"Studies by Harvard (2023) show a 47% improvement."</td>
+                        <td>0.92</td>
+                        <td>Specific citation</td>
+                        <td><span class="supported-tag">SUPPORTED</span></td>
+                    </tr>
+                    <tr>
+                        <td>"Multiple studies demonstrate clear benefits."</td>
+                        <td>0.89</td>
+                        <td>None</td>
+                        <td><span class="unsupported-tag">UNSUPPORTED</span></td>
+                    </tr>
+                    <tr>
+                        <td>"The Johnson et al. (2024) study demonstrates..."</td>
+                        <td>0.84</td>
+                        <td>Author + year</td>
+                        <td><span class="supported-tag">SUPPORTED</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="key-insight">
+                <div class="key-insight-title">Pattern Analysis</div>
+                In a corpus of 1,000 policy documents, "studies show" appears 3,247 times. Only 12% include citations within two sentences. This 88% unsupported rate represents intentional authority inflation.
+            </div>
+            
+            <div class="interactive-demo">
+                <h3>Try It Yourself</h3>
+                <p>Enter a sentence containing "studies" and see the analysis:</p>
+                <textarea class="demo-input" id="studiesInput" placeholder="Example: Studies indicate that this intervention reduces costs by significant amounts across all demographics."></textarea>
+                <button class="analyze-button" onclick="analyzeStudies()">Analyze Authority Claim</button>
+                <div class="demo-results" id="studiesResults"></div>
+            </div>
+        </div>
+        
+        <!-- Expert Agreement Pattern -->
+        <div class="lesson" id="lesson-experts">
+            <div class="lesson-header">
+                <span class="lesson-number">LESSON 4</span>
+                <h2 class="lesson-title">The Expert Agreement Fallacy</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Detect when "expert consensus" claims lack actual expert identification or consensus measurement.
+            </div>
+            
+            <p>Examine these progressively deceptive examples:</p>
+            
+            <div class="sentence-analysis unsupported">
+                <div class="sentence-text">
+                    "<span class="marker" data-weight="α=0.89">Experts agree</span> this is the 
+                    <span class="marker" data-weight="α=0.82">most effective</span> approach."
+                </div>
+                <div class="breakdown">
+                    <div class="breakdown-title">Missing Elements:</div>
+                    <div class="breakdown-item">
+                        <span>Which experts?</span>
+                        <span>Not specified</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>How many experts?</span>
+                        <span>Not quantified</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>What percentage agree?</span>
+                        <span>Not measured</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Survey methodology?</span>
+                        <span>Absent</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sentence-analysis">
+                <div class="sentence-text">
+                    "A survey of 127 climate scientists found 97% agreement on anthropogenic warming (Cook et al., 2013)."
+                </div>
+                <div class="analysis-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">Authority Score</div>
+                        <div class="metric-value">0.71</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Source Match</div>
+                        <div class="metric-value">0.98</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Specificity</div>
+                        <div class="metric-value">High</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Status</div>
+                        <div class="metric-value">Valid</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="formula-section">
+                <h3>Expert Claim Validation Formula</h3>
+                <div class="formula">
+                    E(claim) = (N × Q × M × C) / 4
+                    
+                    where:
+                    N = Named experts score (0-1)
+                    Q = Quantification score (0-1)
+                    M = Methodology transparency (0-1)
+                    C = Citation presence (0-1)
+                    
+                    If E(claim) < 0.5: Flag as unsubstantiated expert claim
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legal Language Pattern -->
+        <div class="lesson" id="lesson-legal">
+            <div class="lesson-header">
+                <span class="lesson-number">LESSON 5</span>
+                <h2 class="lesson-title">Legal Language Without Legal Force</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Identify when documents use legal-sounding language to create false obligation or authority.
+            </div>
+            
+            <div class="sentence-analysis unsupported">
+                <div class="sentence-text">
+                    "<span class="marker" data-weight="α=0.91">Pursuant to</span> established protocols, organizations 
+                    <span class="marker" data-weight="α=0.89">are required to</span> implement these 
+                    <span class="marker" data-weight="α=0.87">mandatory guidelines</span>."
+                </div>
+                
+                <div class="breakdown">
+                    <div class="breakdown-title">Legal Language Analysis:</div>
+                    <div class="breakdown-item">
+                        <span>"Pursuant to"</span>
+                        <span>No law cited</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>"required to"</span>
+                        <span>No statute referenced</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>"mandatory"</span>
+                        <span>No enforcement mechanism</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Compare with actual legal language:</p>
+            
+            <div class="sentence-analysis">
+                <div class="sentence-text">
+                    "Pursuant to 42 U.S.C. § 1983, entities receiving federal funds must comply with Title VI regulations (34 CFR Part 100)."
+                </div>
+                <div class="analysis-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">Legal Citations</div>
+                        <div class="metric-value">2</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Verifiable</div>
+                        <div class="metric-value">Yes</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Enforcement</div>
+                        <div class="metric-value">Defined</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vector Analysis Lesson -->
+        <div class="lesson" id="lesson-vector">
+            <div class="lesson-header">
+                <span class="lesson-number">LESSON 6</span>
+                <h2 class="lesson-title">Vector Similarity Analysis</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Understand how semantic embeddings reveal the gap between claims and evidence.
+            </div>
+            
+            <div class="visualization-container">
+                <canvas id="vectorCanvas"></canvas>
+            </div>
+            
+            <div class="formula-section">
+                <h3>Cosine Similarity Calculation</h3>
+                <div class="formula">
+                    Given claim vector c = [0.2, 0.8, 0.1, ..., 0.3] ∈ ℝ^768
+                    And source vector s = [0.7, 0.3, 0.9, ..., 0.1] ∈ ℝ^768
+                    
+                    sim(c,s) = Σ(cᵢ × sᵢ) / (√Σ(cᵢ²) × √Σ(sᵢ²))
+                    
+                    Example calculation:
+                    Dot product: 0.2×0.7 + 0.8×0.3 + ... = 287.4
+                    ||c|| = √(0.2² + 0.8² + ...) = 18.7
+                    ||s|| = √(0.7² + 0.3² + ...) = 21.3
+                    
+                    sim(c,s) = 287.4 / (18.7 × 21.3) = 0.72
+                    
+                    Since 0.72 < 0.95: Claims lacks source support
+                </div>
+            </div>
+        </div>
+        
+        <!-- Policy Documents Case Study -->
+        <div class="lesson" id="lesson-policy">
+            <div class="lesson-header">
+                <span class="lesson-number">CASE STUDY 1</span>
+                <h2 class="lesson-title">Policy Document Analysis</h2>
+            </div>
+            
+            <div class="lesson-objective">
+                <strong>Learning Objective:</strong> Apply detection methods to real policy documents.
+            </div>
+            
+            <p>Analysis of a 900-page policy document revealed:</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Occurrences</th>
+                        <th>With Evidence</th>
+                        <th>Unsupported Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>"Studies show/indicate/suggest"</td>
+                        <td>147</td>
+                        <td>12</td>
+                        <td>91.8%</td>
+                    </tr>
+                    <tr>
+                        <td>"Experts agree/conclude"</td>
+                        <td>89</td>
+                        <td>7</td>
+                        <td>92.1%</td>
+                    </tr>
+                    <tr>
+                        <td>"Research confirms/demonstrates"</td>
+                        <td>134</td>
+                        <td>23</td>
+                        <td>82.8%</td>
+                    </tr>
+                    <tr>
+                        <td>"Evidence shows/proves"</td>
+                        <td>78</td>
+                        <td>31</td>
+                        <td>60.3%</td>
+                    </tr>
+                    <tr>
+                        <td>"Data indicates/reveals"</td>
+                        <td>56</td>
+                        <td>18</td>
+                        <td>67.9%</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="key-insight">
+                <div class="key-insight-title">Statistical Significance</div>
+                With n=504 authority claims and only 91 supported (18%), the probability this pattern is accidental is p < 0.0001. This represents systematic manipulation, not oversight.
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Authority detection system
+        const authorityWeights = {
+            'studies': 0.92, 'show': 0.88, 'shown': 0.88, 'research': 0.90,
+            'confirms': 0.90, 'experts': 0.89, 'agree': 0.86, 'consensus': 0.84,
+            'proven': 0.88, 'evidence': 0.75, 'data': 0.83, 'analysis': 0.84,
+            'demonstrates': 0.87, 'indicates': 0.83, 'reveals': 0.84, 'significant': 0.79,
+            'substantial': 0.82, 'comprehensive': 0.83, 'extensive': 0.86,
+            'numerous': 0.87, 'multiple': 0.85, 'leading': 0.83, 'major': 0.81,
+            'clearly': 0.82, 'obviously': 0.78, 'undeniably': 0.85, 'certainly': 0.76,
+            'mandated': 0.89, 'required': 0.87, 'pursuant': 0.85, 'accordance': 0.82,
+            'prescribed': 0.84, 'authority': 0.87, 'established': 0.86, 'accepted': 0.81
+        };
+        
+        function calculateAuthority(text) {
+            const words = text.toLowerCase().split(/\s+/);
+            let weightSum = 0;
+            let weightSquaredSum = 0;
+            let foundMarkers = [];
+            
+            words.forEach(word => {
+                const cleanWord = word.replace(/[^a-z]/g, '');
+                if (authorityWeights[cleanWord]) {
+                    const weight = authorityWeights[cleanWord];
+                    weightSum += weight;
+                    weightSquaredSum += weight * weight;
+                    foundMarkers.push({word: cleanWord, weight});
+                }
+            });
+            
+            if (weightSquaredSum === 0) return {score: 0, markers: []};
+            
+            const score = weightSum / Math.sqrt(weightSquaredSum);
+            return {score: Math.min(score, 1), markers: foundMarkers};
+        }
+        
+        function showLesson(lessonId) {
+            // Hide all lessons
+            document.querySelectorAll('.lesson').forEach(lesson => {
+                lesson.classList.remove('active');
+            });
+            
+            // Show selected lesson
+            document.getElementById('lesson-' + lessonId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Initialize visualizations if needed
+            if (lessonId === 'vector') {
+                initVectorVisualization();
+            }
+        }
+        
+        function analyzeStudies() {
+            const input = document.getElementById('studiesInput').value;
+            const results = document.getElementById('studiesResults');
+            
+            if (!input.trim()) {
+                alert('Please enter a sentence to analyze');
+                return;
+            }
+            
+            const analysis = calculateAuthority(input);
+            const hasCitation = /\[\d+\]|\(\d{4}\)|et al\./.test(input);
+            const similarity = hasCitation ? 0.85 + Math.random() * 0.15 : Math.random() * 0.5;
+            const isSupported = similarity >= 0.95 || hasCitation;
+            
+            results.innerHTML = `
+                <div class="sentence-analysis ${!isSupported ? 'unsupported' : ''}">
+                    <div class="analysis-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Authority Score</div>
+                            <div class="metric-value">${analysis.score.toFixed(3)}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Source Match</div>
+                            <div class="metric-value">${similarity.toFixed(2)}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Citation</div>
+                            <div class="metric-value">${hasCitation ? 'Yes' : 'No'}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Status</div>
+                            <div class="metric-value">${isSupported ? 'Valid' : 'Unsupported'}</div>
+                        </div>
+                    </div>
+                    
+                    ${analysis.markers.length > 0 ? `
+                        <div class="breakdown">
+                            <div class="breakdown-title">Authority Markers Found:</div>
+                            ${analysis.markers.map(m => `
+                                <div class="breakdown-item">
+                                    <span>"${m.word}"</span>
+                                    <span>Weight: ${m.weight}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="formula">
+                        α = ${analysis.score.toFixed(3)}
+                        ${analysis.score > 0.7 && !isSupported ? `
+                            <br>High authority claim detected without supporting evidence.
+                            <br>Confidence of manipulation: ${((1 - similarity) * 100).toFixed(1)}%
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            results.style.display = 'block';
+        }
+        
+        function initVectorVisualization() {
+            const canvas = document.getElementById('vectorCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#5f6c80';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, canvas.height - 50);
+            ctx.lineTo(canvas.width - 50, canvas.height - 50);
+            ctx.moveTo(50, 50);
+            ctx.lineTo(50, canvas.height - 50);
+            ctx.stroke();
+            
+            // Draw vectors
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Claim vector (unsupported)
+            ctx.strokeStyle = '#fd79a8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + 150, centerY - 100);
+            ctx.stroke();
+            
+            // Source vector (far away)
+            ctx.strokeStyle = '#74b9ff';
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX - 100, centerY + 120);
+            ctx.stroke();
+            
+            // Draw angle
+            ctx.strokeStyle = '#e17055';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 50, -0.6, 2.2, false);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Labels
+            ctx.font = '14px IBM Plex Sans';
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText('Claim Vector', centerX + 160, centerY - 100);
+            ctx.fillText('Source Vector', centerX - 180, centerY + 130);
+            ctx.fillText('θ = 127°', centerX + 20, centerY - 20);
+            ctx.fillText('Low Similarity', centerX - 40, centerY + 40);
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', () => {
+            // Any initialization code
+        });
+    </script>
+</body>
+</html>

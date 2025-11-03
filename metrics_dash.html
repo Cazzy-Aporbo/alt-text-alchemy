@@ -1,0 +1,704 @@
+<!-- guide.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LLM Metrics Guide • Complete Internal Reference</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Complete internal reference for A Health Metrics Dashboard: purpose, how-to, all metric formulas, and the Overall Confidence Score (C★)." />
+  <meta property="og:title" content="Metrics Guide — Complete Internal Reference" />
+  <meta property="og:description" content="All 30 metrics across Core Communication, Frameworks, Accuracy, Clinical & Safety, Psychological, System & Style — plus Overall Confidence Score." />
+  <meta name="theme-color" content="#0f0b16" />
+
+  <style>
+    :root{
+      --color-bg:#0f0b16;
+      --color-card:#171228;
+      --color-ink:#f3effa;
+      --color-ink-muted:#cbbbe7;
+      --color-pass:#4CAF50;
+      --color-warn:#FFC107;
+      --color-fail:#F44336;
+      --gradient-primary:linear-gradient(135deg,#C792EA,#8B5FC7);
+      --gradient-glass:linear-gradient(135deg,rgba(199,146,234,.12),rgba(139,95,199,.12));
+      --ring:0 0 0 3px rgba(199,146,234,.35);
+      --radius:14px;
+      --radius-sm:10px;
+      --shadow:0 10px 30px rgba(0,0,0,.30);
+      --shadow-soft:0 8px 22px rgba(0,0,0,.22);
+      --maxw:1160px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:radial-gradient(1200px 800px at 20% -10%,rgba(199,146,234,.08),transparent),var(--color-bg);color:var(--color-ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif;line-height:1.5}
+    a{color:inherit;text-decoration:none}
+    a:focus,button:focus,input:focus,select:focus{outline:none;box-shadow:var(--ring)}
+    header{position:sticky;top:0;z-index:50;background:rgba(23,18,40,.8);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid rgba(199,146,234,.15)}
+    .skip{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip:focus{left:12px;top:12px;width:auto;height:auto;padding:8px 12px;border-radius:8px;background:#000;color:#fff;z-index:1000}
+    .nav{display:flex;gap:14px;align-items:center;justify-content:space-between;max-width:var(--maxw);margin:0 auto;padding:10px 16px}
+    .nav a.brand{font-weight:800;letter-spacing:.2px;background:var(--gradient-primary);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap}
+    .tabs a{padding:8px 10px;border-radius:999px;background:rgba(199,146,234,.12);font-size:13px;color:var(--color-ink-muted)}
+    .tabs a:hover{background:rgba(199,146,234,.18);color:var(--color-ink)}
+    main{max-width:var(--maxw);margin:0 auto;padding:18px 16px 80px}
+    .hero{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;align-items:center}
+    .hero h1{margin:.2rem 0 0;font-size:34px;line-height:1.15}
+    .muted{color:var(--color-ink-muted)}
+    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn{appearance:none;border:0;border-radius:999px;background:var(--gradient-primary);color:#fff;padding:10px 16px;font-weight:700;box-shadow:var(--shadow-soft);cursor:pointer}
+    .btn.secondary{background:rgba(199,146,234,.12);color:var(--color-ink)}
+    .btn:hover{filter:brightness(1.05)}
+    .grid{display:grid;gap:14px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--color-card);border:1px solid rgba(199,146,234,.18);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .card-title{font-weight:800;font-size:20px;margin:0 0 8px}
+    .section-title{font-weight:800;font-size:18px;margin:12px 0}
+    .pillar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 12px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--gradient-glass);font-size:12px}
+    .searchbar{display:flex;gap:8px;align-items:center;margin-top:10px}
+    .searchbar input{flex:1;padding:10px 12px;border-radius:999px;border:1px solid rgba(199,146,234,.15);background:#0f0b16;color:var(--color-ink)}
+    .metric-card{position:relative}
+    .metric-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .metric-name{font-weight:800}
+    .metric-cat{font-size:12px;color:var(--color-ink-muted)}
+    .explain{display:none;margin-top:12px;border-top:1px dashed rgba(199,146,234,.25);padding-top:12px}
+    .mini{appearance:none;border:1px solid rgba(199,146,234,.25);background:rgba(199,146,234,.1);color:var(--color-ink);border-radius:999px;padding:6px 10px;font-size:12px;cursor:pointer}
+    .badge-pass{background:rgba(76,175,80,.14);border:1px solid rgba(76,175,80,.35)}
+    .badge-warn{background:rgba(255,193,7,.14);border:1px solid rgba(255,193,7,.35)}
+    .badge-fail{background:rgba(244,67,54,.14);border:1px solid rgba(244,67,54,.35)}
+    .code{background:#0f0b16;border:1px solid rgba(199,146,234,.2);border-radius:10px;padding:10px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+    .table{width:100%;border-collapse:separate;border-spacing:0 6px}
+    .table th{font-size:12px;color:var(--color-ink-muted);text-align:left}
+    .table td,.table th{padding:6px 8px}
+    .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .toc{display:none}
+    @media(min-width:1100px){.layout{display:grid;grid-template-columns:1fr 260px;gap:18px} .toc{display:block;position:sticky;top:76px}}
+    .toc .card{position:sticky;top:76px}
+    .toc a{display:block;padding:6px 0;color:var(--color-ink-muted);font-size:13px}
+    .toc a:hover{color:var(--color-ink)}
+    .help{font-size:13px;color:var(--color-ink-muted)}
+    .muted-12{font-size:12px;color:var(--color-ink-muted)}
+    .copylink{position:absolute;top:12px;right:12px}
+    @media print{
+      header,.toc,.cta,.searchbar{display:none !important}
+      main{padding:0}
+      .card{page-break-inside:avoid;border:1px solid #999;background:#fff;color:#000}
+      body{background:#fff;color:#000}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header role="banner">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#overview">LLM Metrics Guide</a>
+      <div class="tabs" role="navigation" aria-label="Sections">
+        <a href="#overview">Overview</a>
+        <a href="#core">Core Communication</a>
+        <a href="#frameworks">Frameworks</a>
+        <a href="#accuracy">Accuracy</a>
+        <a href="#clinical">Clinical &amp; Safety</a>
+        <a href="#psychological">Psychological</a>
+        <a href="#system-style">System &amp; Style</a>
+        <a href="#confidence">Confidence Score</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- HERO / OVERVIEW -->
+    <section id="overview" class="card" aria-labelledby="ov-title" style="scroll-margin-top:96px;">
+      <h1 id="ov-title">LLM Metrics Guide</h1>
+      <p class="muted">Complete Internal Reference — All Metrics, Formulas, and Clinical Rationale</p>
+      <div class="cta">
+        <a class="btn" href="#core" aria-label="Jump to Core Communication metrics">Start with Core Metrics</a>
+        <a class="btn secondary" href="#confidence" aria-label="Jump to Overall Confidence Score">Jump to Confidence Score</a>
+        <button class="btn secondary" onclick="window.print()" aria-label="Print / Save as PDF">Download Guide</button>
+      </div>
+
+      <div class="grid" style="margin-top:12px;">
+        <div class="card">
+          <h2 class="card-title">What This Dashboard Measures</h2>
+          <p>
+            This system evaluates health communication across <strong>30 distinct metrics</strong> in
+            <strong>7 categories</strong>: Core Communication, Frameworks, Accuracy, Clinical &amp; Safety,
+            Psychological, and System &amp; Style. Each score is computed by a <strong>deterministic formula</strong>
+            grounded in clinical communication research—so every result is <strong>transparent and reproducible</strong>.
+          </p>
+          <div class="pillar">
+            <span class="pill badge-pass">Pass (≥ threshold)</span>
+            <span class="pill badge-warn">Needs Work (&lt; threshold)</span>
+            <span class="pill badge-fail">Critical Issues (&lt; 45%)</span>
+          </div>
+          <p class="help">
+            Caps prevent inflated 100% scores; an “optimism tax” slightly reduces scores when evidence is weak.
+            Band labels: Exceptional (≥86), Good (≥74), Adequate (≥60), Poor (≥45), Inadequate (&lt;45).
+          </p>
+          <div class="searchbar" role="search">
+            <input id="search" type="search" placeholder="Filter metrics by name or tag (e.g., clarity, BRAN, empathy, bias)…" aria-label="Filter metrics" />
+            <button class="mini" id="clearSearch" aria-label="Clear filter">Clear</button>
+          </div>
+        </div>
+
+        <aside class="toc">
+          <div class="card" aria-label="Table of contents">
+            <div class="card-title">Quick Links</div>
+            <a href="#core">Core Communication</a>
+            <a href="#frameworks">Question Frameworks</a>
+            <a href="#accuracy">Accuracy</a>
+            <a href="#clinical">Clinical &amp; Safety</a>
+            <a href="#psychological">Psychological</a>
+            <a href="#system-style">System &amp; Style</a>
+            <a href="#confidence">Overall Confidence (C★)</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- CONTAINERS: metrics render here via JS -->
+    <section id="core" class="card" aria-labelledby="core-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="core-title" class="card-title">Core Communication Metrics</h2>
+        <span class="muted-12">Clarity • Empowerment • Cultural Safety • Coverage • Resonance • Personalization • Safety</span>
+      </div>
+      <div id="core-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section id="frameworks" class="card" aria-labelledby="fw-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="fw-title" class="card-title">Question Framework Metrics</h2>
+        <span class="muted-12">PICOTS • BRAN • Ask–Tell–Ask • CUSP • PACES • BATHE • SOAP • Variety • Uniqueness</span>
+      </div>
+      <div id="frameworks-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section id="accuracy" class="card" aria-labelledby="acc-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="acc-title" class="card-title">Accuracy Metrics</h2>
+        <span class="muted-12">Grounding • Calibration • Source Verification • Consistency • Currency</span>
+      </div>
+      <div id="accuracy-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section id="clinical" class="card" aria-labelledby="clin-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="clin-title" class="card-title">Clinical &amp; Safety Metrics</h2>
+        <span class="muted-12">Relevance • Trajectory • Bias • Diagnostic Utility • Escalation</span>
+      </div>
+      <div id="clinical-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section id="psychological" class="card" aria-labelledby="psych-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="psych-title" class="card-title">Psychological &amp; Interaction Metrics</h2>
+        <span class="muted-12">Recovery • Intention Alignment • Progressive Depth</span>
+      </div>
+      <div id="psychological-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section id="system-style" class="card" aria-labelledby="sys-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="sys-title" class="card-title">System &amp; Style Metrics</h2>
+        <span class="muted-12">Context • Human Likelihood • Regulatory Readiness</span>
+      </div>
+      <div id="system-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section id="confidence" class="card" aria-labelledby="conf-title" style="scroll-margin-top:96px;">
+      <div class="row">
+        <h2 id="conf-title" class="card-title">Overall Confidence Score (C★)</h2>
+        <span class="muted-12">Meta score — trust in the entire evaluation</span>
+      </div>
+      <div id="confidence-container" class="grid" aria-live="polite"></div>
+    </section>
+
+    <footer class="card" style="margin-top:18px;">
+      <div class="row">
+        <div>
+          <div class="card-title" style="margin:0 0 4px">Compliance &amp; Audit</div>
+          <p class="help" style="margin:0">All formulas are deterministic, versioned, and explainable. Phrase packs are auditable and PHI-free.</p>
+        </div>
+        <div class="muted-12">© 2025 Cazandra Aporbo, MS. • Building equitable healthcare communication through evidence-based AI.</div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // -----------------------------
+    // Metric Catalog (30 metrics + meta Confidence)
+    // -----------------------------
+    const METRICS = [
+      // ===== CORE COMMUNICATION (7) =====
+      {
+        id:'communication-clarity', cat:'core', name:'Communication Clarity',
+        description:'Checks if sentences are short, plain, and easy to follow on the first read (no medical degree needed).',
+        formula:'raw = 0.55·range(8–22w) + 0.20·bandFit(avgLen,12..24) + 0.12·readability + 0.22·sat(clarity) − penalties; final = finalize(raw, cap 0.93).',
+        threshold:'0.60',
+        why:'Clear language reduces errors, increases understanding, and builds trust.',
+        example:'“In simple terms, here’s what this test looks for… Let’s walk it step by step.”',
+        tips:['Keep sentences 8–22 words','Define any medical term on first use','Use stepwise micro-headings and examples','Replace passive phrasing with direct, plain verbs'],
+        tags:['clarity','plain language','readability','range']
+      },
+      {
+        id:'user-empowerment', cat:'core', name:'User Empowerment',
+        description:'Looks for phrases that invite the person to act or decide.',
+        formula:'raw = 0.25 + 0.50·sat(#agency,3) + 0.25·sat(#actions,4); final = finalize(raw, cap 0.90).',
+        threshold:'0.58',
+        why:'When people have agency, they ask questions, follow through, and get better outcomes.',
+        example:'“You can choose from a few options. Let’s plan next steps together.”',
+        tips:['Add “you can / options include”','Offer 2–3 concrete actions','Invite shared decisions (“shall we…?”)','Link actions to outcomes'],
+        tags:['agency','actions','shared decision']
+      },
+      {
+        id:'cultural-safety', cat:'core', name:'Cultural Safety',
+        description:'Ensures language is respectful, identity-aware, and judgment-free.',
+        formula:'raw = 0.50 + 0.45·sat(inclusive,4) − 0.40·sat(risky,2); final = finalize(raw, cap 0.95).',
+        threshold:'0.70',
+        why:'Safety reduces disparities and increases trust—especially for historically dismissed users.',
+        example:'“At your pace, using the name and pronouns you prefer, and including any support person you choose.”',
+        tips:['Name preferences and pronouns','Avoid absolutes (“always/never/must”)','Invite preferences and boundaries','Remove labels like “non-compliant”'],
+        tags:['inclusion','identity','respect','bias']
+      },
+      {
+        id:'comprehensive-coverage', cat:'core', name:'Comprehensive Coverage',
+        description:'Confirms all key parts (title, intro, question sets, support) are included.',
+        formula:'raw = 0.35·coverage(6 parts) + depth(intro/support/questions); final = finalize(raw, cap 0.94).',
+        threshold:'0.68',
+        why:'Completeness prevents gaps that derail real appointments.',
+        example:'Includes title, intro, 3× question lists (symptoms/condition/history), and a supportive close.',
+        tips:['Check all 6 parts exist','Ensure intros/support are > 30–50 words','Aim for ≥9 total questions','Avoid thin sections'],
+        tags:['structure','coverage','length']
+      },
+      {
+        id:'emotional-resonance', cat:'core', name:'Emotional Resonance',
+        description:'Detects empathy and validation in the wording.',
+        formula:'raw = 0.45 + 0.30·sat(resonance,5) + 0.12·sat(comfort,3) + 0.10·sat(validation,2); final = finalize(raw, cap 0.95).',
+        threshold:'0.58',
+        why:'Validation lowers anxiety and improves recall.',
+        example:'“That sounds exhausting—and it makes sense you’d feel that way.”',
+        tips:['Acknowledge feelings plainly','Name the effort and courage','Offer grounded reassurance','Avoid clichés or minimizers'],
+        tags:['empathy','validation','reassurance']
+      },
+      {
+        id:'personalization', cat:'core', name:'Personalization Fit',
+        description:'Checks if the output refers to the user’s unique details (age, symptoms, context).',
+        formula:'raw = 0.20 + 0.70·sat(#userRefs,K) + 0.10·sat(phrasing,2); final = finalize(raw, cap 0.90).',
+        threshold:'0.55',
+        why:'Specifics prove we “heard” the user and tailor guidance.',
+        example:'“Since you mentioned PCOS and fatigue worsening pre-cycle…”',
+        tips:['Reference 2–3 concrete details','Use “based on what you shared…”','Avoid generic templates','Mirror timeframes and meds correctly'],
+        tags:['specifics','tailoring','context']
+      },
+      {
+        id:'language-safety', cat:'core', name:'Language Safety',
+        description:'Ensures no shaming, stigma, or fear-based phrases appear.',
+        formula:'raw = 1 − penalties(harsh,prof,stigma,fear) + bonuses(uncertainty,safety); final = finalize(raw, cap 0.98).',
+        threshold:'0.80',
+        why:'Harmful language erodes trust; safety language protects it.',
+        example:'Avoids “just anxiety / calm down”; uses “your concern is valid—we’ll check and follow up.”',
+        tips:['Purge dismissive/harsh words','Avoid catastrophizing','Add uncertainty honesty (“might be…”)','Add safety cues (“we’ll make a plan”)'],
+        tags:['safety','stigma','fear','validation']
+      },
+
+      // ===== FRAMEWORKS (7) =====
+      {
+        id:'evidence-based-questioning', cat:'frameworks', name:'Evidence-Based Questioning',
+        description:'Evaluates PICOTS + Ask–Tell–Ask + BRAN structure inside questions.',
+        formula:'raw = 0.45·PICOTS_coverage + 0.30·ATA + 0.25·BRAN_coverage; final = finalize(raw, cap 0.92).',
+        threshold:'0.62',
+        why:'Structure anchors clinical reasoning and informed choice.',
+        example:'“Benefits, risks, alternatives, and what if we do nothing?”',
+        tips:['Cover ≥4 PICOTS parts','Include full BRAN','Use Ask–Tell–Ask cadence','Tie questions to outcomes & time'],
+        tags:['PICOTS','BRAN','ATA','evidence']
+      },
+      {
+        id:'cusp-triage', cat:'frameworks', name:'CUSP Triage Readiness',
+        description:'Checks Complaint, Urgency, Severity, Plan (duration/trigger coverage).',
+        formula:'raw = 0.70·coverage(C,U,S,P) + 0.30·quality(duration/trigger); final = finalize(raw, cap 0.90).',
+        threshold:'0.62',
+        why:'Captures severity and next steps—prevents missed emergencies.',
+        example:'“Since when? How fast is it changing? What’s our immediate plan?”',
+        tips:['Add “since when” & “how severe”','Note triggers/relievers','Define immediate action if red flags','Use 0–10 severity scales when relevant'],
+        tags:['triage','severity','plan']
+      },
+      {
+        id:'paces-decision', cat:'frameworks', name:'PACES Decision Framing',
+        description:'Covers Problem, Alternatives, Consequences, Evidence, Success.',
+        formula:'raw = 0.80·coverage(P,A,C,E,S) + 0.20·quality(specific outcomes/costs); final = finalize(raw, cap 0.92).',
+        threshold:'0.62',
+        why:'Exposes trade-offs so choices are truly informed.',
+        example:'“What does success look like for you over 3 months?”',
+        tips:['List real alternatives','State consequences & costs','Cite evidence level','Define “success” concretely'],
+        tags:['decisions','trade-offs','success']
+      },
+      {
+        id:'bathe-psychosocial', cat:'frameworks', name:'BATHE Psychosocial Fit',
+        description:'Covers Background, Affect, Troubling, Handling, Empathy.',
+        formula:'raw = 0.85·coverage(B,A,T,H,E) + 0.15·quality(emotional depth); final = finalize(raw, cap 0.91).',
+        threshold:'0.60',
+        why:'Brings psychosocial context that shapes outcomes.',
+        example:'“What’s been hardest? How have you been handling this?”',
+        tips:['Ask how it affects life/work','Reflect affect/feelings','Name coping supports','Offer brief empathic reflection'],
+        tags:['psychosocial','affect','coping']
+      },
+      {
+        id:'soap-structure', cat:'frameworks', name:'SOAP Follow-up Structure',
+        description:'Ensures Subjective, Objective, Assessment, Plan traces are present.',
+        formula:'raw = 0.75·coverage(S,O,A,P) + 0.25·quality(specificity); final = finalize(raw, cap 0.91).',
+        threshold:'0.60',
+        why:'Complete follow-ups reduce back-and-forth and omissions.',
+        example:'“Subjective: fatigue worse p.m.; Objective: vitals; Plan: labs + return.”',
+        tips:['Request vitals/tests if relevant','Summarize assessment plainly','Specify plan + timing','Avoid vague filler'],
+        tags:['SOAP','follow-up','plan']
+      },
+      {
+        id:'question-type-balance', cat:'frameworks', name:'Question Type Balance',
+        description:'Checks for a healthy mix: open, direct (yes/no), probing, compare, clarify.',
+        formula:'raw = 1 − abs(openRatio − 0.70); final = finalize(raw, cap 0.92).',
+        threshold:'0.58',
+        why:'Variety elicits richer data without derailing the visit.',
+        example:'Mix “how/what/why” with selective yes/no and clarifiers.',
+        tips:['Target ~70% open','Add 1–2 clarifiers','Include 1 comparative check','Avoid one-type dominance'],
+        tags:['open','clarify','probing','compare']
+      },
+      {
+        id:'question-uniqueness', cat:'frameworks', name:'Question Uniqueness',
+        description:'Verifies that questions are not just repeats of each other.',
+        formula:'raw = 1 − avgSimilarity; final = finalize(raw, cap 0.93).',
+        threshold:'0.60',
+        why:'Non-redundant questions save time and surface new info.',
+        example:'No repeated “Is it worse?” in slightly different words.',
+        tips:['De-duplicate near-synonyms','Cover new angles','Use checklists to avoid repeats','Favor discriminators'],
+        tags:['uniqueness','similarity','coverage']
+      },
+
+      // ===== ACCURACY (5) =====
+      {
+        id:'grounding-accuracy', cat:'accuracy', name:'Grounding Accuracy',
+        description:'Measures whether facts are tied to evidence, guidelines, and citations.',
+        formula:'raw = 0.40·knowledge_base_alignment + 0.30·evidence_markers + 0.20·guideline_cues + 0.10·citations; final = finalize(raw, cap 0.96).',
+        threshold:'0.80',
+        why:'Anchors claims to medical reality; reduces misinformation risk.',
+        example:'“According to ACOG (2024)… recent RCTs suggest…”',
+        tips:['Add explicit guideline names','Use cautious claims','Avoid absolute language','Link facts to sources'],
+        tags:['evidence','guidelines','citations']
+      },
+      {
+        id:'clinical-calibration', cat:'accuracy', name:'Clinical Calibration',
+        description:'Checks if probabilities and risks match real-world outcomes.',
+        formula:'raw = 0.50·probability_realism + 0.30·risk_stratification + 0.20·uncertainty_language; final = finalize(raw, cap 0.90).',
+        threshold:'0.75',
+        why:'Over- or under-stated risks can harm decisions.',
+        example:'“Most improve within weeks; a smaller group needs imaging.”',
+        tips:['Use ranges not single-points','State uncertainty honestly','Stratify by red flags','Avoid “always/never”'],
+        tags:['probability','risk','uncertainty']
+      },
+      {
+        id:'source-verification', cat:'accuracy', name:'Source Verification',
+        description:'Ensures claims can be traced to authoritative sources.',
+        formula:'raw = 0.60·authoritative_source + 0.25·clear_attribution + 0.15·recency; final = finalize(raw, cap 0.90).',
+        threshold:'0.85',
+        why:'Traceability supports audit and trust.',
+        example:'“CDC clinical guidance (rev. 2024)…”',
+        tips:['Name institutions explicitly','Prefer primary guidelines','Note revision years','Avoid unsourced assertions'],
+        tags:['traceable','authoritative','recency']
+      },
+      {
+        id:'factual-consistency', cat:'accuracy', name:'Factual Consistency',
+        description:'Looks for internal contradictions or terminology conflicts.',
+        formula:'raw = 1 − (0.60·contradictions + 0.40·terminology_conflicts); final = finalize(raw, cap 0.98).',
+        threshold:'0.90',
+        why:'Conflicts confuse users and undermine credibility.',
+        example:'Avoid “always safe” and later “can be dangerous.”',
+        tips:['Normalize terms across sections','Remove conflicting claims','Add “context depends” notes','Use consistent thresholds'],
+        tags:['consistency','conflict','terminology']
+      },
+      {
+        id:'knowledge-currency', cat:'accuracy', name:'Knowledge Currency',
+        description:'Checks if information reflects current best evidence.',
+        formula:'raw = 0.70·recency_signals − 0.30·outdated_terms; final = finalize(raw, cap 0.92).',
+        threshold:'0.78',
+        why:'Medicine evolves; stale guidance misleads.',
+        example:'“As of 2024 guidance…”',
+        tips:['Add revision dates','Remove outdated jargon','Prefer current consensus','Flag areas of change'],
+        tags:['recency','updates','currency']
+      },
+
+      // ===== CLINICAL & SAFETY (5) =====
+      {
+        id:'clinical-relevance', cat:'clinical', name:'Clinical Relevance',
+        description:'Confirms alignment with diagnostic/therapeutic pathways and red flags.',
+        formula:'raw = 0.50·guideline_alignment + 0.30·redflag_coverage + 0.20·workup_mapped; final = finalize(raw, cap 0.88).',
+        threshold:'0.65',
+        why:'Keeps questions actionable in real clinics.',
+        example:'Maps symptoms to next steps (labs, imaging, timing).',
+        tips:['Reference red flags explicitly','Tie to diagnostic steps','Avoid “nice to know” fluff','State likely next tests'],
+        tags:['workup','pathway','red flags']
+      },
+      {
+        id:'trajectory-sensitivity', cat:'clinical', name:'Trajectory Sensitivity',
+        description:'Detects worsening/improving trends and adapts to change over time.',
+        formula:'raw = 0.60·progression_tracking + 0.40·temporal_awareness; final = finalize(raw, cap 0.88).',
+        threshold:'0.62',
+        why:'Progression signals severity and urgency.',
+        example:'“Since when? Getting worse or better? New symptoms?”',
+        tips:['Ask onset/duration','Track patterns over time','Note new symptom emergence','Link change to action'],
+        tags:['timeline','progression','temporal']
+      },
+      {
+        id:'bias-signal', cat:'clinical', name:'Bias Signal Score',
+        description:'Flags identity-based bias; rewards equity language.',
+        formula:'raw = 1.0 − bias_penalties + equity_bonuses; final = finalize(raw, cap 0.95).',
+        threshold:'0.75',
+        why:'Bias harms care quality and access.',
+        example:'“Regardless of background, we follow the same evidence and your preferences.”',
+        tips:['Avoid stereotypes','Use universal evidence','Invite preferences','Use person-first language'],
+        tags:['bias','equity','inclusive']
+      },
+      {
+        id:'diagnostic-utility', cat:'clinical', name:'Diagnostic Utility',
+        description:'Checks if questions narrow differentials and identify discriminators.',
+        formula:'raw = 0.40·discriminating_power + 0.35·differential_narrowing + 0.25·specificity; final = finalize(raw, cap 0.88).',
+        threshold:'0.60',
+        why:'Sharp questions accelerate accurate diagnosis.',
+        example:'“Does activity trigger it, or does rest help?”',
+        tips:['Add rule-in/out features','Use pathognomonic clues when appropriate','Compare typical vs atypical','Tie to likely differential'],
+        tags:['differential','discriminator','specific']
+      },
+      {
+        id:'escalation-appropriateness', cat:'clinical', name:'Escalation Appropriateness',
+        description:'Ensures urgency recommendations match severity and red flags.',
+        formula:'raw = 0.55·severity_match + 0.25·redflag_action + 0.20·over_under_avoidance; final = finalize(raw, cap 0.90).',
+        threshold:'0.70',
+        why:'Under-escalation endangers; over-escalation alarms.',
+        example:'“If chest pressure + shortness of breath → emergency services now.”',
+        tips:['Bind specific red flags to actions','Avoid generic “seek care”','Calibrate urgency language','Include time windows'],
+        tags:['urgency','severity','triage']
+      },
+
+      // ===== PSYCHOLOGICAL & INTERACTION (3) =====
+      {
+        id:'emotional-recovery', cat:'psychological', name:'Emotional Recovery Score',
+        description:'Looks for calming, grounding language to ease distress.',
+        formula:'raw = 0.50·calming_language + 0.30·grounding_techniques + 0.20·pacing; final = finalize(raw, cap 0.92).',
+        threshold:'0.58',
+        why:'Regulated users process information and follow plans better.',
+        example:'“Let’s go one step at a time. You’re not alone; we’ll make a plan.”',
+        tips:['Use slow/stepwise phrasing','Normalize stress responses','Offer simple grounding steps','Avoid therapy-style directives'],
+        tags:['calming','grounding','pacing']
+      },
+      {
+        id:'intention-alignment', cat:'psychological', name:'Intention Alignment',
+        description:'Confirms the response stays on the user’s stated goals and concerns.',
+        formula:'raw = 0.60·goal_reference + 0.25·priority_focus + 0.15·scope_match; final = finalize(raw, cap 0.90).',
+        threshold:'0.65',
+        why:'Relevance prevents the feeling of being ignored or derailed.',
+        example:'“You asked mainly about urgency; let’s focus on red flags first.”',
+        tips:['Restate user goals','Prioritize top concern first','Defer tangents explicitly','Close the loop on the ask'],
+        tags:['goals','priorities','relevance']
+      },
+      {
+        id:'progressive-depth', cat:'psychological', name:'Progressive Depth',
+        description:'Checks that complexity layers from basic to detailed questions.',
+        formula:'raw = 0.60·logical_progression + 0.40·scaffolding_quality; final = finalize(raw, cap 0.88).',
+        threshold:'0.60',
+        why:'Scaffolding keeps beginners and experts engaged without overwhelm.',
+        example:'“First, basics of the symptom; then, deeper discriminators.”',
+        tips:['Use “first/next/then”','Reference prior answers','Zoom from overview to detail','Avoid big jumps in complexity'],
+        tags:['scaffold','sequence','progression']
+      },
+
+      // ===== SYSTEM & STYLE (3) =====
+      {
+        id:'context-preservation', cat:'system', name:'Context Preservation',
+        description:'Ensures earlier details are remembered and used consistently.',
+        formula:'raw = 0.65·detail_carryover + 0.35·consistency_across_sections; final = finalize(raw, cap 0.92).',
+        threshold:'0.62',
+        why:'Losing facts breaks trust and creates errors.',
+        example:'If “PCOS” is noted early, later advice must reflect it.',
+        tips:['Echo critical facts','Avoid contradictions later','Summarize before adding new info','Keep consistent terminology'],
+        tags:['memory','consistency','thread']
+      },
+      {
+        id:'human-likelihood', cat:'system', name:'Human Likelihood Score',
+        description:'Evaluates whether tone and flow resemble thoughtful human communication.',
+        formula:'raw = 0.40·natural_phrasing + 0.30·conversational_flow + 0.30·avoiding_robotic_tells; final = finalize(raw, cap 0.85).',
+        threshold:'0.60',
+        why:'Natural cadence improves engagement and trust.',
+        example:'“Good question—let’s take it step by step.”',
+        tips:['Vary sentence rhythm','Use connective reasoning (“because/so”)','Avoid template-y repeats','Prefer grounded hedges over filler'],
+        tags:['cadence','flow','natural']
+      },
+      {
+        id:'regulatory-readiness', cat:'system', name:'Regulatory Readiness',
+        description:'Confirms output is auditable, traceable, and compliance-aware.',
+        formula:'raw = 0.40·documentation_quality + 0.30·compliance_awareness + 0.30·audit_trail; final = finalize(raw, cap 0.88).',
+        threshold:'0.70',
+        why:'Audit-ready communication accelerates partnerships and trials.',
+        example:'Documented formulas, versioned phrase packs, clear sourcing.',
+        tips:['Name sources & versions','Keep math explainable','Log reviewer edits','Avoid PHI in examples'],
+        tags:['audit','traceable','compliance']
+      },
+
+      // ===== META (Confidence C★) =====
+      {
+        id:'confidence-star', cat:'meta', name:'Overall Confidence (C★)',
+        description:'Meta-metric: trust in the entire evaluation (inputs + evidence + output stability).',
+        formula:'C★ = 0.40·Input Quality (IC) + 0.35·Evidence Strength (EC) + 0.25·Output Consistency (OC) ± bonuses/penalties.',
+        threshold:'0.70',
+        why:'Shows how reliable the evaluation is as a whole—not model “certainty,” but system robustness.',
+        example:'IC: completeness & specificity; EC: grounding & frameworks; OC: coherence across tiles.',
+        tips:['Improve input completeness','Add evidence markers (PICOTS/BRAN)','Reduce variance across tiles','Resolve contradictions before export'],
+        tags:['confidence','meta','reliability']
+      }
+    ];
+
+    // -----------------------------
+    // Rendering
+    // -----------------------------
+    const containers = {
+      core: document.getElementById('core-container'),
+      frameworks: document.getElementById('frameworks-container'),
+      accuracy: document.getElementById('accuracy-container'),
+      clinical: document.getElementById('clinical-container'),
+      psychological: document.getElementById('psychological-container'),
+      system: document.getElementById('system-container'),
+      meta: document.getElementById('confidence-container')
+    };
+
+    function pillFor(cat){
+      const map = {
+        core:'Core Communication',
+        frameworks:'Framework',
+        accuracy:'Accuracy',
+        clinical:'Clinical & Safety',
+        psychological:'Psychological',
+        system:'System & Style',
+        meta:'Meta'
+      };
+      return `<span class="pill">${map[cat] || cat}</span>`;
+    }
+
+    function metricCard(m){
+      const deep = `#${m.id}`;
+      return `
+      <article id="${m.id}" class="card metric-card" data-tags="${(m.tags||[]).join(' ').toLowerCase()}">
+        <button class="mini copylink" aria-label="Copy deep link to ${m.name}" data-link="${deep}">🔗</button>
+        <div class="metric-head">
+          <div>
+            <div class="metric-name">${m.name}</div>
+            <div class="metric-cat">${pillFor(m.cat)}</div>
+          </div>
+          <button class="mini explain-toggle" aria-expanded="false" aria-controls="${m.id}-explain">Explain</button>
+        </div>
+        <p class="help">${m.description}</p>
+        <div class="explain" id="${m.id}-explain" hidden>
+          <div class="grid">
+            <div class="card" style="background:rgba(199,146,234,.06);">
+              <div class="section-title">Formula</div>
+              <pre class="code">${m.formula}</pre>
+              <div class="muted-12">Pass threshold: <strong>${m.threshold}</strong>; scores are capped per metric to avoid artificial 100%.</div>
+            </div>
+            <div class="card">
+              <div class="section-title">Why it matters</div>
+              <p>${m.why}</p>
+              <div class="section-title" style="margin-top:10px">Example</div>
+              <p class="help">${m.example}</p>
+            </div>
+          </div>
+          <div class="grid" style="margin-top:10px;">
+            <div class="card">
+              <div class="section-title">Do this next</div>
+              <ul style="margin:0 0 0 18px;">
+                ${(m.tips||[]).map(t=>`<li>${t}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="card">
+              <div class="section-title">Tags</div>
+              <p class="muted-12">${(m.tags||[]).join(' • ') || '—'}</p>
+            </div>
+          </div>
+        </div>
+      </article>`;
+    }
+
+    function render(){
+      // Clear all
+      Object.values(containers).forEach(c=>c && (c.innerHTML=''));
+      // Group by category
+      METRICS.forEach(m=>{
+        const el = metricCard(m);
+        if(containers[m.cat]) containers[m.cat].insertAdjacentHTML('beforeend', el);
+      });
+
+      // Wire up toggles & deep-link copy
+      document.querySelectorAll('.explain-toggle').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const controls = btn.getAttribute('aria-controls');
+          const panel = document.getElementById(controls);
+          const expanded = btn.getAttribute('aria-expanded') === 'true';
+          btn.setAttribute('aria-expanded', String(!expanded));
+          panel.hidden = expanded;
+          panel.style.display = expanded ? 'none' : 'block';
+        });
+      });
+      document.querySelectorAll('.copylink').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const hash = btn.getAttribute('data-link');
+          const url = location.origin + location.pathname + hash;
+          navigator.clipboard.writeText(url).then(()=>{
+            const old = btn.textContent; btn.textContent='✅'; setTimeout(()=>btn.textContent='🔗', 900);
+          });
+        });
+      });
+      // Open panel on deep link
+      if(location.hash){
+        const id = location.hash.slice(1);
+        const target = document.getElementById(id);
+        if(target){
+          target.scrollIntoView({block:'start'});
+          const btn = target.querySelector('.explain-toggle');
+          if(btn){
+            const controls = btn.getAttribute('aria-controls');
+            const panel = document.getElementById(controls);
+            btn.setAttribute('aria-expanded','true');
+            panel.hidden = false; panel.style.display = 'block';
+          }
+        }
+      }
+    }
+
+    // Search filter (name + tags)
+    function setupSearch(){
+      const input = document.getElementById('search');
+      const clear = document.getElementById('clearSearch');
+      let timer = null;
+      const run = ()=>{
+        const q = (input.value || '').trim().toLowerCase();
+        document.querySelectorAll('.metric-card').forEach(card=>{
+          const name = card.querySelector('.metric-name')?.textContent.toLowerCase() || '';
+          const tags = card.getAttribute('data-tags') || '';
+          const hit = !q || name.includes(q) || tags.includes(q);
+          card.style.display = hit ? '' : 'none';
+        });
+      };
+      input.addEventListener('input', ()=>{
+        clearTimeout(timer);
+        timer = setTimeout(run, 150);
+      });
+      clear.addEventListener('click', ()=>{
+        input.value=''; run(); input.focus();
+      });
+    }
+
+    render();
+    setupSearch();
+
+    // Expose for debugging if needed
+    window._METRICS_GUIDE = { METRICS };
+  </script>
+</body>
+</html>

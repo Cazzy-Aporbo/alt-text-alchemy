@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biosphere Memory Interface - Quantum-Biological Intelligence System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00ff88;
+            --secondary: #00aaff;
+            --accent: #ff00ff;
+            --dark: #0a0a0a;
+            --light: #ffffff;
+            --gray: #1a1a1a;
+            --text-light: #e0e0e0;
+            --quantum: #9945ff;
+            --biological: #00ff00;
+            --neural: #ff6600;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Quantum Particle Background */
+        #quantum-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-description {
+            max-width: 800px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.8;
+            margin-bottom: 3rem;
+        }
+
+        /* Interactive Visualization Container */
+        .visualization-container {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visualization-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Research Grid */
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .research-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .research-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+        }
+
+        .research-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .research-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .research-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .research-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .research-description {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .research-citation {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-style: italic;
+        }
+
+        /* Memory Type Visualization */
+        .memory-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .memory-type {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .memory-type:hover {
+            transform: scale(1.05);
+            border-color: var(--quantum);
+        }
+
+        .memory-type-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--quantum), var(--biological));
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Interactive System Diagram */
+        .system-diagram {
+            position: relative;
+            height: 600px;
+            margin: 3rem 0;
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, var(--quantum), transparent);
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease infinite;
+        }
+
+        .node:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .connection {
+            position: absolute;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 2px;
+            transform-origin: left center;
+            animation: flow 2s linear infinite;
+        }
+
+        @keyframes flow {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* Capability Cards */
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .capability-card {
+            background: linear-gradient(135deg, var(--glass), transparent);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .capability-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .capability-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .capability-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .capability-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        /* Data Flow Animation */
+        .data-flow {
+            position: relative;
+            height: 400px;
+            margin: 3rem 0;
+            background: var(--glass);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .data-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: data-flow-animation 3s linear infinite;
+        }
+
+        @keyframes data-flow-animation {
+            0% {
+                transform: translateX(0) translateY(200px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100vw) translateY(200px);
+                opacity: 0;
+            }
+        }
+
+        /* Interactive Console */
+        .console {
+            background: #000;
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .console-header {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .console-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: var(--primary);
+            animation: blink 1s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .console-output {
+            color: var(--text-light);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--gray);
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .research-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-flex;
+            gap: 0.3rem;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: loading-bounce 1.4s ease infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading-bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            margin: 2rem 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--glass);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="quantum-canvas"></canvas>
+
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span>🧬</span>
+                <span>Biosphere Memory Interface</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#research">Research</a></li>
+                <li><a href="#capabilities">Capabilities</a></li>
+                <li><a href="#visualization">Visualization</a></li>
+                <li><a href="#documentation">Documentation</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Biosphere Memory Interface</h1>
+            <p class="hero-subtitle">Quantum-Biological Landscape Intelligence System</p>
+            <p class="hero-description">
+                A revolutionary convergence of 8 emerging sciences that reveals landscapes and ecosystems 
+                as intelligent, memory-bearing entities. This system reads biological information stored 
+                in quantum states, DNA, mycelial networks, and mechanical patterns - then translates 
+                ecosystem "thoughts" into human understanding.
+            </p>
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </section>
+
+        <!-- Research Foundations -->
+        <section id="research">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Scientific Foundations
+            </h2>
+            
+            <div class="research-grid">
+                <div class="research-card" onclick="showModal('quantum-biology')">
+                    <span class="research-number">1</span>
+                    <h3 class="research-title">Quantum Biology</h3>
+                    <p class="research-description">
+                        Quantum coherence in photosynthetic complexes enables information storage 
+                        at the molecular level. Energy transfer occurs through quantum superposition.
+                    </p>
+                    <p class="research-citation">
+                        Lambert et al. (2013) Nature Physics • Engel et al. (2007) Nature
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('biogeomorphology')">
+                    <span class="research-number">2</span>
+                    <h3 class="research-title">Biogeomorphology</h3>
+                    <p class="research-description">
+                        Life shapes landscapes through mechanical forces that encode historical 
+                        information in geological structures.
+                    </p>
+                    <p class="research-citation">
+                        Viles, H. (2019) Geomorphology
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('dna-storage')">
+                    <span class="research-number">3</span>
+                    <h3 class="research-title">DNA Digital Storage</h3>
+                    <p class="research-description">
+                        DNA can store 215 petabytes per gram with millennia-long stability, 
+                        making soil microbiomes vast biological hard drives.
+                    </p>
+                    <p class="research-citation">
+                        Church et al. (2012) Science • Grass et al. (2015) Angewandte Chemie
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('mycelial')">
+                    <span class="research-number">4</span>
+                    <h3 class="research-title">Mycelial Networks</h3>
+                    <p class="research-description">
+                        Underground fungal networks transfer information between plants across 
+                        kilometers, forming a "wood wide web" of communication.
+                    </p>
+                    <p class="research-citation">
+                        Simard, S. (2018) Nature • Simard et al. (2012) Fungal Biology Reviews
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('sonogenetics')">
+                    <span class="research-number">5</span>
+                    <h3 class="research-title">Sonogenetics</h3>
+                    <p class="research-description">
+                        Ultrasound can control cellular processes by activating mechanosensitive 
+                        ion channels, enabling biological information writing.
+                    </p>
+                    <p class="research-citation">
+                        Duque et al. (2022) Nature Communications • Ibsen et al. (2015) Nature Comms
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('mechanobiology')">
+                    <span class="research-number">6</span>
+                    <h3 class="research-title">Mechanobiology</h3>
+                    <p class="research-description">
+                        Mechanical forces in biological systems store and transmit information 
+                        through stress patterns and structural deformations.
+                    </p>
+                    <p class="research-citation">
+                        Ingber, D.E. (2006) FASEB Journal
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('biosemiotics')">
+                    <span class="research-number">7</span>
+                    <h3 class="research-title">Biosemiotics</h3>
+                    <p class="research-description">
+                        Living systems create and interpret meaning through biological signals, 
+                        forming a natural language of life.
+                    </p>
+                    <p class="research-citation">
+                        Barbieri, M. (2008) Biosemiotics • Hoffmeyer, J. (2008)
+                    </p>
+                </div>
+
+                <div class="research-card" onclick="showModal('quorum-sensing')">
+                    <span class="research-number">8</span>
+                    <h3 class="research-title">Quorum Sensing</h3>
+                    <p class="research-description">
+                        Bacteria communicate through chemical signals to coordinate collective 
+                        behavior and store community information.
+                    </p>
+                    <p class="research-citation">
+                        Waters & Bassler (2005) Annual Review of Cell Biology
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory Types Visualization -->
+        <section class="visualization-container">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Biological Memory Storage Types</h2>
+            <div class="memory-types">
+                <div class="memory-type">
+                    <div class="memory-type-icon">⚛️</div>
+                    <div>Quantum Photosynthetic</div>
+                    <small>Coherence: 300ms</small>
+                </div>
+                <div class="memory-type">
+                    <div class="memory-type-icon">🧬</div>
+                    <div>DNA Microbial</div>
+                    <small>Density: 10⁹ cells/g</small>
+                </div>
+                <div class="memory-type">
+                    <div class="memory-type-icon">🍄</div>
+                    <div>Mycelial Network</div>
+                    <small>Range: 10km</small>
+                </div>
+                <div class="memory-type">
+                    <div class="memory-type-icon">⚙️</div>
+                    <div>Mechanical Geological</div>
+                    <small>Duration: 10⁶ years</small>
+                </div>
+                <div class="memory-type">
+                    <div class="memory-type-icon">🦠</div>
+                    <div>Quorum Chemical</div>
+                    <small>Signals: 100+ types</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive System Diagram -->
+        <section id="visualization">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">System Architecture</h2>
+            <div class="system-diagram" id="systemDiagram">
+                <!-- Nodes will be added by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Capabilities -->
+        <section id="capabilities">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem;">Revolutionary Capabilities</h2>
+            <div class="capabilities">
+                <div class="capability-card">
+                    <span class="capability-icon">📖</span>
+                    <h3 class="capability-title">Read Biological Memory</h3>
+                    <p>Extract information from quantum states, DNA sequences, mycelial signals, and mechanical stress patterns in landscapes.</p>
+                </div>
+                <div class="capability-card">
+                    <span class="capability-icon">🧠</span>
+                    <h3 class="capability-title">Decode Ecosystem Intelligence</h3>
+                    <p>Interpret collective "thoughts" and decision-making patterns of ecosystems from biological signals.</p>
+                </div>
+                <div class="capability-card">
+                    <span class="capability-icon">🔄</span>
+                    <h3 class="capability-title">Translate Bio-Human</h3>
+                    <p>Bridge ecosystem intelligence and human understanding through biosemiotic interpretation.</p>
+                </div>
+                <div class="capability-card">
+                    <span class="capability-icon">🔮</span>
+                    <h3 class="capability-title">Predict Ecological Futures</h3>
+                    <p>Forecast ecosystem changes by analyzing temporal patterns in biosphere memory.</p>
+                </div>
+                <div class="capability-card">
+                    <span class="capability-icon">✍️</span>
+                    <h3 class="capability-title">Write to Landscapes</h3>
+                    <p>Encode information into living systems using DNA storage, protein expression, and sonogenetic control.</p>
+                </div>
+                <div class="capability-card">
+                    <span class="capability-icon">🌐</span>
+                    <h3 class="capability-title">Network Intelligence</h3>
+                    <p>Measure and interact with the collective intelligence of mycelial and bacterial networks.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Flow Visualization -->
+        <section>
+            <h2 style="text-align: center; margin-bottom: 2rem;">Information Flow</h2>
+            <div class="data-flow" id="dataFlow">
+                <!-- Particles will be added by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Interactive Console -->
+        <section>
+            <h2 style="text-align: center; margin-bottom: 2rem;">System Console</h2>
+            <div class="console">
+                <div class="console-header">
+                    <span>BMI Console v2.0.0</span>
+                    <span style="color: var(--secondary);">[READY]</span>
+                </div>
+                <div class="console-output" id="consoleOutput">
+                    > Initializing Biosphere Memory Interface...<br>
+                    > Loading quantum biological processor...<br>
+                    > Calibrating mycelial network simulator...<br>
+                    > DNA encoder ready (4-bit redundancy)...<br>
+                    > Sonogenetic controller online...<br>
+                    > <br>
+                    > System ready. Reading landscape memory...<span class="console-cursor"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Indicators -->
+        <section>
+            <h2 style="text-align: center; margin-bottom: 2rem;">System Performance</h2>
+            
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Quantum Coherence</span>
+                    <span id="coherence-value">87%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 87%"></div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Network Connectivity</span>
+                    <span id="connectivity-value">92%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 92%"></div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Information Density</span>
+                    <span id="density-value">76%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 76%"></div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Translation Accuracy</span>
+                    <span id="accuracy-value">94%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 94%"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Quantum Particle Background Animation
+        const canvas = document.getElementById('quantum-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.5 + 0.5;
+                this.color = Math.random() > 0.5 ? '#00ff88' : '#00aaff';
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        const particles = Array.from({ length: 100 }, () => new Particle());
+        const connections = [];
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            // Draw connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        ctx.globalAlpha = (100 - distance) / 100 * 0.3;
+                        ctx.strokeStyle = '#00ff88';
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                        ctx.globalAlpha = 1;
+                    }
+                }
+            }
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // System Diagram
+        function createSystemDiagram() {
+            const diagram = document.getElementById('systemDiagram');
+            
+            const nodes = [
+                { id: 'quantum', label: 'Quantum\nProcessor', x: 20, y: 30, icon: '⚛️' },
+                { id: 'mycelial', label: 'Mycelial\nNetwork', x: 50, y: 20, icon: '🍄' },
+                { id: 'dna', label: 'DNA\nEncoder', x: 80, y: 30, icon: '🧬' },
+                { id: 'sonic', label: 'Sonogenetic\nController', x: 35, y: 60, icon: '🔊' },
+                { id: 'bio', label: 'Biosemiotic\nInterpreter', x: 65, y: 60, icon: '🧠' },
+                { id: 'core', label: 'BMI Core', x: 50, y: 40, icon: '💎' }
+            ];
+
+            const connections = [
+                ['quantum', 'core'],
+                ['mycelial', 'core'],
+                ['dna', 'core'],
+                ['sonic', 'core'],
+                ['bio', 'core'],
+                ['quantum', 'bio'],
+                ['mycelial', 'dna']
+            ];
+
+            // Create nodes
+            nodes.forEach((node, index) => {
+                const nodeEl = document.createElement('div');
+                nodeEl.className = 'node';
+                nodeEl.style.left = node.x + '%';
+                nodeEl.style.top = node.y + '%';
+                nodeEl.style.animationDelay = index * 0.1 + 's';
+                nodeEl.innerHTML = `
+                    <div style="font-size: 2rem">${node.icon}</div>
+                    <div style="font-size: 0.8rem; margin-top: 0.5rem">${node.label}</div>
+                `;
+                nodeEl.onclick = () => showNodeInfo(node.id);
+                diagram.appendChild(nodeEl);
+            });
+
+            // Create connections
+            connections.forEach(([from, to], index) => {
+                const fromNode = nodes.find(n => n.id === from);
+                const toNode = nodes.find(n => n.id === to);
+                
+                const connection = document.createElement('div');
+                connection.className = 'connection';
+                
+                const dx = toNode.x - fromNode.x;
+                const dy = toNode.y - fromNode.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                connection.style.left = fromNode.x + '%';
+                connection.style.top = fromNode.y + '%';
+                connection.style.width = distance + '%';
+                connection.style.transform = `rotate(${angle}deg)`;
+                connection.style.animationDelay = index * 0.2 + 's';
+                
+                diagram.appendChild(connection);
+            });
+        }
+
+        createSystemDiagram();
+
+        // Data Flow Animation
+        function createDataFlow() {
+            const container = document.getElementById('dataFlow');
+            
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'data-particle';
+                particle.style.top = Math.random() * 400 + 'px';
+                particle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                particle.style.backgroundColor = Math.random() > 0.5 ? 'var(--primary)' : 'var(--secondary)';
+                container.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 4000);
+            }, 200);
+        }
+
+        createDataFlow();
+
+        // Console Animation
+        function animateConsole() {
+            const output = document.getElementById('consoleOutput');
+            const messages = [
+                'Scanning quantum photosynthetic states...',
+                'Detecting mycelial network nodes: 1,247 found',
+                'DNA memory extraction: 847 MB recovered',
+                'Ecosystem thought pattern: ADAPTIVE',
+                'Complexity index: 0.873',
+                'Information flow rate: 12.4 kb/s',
+                'Translation confidence: 94.2%',
+                'Memory capacity detected: 1.2 TB',
+                'Biological channels active: 7/8',
+                'System operational'
+            ];
+            
+            let index = 0;
+            setInterval(() => {
+                if (index < messages.length) {
+                    output.innerHTML += `<br>> ${messages[index]}<span class="console-cursor"></span>`;
+                    index++;
+                    output.scrollTop = output.scrollHeight;
+                }
+            }, 2000);
+        }
+
+        setTimeout(animateConsole, 3000);
+
+        // Modal Functions
+        const modalData = {
+            'quantum-biology': {
+                title: 'Quantum Biology',
+                content: `
+                    <h3>Quantum Coherence in Biological Systems</h3>
+                    <p>Recent discoveries have revealed that quantum mechanical phenomena play crucial roles in biological processes:</p>
+                    <ul>
+                        <li><strong>Photosynthesis:</strong> Energy transfer occurs through quantum coherent states, achieving near 100% efficiency</li>
+                        <li><strong>Avian Navigation:</strong> Birds use quantum entanglement in cryptochrome proteins to sense magnetic fields</li>
+                        <li><strong>Enzyme Catalysis:</strong> Quantum tunneling enables reactions that would be impossible classically</li>
+                        <li><strong>DNA Mutation:</strong> Quantum effects influence genetic mutations through proton tunneling</li>
+                    </ul>
+                    <p><strong>Key Research:</strong></p>
+                    <p>Lambert, N., Chen, Y. N., Cheng, Y. C., Li, C. M., Chen, G. Y., & Nori, F. (2013). Quantum biology. Nature Physics, 9(1), 10-18.</p>
+                    <p>Engel, G. S., Calhoun, T. R., Read, E. L., Ahn, T. K., Mančal, T., Cheng, Y. C., ... & Fleming, G. R. (2007). Evidence for wavelike energy transfer through quantum coherence in photosynthetic systems. Nature, 446(7137), 782-786.</p>
+                `
+            },
+            'dna-storage': {
+                title: 'DNA Digital Data Storage',
+                content: `
+                    <h3>Information Storage in DNA</h3>
+                    <p>DNA represents the most efficient information storage medium known:</p>
+                    <ul>
+                        <li><strong>Density:</strong> 215 petabytes per gram of DNA</li>
+                        <li><strong>Longevity:</strong> Stable for thousands of years under proper conditions</li>
+                        <li><strong>Energy Efficiency:</strong> No power required for storage maintenance</li>
+                        <li><strong>Biological Integration:</strong> Living organisms naturally copy and maintain DNA</li>
+                    </ul>
+                    <p><strong>Applications in BMI:</strong></p>
+                    <ul>
+                        <li>Soil microbiomes as distributed data storage</li>
+                        <li>Horizontal gene transfer for information propagation</li>
+                        <li>Error correction through biological redundancy</li>
+                    </ul>
+                    <p><strong>Key Research:</strong></p>
+                    <p>Church, G. M., Gao, Y., & Kosuri, S. (2012). Next-generation digital information storage in DNA. Science, 337(6102), 1628.</p>
+                `
+            },
+            'mycelial': {
+                title: 'Mycelial Networks',
+                content: `
+                    <h3>The Wood Wide Web</h3>
+                    <p>Fungal networks form vast underground communication systems:</p>
+                    <ul>
+                        <li><strong>Scale:</strong> Individual networks can span entire forests</li>
+                        <li><strong>Information Transfer:</strong> Chemical signals, nutrients, and warning messages</li>
+                        <li><strong>Network Topology:</strong> Scale-free architecture similar to the internet</li>
+                        <li><strong>Processing:</strong> Distributed decision-making and resource allocation</li>
+                    </ul>
+                    <p><strong>Intelligence Features:</strong></p>
+                    <ul>
+                        <li>Memory of past interactions</li>
+                        <li>Learning and adaptation</li>
+                        <li>Collective problem-solving</li>
+                        <li>Inter-species communication</li>
+                    </ul>
+                    <p><strong>Key Research:</strong></p>
+                    <p>Simard, S. (2018). Mycorrhizal networks facilitate tree communication, learning, and memory. Memory and Learning in Plants, 191-213.</p>
+                `
+            },
+            'sonogenetics': {
+                title: 'Sonogenetics',
+                content: `
+                    <h3>Ultrasound Control of Biological Systems</h3>
+                    <p>Sonogenetics enables non-invasive control of cellular processes:</p>
+                    <ul>
+                        <li><strong>Mechanism:</strong> Ultrasound activates mechanosensitive ion channels</li>
+                        <li><strong>Precision:</strong> Cell-type specific targeting through frequency tuning</li>
+                        <li><strong>Depth:</strong> Can penetrate several centimeters of tissue</li>
+                        <li><strong>Safety:</strong> Non-ionizing and reversible</li>
+                    </ul>
+                    <p><strong>BMI Applications:</strong></p>
+                    <ul>
+                        <li>Write information into bacterial populations</li>
+                        <li>Trigger protein expression patterns</li>
+                        <li>Control metabolic pathways</li>
+                        <li>Induce morphological changes</li>
+                    </ul>
+                    <p><strong>Key Research:</strong></p>
+                    <p>Duque, M., Lee-Kubli, C. A., Tufail, Y., Magaram, U., Patel, J., Chakraborty, A., ... & Chalasani, S. H. (2022). Sonogenetic control of mammalian cells using exogenous Transient Receptor Potential A1 channels. Nature Communications, 13(1), 638.</p>
+                `
+            }
+        };
+
+        function showModal(topic) {
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modal-body');
+            
+            if (modalData[topic]) {
+                modalBody.innerHTML = `
+                    <h2>${modalData[topic].title}</h2>
+                    ${modalData[topic].content}
+                `;
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function showNodeInfo(nodeId) {
+            const nodeInfo = {
+                'quantum': 'Processes quantum coherent states from photosynthetic complexes',
+                'mycelial': 'Simulates underground fungal communication networks',
+                'dna': 'Encodes/decodes information in DNA sequences',
+                'sonic': 'Controls biological processes using ultrasound',
+                'bio': 'Translates biological signals into semantic meaning',
+                'core': 'Central processing unit integrating all subsystems'
+            };
+            
+            alert(nodeInfo[nodeId] || 'System component');
+        }
+
+        // Click outside modal to close
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Dynamic Progress Updates
+        setInterval(() => {
+            const coherence = 80 + Math.random() * 15;
+            const connectivity = 85 + Math.random() * 12;
+            const density = 70 + Math.random() * 20;
+            const accuracy = 90 + Math.random() * 8;
+            
+            document.getElementById('coherence-value').textContent = Math.round(coherence) + '%';
+            document.querySelector('.progress-fill').style.width = coherence + '%';
+            
+            document.getElementById('connectivity-value').textContent = Math.round(connectivity) + '%';
+            document.querySelectorAll('.progress-fill')[1].style.width = connectivity + '%';
+            
+            document.getElementById('density-value').textContent = Math.round(density) + '%';
+            document.querySelectorAll('.progress-fill')[2].style.width = density + '%';
+            
+            document.getElementById('accuracy-value').textContent = Math.round(accuracy) + '%';
+            document.querySelectorAll('.progress-fill')[3].style.width = accuracy + '%';
+        }, 3000);
+    </script>
+</body>
+</html>

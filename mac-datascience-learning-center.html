@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mac Data Science Learning Center - By Cazzy Aporbo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --tertiary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --card-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --hover-transform: translateY(-5px);
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.3));
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-100px) rotate(120deg); }
+            66% { transform: translateY(100px) rotate(240deg); }
+        }
+
+        .circle-1 { width: 200px; height: 200px; left: 10%; top: 20%; animation-delay: 0s; }
+        .circle-2 { width: 150px; height: 150px; right: 10%; top: 60%; animation-delay: 5s; }
+        .circle-3 { width: 250px; height: 250px; left: 60%; bottom: 20%; animation-delay: 10s; }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .author-credit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Search Bar */
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1.2rem 0.8rem 3rem;
+            border: 2px solid transparent;
+            border-radius: 30px;
+            background: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Navigation */
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin: 4rem 0 2rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tool Cards Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .tool-card:hover {
+            transform: var(--hover-transform);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .tool-category {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .tool-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .tool-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tool-link {
+            padding: 0.5rem 1.2rem;
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Learning Modules */
+        .learning-module {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .module-title {
+            font-size: 2rem;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .module-progress {
+            width: 200px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 1s ease;
+            animation: progressFill 2s ease forwards;
+        }
+
+        @keyframes progressFill {
+            to { width: 65%; }
+        }
+
+        .concept-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .concept-item {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .concept-item:hover {
+            background: var(--bg-gradient);
+            transform: scale(1.02);
+        }
+
+        .concept-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-status {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            background: #10b981;
+            color: white;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--card-shadow);
+        }
+
+        .quiz-question {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            padding: 1rem 1.5rem;
+            background: #f7fafc;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent-purple);
+            background: white;
+        }
+
+        .quiz-option.selected {
+            background: var(--bg-gradient);
+            border-color: var(--accent-purple);
+        }
+
+        /* Interactive Code Editor */
+        .code-editor {
+            background: #1e1e2e;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .code-content {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            color: #a6accd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-line {
+            margin: 0.2rem 0;
+        }
+
+        .code-keyword { color: #c792ea; }
+        .code-string { color: #c3e88d; }
+        .code-function { color: #82aaff; }
+        .code-comment { color: #676e95; }
+
+        /* Resource Cards */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            transform: var(--hover-transform);
+        }
+
+        .resource-header {
+            padding: 1.5rem;
+            background: var(--tertiary-gradient);
+            color: white;
+        }
+
+        .resource-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-type {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .resource-body {
+            padding: 1.5rem;
+        }
+
+        .resource-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .resource-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .resource-tag {
+            padding: 0.3rem 0.8rem;
+            background: #f0f4f8;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            padding: 3rem 2rem;
+            margin-top: 5rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-purple);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-container {
+                width: 100%;
+                margin: 1rem 0;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(139, 92, 246, 0.1);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">Mac Data Science Hub</div>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search tools, concepts, or resources..." id="searchInput" onkeyup="filterContent()">
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item" onclick="scrollToSection('tools')">Tools</li>
+                    <li class="nav-item" onclick="scrollToSection('learn')">Learn</li>
+                    <li class="nav-item" onclick="scrollToSection('practice')">Practice</li>
+                    <li class="nav-item" onclick="scrollToSection('resources')">Resources</li>
+                </ul>
+            </nav>
+        </div>
+        <div class="author-credit">Created by Cazzy Aporbo</div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- AI Tools Section -->
+        <section id="tools" class="tools-section">
+            <div class="section-header">
+                <h1 class="section-title">AI & Data Science Tools</h1>
+                <p class="section-subtitle">Comprehensive collection of cutting-edge AI tools and platforms for Mac</p>
+            </div>
+
+            <div class="tools-grid">
+                <!-- Julius AI -->
+                <div class="tool-card searchable" data-keywords="julius ai data analysis visualization">
+                    <span class="tool-category">AI Data Analysis</span>
+                    <h3 class="tool-name">Julius AI</h3>
+                    <p class="tool-description">Advanced AI data analyst that can analyze, visualize, and interpret your data through natural language. Perfect for statistical analysis and creating professional visualizations.</p>
+                    <div class="tool-links">
+                        <a href="https://julius.ai" target="_blank" class="tool-link">Official Site</a>
+                        <a href="https://docs.julius.ai" target="_blank" class="tool-link">Documentation</a>
+                    </div>
+                </div>
+
+                <!-- ChatGPT -->
+                <div class="tool-card searchable" data-keywords="chatgpt openai gpt language model">
+                    <span class="tool-category">Language Model</span>
+                    <h3 class="tool-name">ChatGPT</h3>
+                    <p class="tool-description">OpenAI's conversational AI for coding assistance, data analysis explanations, and algorithm development. Includes GPT-4 capabilities for complex reasoning.</p>
+                    <div class="tool-links">
+                        <a href="https://chat.openai.com" target="_blank" class="tool-link">Access ChatGPT</a>
+                        <a href="https://platform.openai.com" target="_blank" class="tool-link">API Access</a>
+                        <a href="https://github.com/openai/openai-python" target="_blank" class="tool-link">GitHub</a>
+                    </div>
+                </div>
+
+                <!-- Claude -->
+                <div class="tool-card searchable" data-keywords="claude anthropic ai assistant">
+                    <span class="tool-category">AI Assistant</span>
+                    <h3 class="tool-name">Claude</h3>
+                    <p class="tool-description">Anthropic's advanced AI assistant with strong coding capabilities, extensive context window, and excellent at explaining complex data science concepts.</p>
+                    <div class="tool-links">
+                        <a href="https://claude.ai" target="_blank" class="tool-link">Use Claude</a>
+                        <a href="https://docs.anthropic.com" target="_blank" class="tool-link">API Docs</a>
+                    </div>
+                </div>
+
+                <!-- Cursor -->
+                <div class="tool-card searchable" data-keywords="cursor ai code editor ide">
+                    <span class="tool-category">AI IDE</span>
+                    <h3 class="tool-name">Cursor</h3>
+                    <p class="tool-description">AI-powered code editor built for pair-programming with AI. Features intelligent code completion, refactoring, and debugging assistance.</p>
+                    <div class="tool-links">
+                        <a href="https://cursor.sh" target="_blank" class="tool-link">Download</a>
+                        <a href="https://github.com/getcursor/cursor" target="_blank" class="tool-link">GitHub</a>
+                    </div>
+                </div>
+
+                <!-- GitHub Copilot -->
+                <div class="tool-card searchable" data-keywords="github copilot code completion">
+                    <span class="tool-category">Code Assistant</span>
+                    <h3 class="tool-name">GitHub Copilot</h3>
+                    <p class="tool-description">AI pair programmer that suggests code completions in real-time. Integrated with VS Code and other popular IDEs.</p>
+                    <div class="tool-links">
+                        <a href="https://github.com/features/copilot" target="_blank" class="tool-link">Get Copilot</a>
+                        <a href="https://docs.github.com/copilot" target="_blank" class="tool-link">Documentation</a>
+                    </div>
+                </div>
+
+                <!-- Jupyter Notebooks -->
+                <div class="tool-card searchable" data-keywords="jupyter notebook python data science">
+                    <span class="tool-category">Development Environment</span>
+                    <h3 class="tool-name">Jupyter Lab</h3>
+                    <p class="tool-description">Interactive development environment for notebooks, code, and data. Essential for data science workflows on Mac.</p>
+                    <div class="tool-links">
+                        <a href="https://jupyter.org" target="_blank" class="tool-link">Official Site</a>
+                        <a href="https://github.com/jupyterlab/jupyterlab" target="_blank" class="tool-link">GitHub</a>
+                    </div>
+                </div>
+
+                <!-- Pandas AI -->
+                <div class="tool-card searchable" data-keywords="pandas ai python data analysis">
+                    <span class="tool-category">Data Analysis</span>
+                    <h3 class="tool-name">PandasAI</h3>
+                    <p class="tool-description">Conversational AI for Pandas dataframes. Ask questions in natural language and get Python code and results.</p>
+                    <div class="tool-links">
+                        <a href="https://github.com/gventuri/pandas-ai" target="_blank" class="tool-link">GitHub</a>
+                        <a href="https://docs.pandas-ai.com" target="_blank" class="tool-link">Documentation</a>
+                    </div>
+                </div>
+
+                <!-- Weights & Biases -->
+                <div class="tool-card searchable" data-keywords="wandb weights biases mlops tracking">
+                    <span class="tool-category">MLOps</span>
+                    <h3 class="tool-name">Weights & Biases</h3>
+                    <p class="tool-description">ML experiment tracking, dataset versioning, and model management platform used by leading AI teams.</p>
+                    <div class="tool-links">
+                        <a href="https://wandb.ai" target="_blank" class="tool-link">Platform</a>
+                        <a href="https://github.com/wandb/wandb" target="_blank" class="tool-link">GitHub</a>
+                        <a href="https://docs.wandb.ai" target="_blank" class="tool-link">Docs</a>
+                    </div>
+                </div>
+
+                <!-- Hugging Face -->
+                <div class="tool-card searchable" data-keywords="hugging face transformers models nlp">
+                    <span class="tool-category">Model Hub</span>
+                    <h3 class="tool-name">Hugging Face</h3>
+                    <p class="tool-description">The AI community's platform for sharing models, datasets, and applications. Access thousands of pre-trained models.</p>
+                    <div class="tool-links">
+                        <a href="https://huggingface.co" target="_blank" class="tool-link">Hub</a>
+                        <a href="https://github.com/huggingface/transformers" target="_blank" class="tool-link">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Section -->
+        <section id="learn" class="learning-section">
+            <div class="section-header">
+                <h1 class="section-title">Interactive Learning Paths</h1>
+                <p class="section-subtitle">Master data science concepts through hands-on practice and guided exploration</p>
+            </div>
+
+            <!-- Python Fundamentals Module -->
+            <div class="learning-module searchable" data-keywords="python basics fundamentals">
+                <div class="module-header">
+                    <h2 class="module-title">Python for Data Science</h2>
+                    <div class="module-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+                
+                <div class="concept-list">
+                    <div class="concept-item" onclick="startLesson('python-basics')">
+                        <h4 class="concept-title">Variables & Data Types</h4>
+                        <p>Learn about Python's fundamental data structures</p>
+                        <span class="concept-status">Interactive</span>
+                    </div>
+                    
+                    <div class="concept-item" onclick="startLesson('numpy')">
+                        <h4 class="concept-title">NumPy Arrays</h4>
+                        <p>Master numerical computing with NumPy</p>
+                        <span class="concept-status">Practice Ready</span>
+                    </div>
+                    
+                    <div class="concept-item" onclick="startLesson('pandas')">
+                        <h4 class="concept-title">Pandas DataFrames</h4>
+                        <p>Data manipulation and analysis with Pandas</p>
+                        <span class="concept-status">Quiz Available</span>
+                    </div>
+                    
+                    <div class="concept-item" onclick="startLesson('visualization')">
+                        <h4 class="concept-title">Data Visualization</h4>
+                        <p>Create stunning visualizations with Matplotlib & Seaborn</p>
+                        <span class="concept-status">Project-Based</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Code Editor -->
+            <div class="code-editor">
+                <div class="code-header">
+                    <span class="code-dot dot-red"></span>
+                    <span class="code-dot dot-yellow"></span>
+                    <span class="code-dot dot-green"></span>
+                </div>
+                <div class="code-content">
+                    <div class="code-line"><span class="code-comment"># Interactive Python Example</span></div>
+                    <div class="code-line"><span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd</div>
+                    <div class="code-line"><span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np</div>
+                    <div class="code-line"></div>
+                    <div class="code-line"><span class="code-comment"># Create a DataFrame</span></div>
+                    <div class="code-line">data = {</div>
+                    <div class="code-line">    <span class="code-string">'Date'</span>: pd.date_range(<span class="code-string">'2024-01-01'</span>, periods=<span class="code-function">5</span>),</div>
+                    <div class="code-line">    <span class="code-string">'Sales'</span>: np.random.randint(<span class="code-function">100</span>, <span class="code-function">1000</span>, <span class="code-function">5</span>),</div>
+                    <div class="code-line">    <span class="code-string">'Region'</span>: [<span class="code-string">'North'</span>, <span class="code-string">'South'</span>, <span class="code-string">'East'</span>, <span class="code-string">'West'</span>, <span class="code-string">'Central'</span>]</div>
+                    <div class="code-line">}</div>
+                    <div class="code-line"></div>
+                    <div class="code-line">df = pd.DataFrame(data)</div>
+                    <div class="code-line"><span class="code-function">print</span>(df.describe())</div>
+                </div>
+            </div>
+
+            <!-- Machine Learning Module -->
+            <div class="learning-module searchable" data-keywords="machine learning ml algorithms">
+                <div class="module-header">
+                    <h2 class="module-title">Machine Learning Fundamentals</h2>
+                    <div class="module-progress">
+                        <div class="progress-bar" style="animation: progressFill 2s ease forwards, progressFill2 2s ease forwards;"></div>
+                    </div>
+                </div>
+                
+                <div class="concept-list">
+                    <div class="concept-item" onclick="startLesson('ml-intro')">
+                        <h4 class="concept-title">Supervised Learning</h4>
+                        <p>Classification and regression algorithms</p>
+                        <span class="concept-status">Interactive</span>
+                    </div>
+                    
+                    <div class="concept-item" onclick="startLesson('unsupervised')">
+                        <h4 class="concept-title">Unsupervised Learning</h4>
+                        <p>Clustering and dimensionality reduction</p>
+                        <span class="concept-status">Practice Ready</span>
+                    </div>
+                    
+                    <div class="concept-item" onclick="startLesson('neural-nets')">
+                        <h4 class="concept-title">Neural Networks</h4>
+                        <p>Deep learning fundamentals with TensorFlow</p>
+                        <span class="concept-status">Advanced</span>
+                    </div>
+                    
+                    <div class="concept-item" onclick="startLesson('model-evaluation')">
+                        <h4 class="concept-title">Model Evaluation</h4>
+                        <p>Cross-validation, metrics, and optimization</p>
+                        <span class="concept-status">Quiz Available</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Section with Quizzes -->
+        <section id="practice" class="practice-section">
+            <div class="section-header">
+                <h1 class="section-title">Practice & Quizzes</h1>
+                <p class="section-subtitle">Test your knowledge and reinforce learning through interactive challenges</p>
+            </div>
+
+            <div class="quiz-container searchable" data-keywords="quiz practice test">
+                <h3 class="quiz-question">Which pandas method would you use to get statistical summary of numerical columns?</h3>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectAnswer(this, 'A')">
+                        A. df.info()
+                    </div>
+                    <div class="quiz-option" onclick="selectAnswer(this, 'B')">
+                        B. df.describe()
+                    </div>
+                    <div class="quiz-option" onclick="selectAnswer(this, 'C')">
+                        C. df.summary()
+                    </div>
+                    <div class="quiz-option" onclick="selectAnswer(this, 'D')">
+                        D. df.stats()
+                    </div>
+                </div>
+                <button class="tool-link" style="margin-top: 1.5rem;" onclick="checkAnswer()">Check Answer</button>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section id="resources" class="resources-section">
+            <div class="section-header">
+                <h1 class="section-title">Developer Resources</h1>
+                <p class="section-subtitle">Essential tools, documentation, and communities for data scientists</p>
+            </div>
+
+            <div class="resource-grid">
+                <!-- Learning Apps -->
+                <div class="resource-card searchable" data-keywords="enki learning app mobile">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Enki</h3>
+                        <p class="resource-type">Learning App</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Personalized daily workouts for learning data science, Python, SQL, and more. Bite-sized lessons perfect for consistent learning.</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag">Mobile Learning</span>
+                            <span class="resource-tag">Daily Practice</span>
+                            <span class="resource-tag">Gamified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DataCamp -->
+                <div class="resource-card searchable" data-keywords="datacamp courses tutorials">
+                    <div class="resource-header">
+                        <h3 class="resource-title">DataCamp</h3>
+                        <p class="resource-type">Online Platform</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Interactive courses on data science, machine learning, and programming. Learn by doing with in-browser coding challenges.</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag">Structured Courses</span>
+                            <span class="resource-tag">Certificates</span>
+                            <span class="resource-tag">Projects</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kaggle -->
+                <div class="resource-card searchable" data-keywords="kaggle competitions datasets">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Kaggle</h3>
+                        <p class="resource-type">Community Platform</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Compete in ML competitions, access datasets, and learn from community notebooks. Essential for practical experience.</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag">Competitions</span>
+                            <span class="resource-tag">Datasets</span>
+                            <span class="resource-tag">GPU Access</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fast.ai -->
+                <div class="resource-card searchable" data-keywords="fastai deep learning course">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Fast.ai</h3>
+                        <p class="resource-type">Free Courses</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Practical deep learning courses that teach state-of-the-art techniques. Top-down teaching approach perfect for practitioners.</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag">Deep Learning</span>
+                            <span class="resource-tag">Free</span>
+                            <span class="resource-tag">Practical</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Papers with Code -->
+                <div class="resource-card searchable" data-keywords="papers code research ml">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Papers with Code</h3>
+                        <p class="resource-type">Research Hub</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Browse state-of-the-art ML papers with implementation code. Stay updated with latest research and benchmarks.</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag">Research</span>
+                            <span class="resource-tag">Implementation</span>
+                            <span class="resource-tag">Benchmarks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Colab -->
+                <div class="resource-card searchable" data-keywords="google colab notebook cloud gpu">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Google Colab</h3>
+                        <p class="resource-type">Cloud Platform</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Free cloud-based Jupyter notebooks with GPU access. Perfect for running ML experiments without local setup.</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag">Free GPU</span>
+                            <span class="resource-tag">Cloud</span>
+                            <span class="resource-tag">Collaboration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GitHub Resources -->
+            <div class="section-header" style="margin-top: 4rem;">
+                <h2 class="section-title">Essential GitHub Repositories</h2>
+            </div>
+
+            <div class="resource-grid">
+                <div class="resource-card searchable" data-keywords="awesome machine learning github">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Awesome Machine Learning</h3>
+                        <p class="resource-type">GitHub Collection</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Curated list of ML frameworks, libraries, and software organized by language and category.</p>
+                        <a href="https://github.com/josephmisiti/awesome-machine-learning" target="_blank" class="tool-link">View Repository</a>
+                    </div>
+                </div>
+
+                <div class="resource-card searchable" data-keywords="scikit learn sklearn github">
+                    <div class="resource-header">
+                        <h3 class="resource-title">Scikit-learn</h3>
+                        <p class="resource-type">ML Library</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">Simple and efficient tools for predictive data analysis. The go-to library for classical ML in Python.</p>
+                        <a href="https://github.com/scikit-learn/scikit-learn" target="_blank" class="tool-link">View Repository</a>
+                    </div>
+                </div>
+
+                <div class="resource-card searchable" data-keywords="tensorflow deep learning github">
+                    <div class="resource-header">
+                        <h3 class="resource-title">TensorFlow</h3>
+                        <p class="resource-type">Deep Learning Framework</p>
+                    </div>
+                    <div class="resource-body">
+                        <p class="resource-description">End-to-end open source platform for machine learning with comprehensive ecosystem.</p>
+                        <a href="https://github.com/tensorflow/tensorflow" target="_blank" class="tool-link">View Repository</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mac-Specific Setup Guide -->
+        <section id="mac-setup" class="learning-module">
+            <div class="module-header">
+                <h2 class="module-title">Mac Data Science Setup Guide</h2>
+            </div>
+            
+            <div class="code-editor">
+                <div class="code-header">
+                    <span class="code-dot dot-red"></span>
+                    <span class="code-dot dot-yellow"></span>
+                    <span class="code-dot dot-green"></span>
+                </div>
+                <div class="code-content">
+                    <div class="code-line"><span class="code-comment"># Install Homebrew (Mac Package Manager)</span></div>
+                    <div class="code-line">/bin/bash -c <span class="code-string">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></div>
+                    <div class="code-line"></div>
+                    <div class="code-line"><span class="code-comment"># Install Python and essential tools</span></div>
+                    <div class="code-line">brew install python@3.11</div>
+                    <div class="code-line">brew install git</div>
+                    <div class="code-line">brew install --cask visual-studio-code</div>
+                    <div class="code-line">brew install --cask docker</div>
+                    <div class="code-line"></div>
+                    <div class="code-line"><span class="code-comment"># Create virtual environment</span></div>
+                    <div class="code-line">python3 -m venv datasci_env</div>
+                    <div class="code-line">source datasci_env/bin/activate</div>
+                    <div class="code-line"></div>
+                    <div class="code-line"><span class="code-comment"># Install data science packages</span></div>
+                    <div class="code-line">pip install numpy pandas matplotlib seaborn scikit-learn jupyter</div>
+                    <div class="code-line">pip install tensorflow torch transformers</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3 class="footer-title">Mac Data Science Learning Center</h3>
+            <p style="color: var(--text-secondary); margin: 1rem 0;">Created with passion for the data science community by Cazzy Aporbo</p>
+            <div class="footer-links">
+                <a href="https://github.com" target="_blank" class="footer-link">GitHub</a>
+                <a href="https://www.python.org" target="_blank" class="footer-link">Python.org</a>
+                <a href="https://jupyter.org" target="_blank" class="footer-link">Jupyter</a>
+                <a href="https://www.tensorflow.org" target="_blank" class="footer-link">TensorFlow</a>
+                <a href="https://pytorch.org" target="_blank" class="footer-link">PyTorch</a>
+            </div>
+            <p style="color: var(--text-secondary); margin-top: 2rem; font-size: 0.9rem;">
+                A serene space for exploring data science on Mac. Learn, practice, and master AI tools in a beautiful, animated environment.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Search functionality
+        function filterContent() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const searchableElements = document.getElementsByClassName('searchable');
+            
+            for (let element of searchableElements) {
+                const keywords = element.getAttribute('data-keywords');
+                const text = element.textContent || element.innerText;
+                
+                if (text.toLowerCase().includes(filter) || (keywords && keywords.toLowerCase().includes(filter))) {
+                    element.style.display = "";
+                    // Add highlight animation
+                    element.style.animation = "fadeInUp 0.5s ease";
+                } else {
+                    element.style.display = "none";
+                }
+            }
+        }
+
+        // Smooth scroll to sections
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Interactive lesson starter
+        function startLesson(lessonId) {
+            // In a real implementation, this would load the lesson content
+            console.log(`Starting lesson: ${lessonId}`);
+            alert(`Loading interactive lesson: ${lessonId}\n\nThis would open an interactive coding environment with guided tutorials, live code execution, and immediate feedback.`);
+        }
+
+        // Quiz functionality
+        let selectedOption = null;
+        
+        function selectAnswer(element, answer) {
+            // Remove previous selection
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            selectedOption = answer;
+        }
+
+        function checkAnswer() {
+            if (selectedOption === 'B') {
+                alert('Correct! df.describe() provides statistical summary of numerical columns including count, mean, std, min, max, and quartiles.');
+            } else if (selectedOption) {
+                alert('Not quite. The correct answer is B. df.describe() is the pandas method for getting statistical summaries.');
+            } else {
+                alert('Please select an answer first.');
+            }
+        }
+
+        // Add floating animation to cards on hover
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.tool-card, .resource-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.3s ease';
+                });
+            });
+
+            // Animate progress bars on scroll
+            const observerOptions = {
+                threshold: 0.5,
+                rootMargin: '0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const progressBars = entry.target.querySelectorAll('.progress-bar');
+                        progressBars.forEach(bar => {
+                            bar.style.animation = 'progressFill 2s ease forwards';
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            const modules = document.querySelectorAll('.learning-module');
+            modules.forEach(module => observer.observe(module));
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Cmd/Ctrl + K for search focus
+            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+                event.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            
+            // Escape to clear search
+            if (event.key === 'Escape') {
+                document.getElementById('searchInput').value = '';
+                filterContent();
+            }
+        });
+
+        // Dynamic content loading simulation
+        function loadMoreResources() {
+            // This would typically fetch more resources from an API
+            console.log('Loading additional resources...');
+        }
+
+        // Initialize interactive features
+        console.log('Mac Data Science Learning Center initialized');
+        console.log('Created by Cazzy Aporbo');
+    </script>
+</body>
+</html>

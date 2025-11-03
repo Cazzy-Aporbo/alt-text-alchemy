@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log of Chi - Data Science & AI Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gradient-primary: linear-gradient(180deg, #5eb3b6 0%, #84ceeb 15%, #c1a3d3 35%, #e8b4d3 50%, #f4a6c7 65%, #b794c7 80%, #8b6aa7 100%);
+            --teal: #5eb3b6;
+            --sky: #84ceeb;
+            --pink: #f4a6c7;
+            --rose: #e8b4d3;
+            --purple: #8b6aa7;
+            --lavender: #b794c7;
+            --dark: #1a1a2e;
+            --light: #ffffff;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-dark: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gradient-primary);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        /* Landing Page */
+        #landingPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #landingPage.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        .landing-container {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 100px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-bird {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-bird:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .company-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--light), var(--pink), var(--lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .sign-in-form {
+            margin-top: 30px;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--pink);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(244, 166, 199, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--pink), var(--lavender));
+            border: none;
+            border-radius: 15px;
+            color: var(--dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(244, 166, 199, 0.4);
+        }
+
+        /* Main Dashboard */
+        #mainDashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        #mainDashboard.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--light), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px;
+            border-radius: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--pink), var(--lavender));
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Content Area */
+        .content-area {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        /* Widget Cards */
+        .widget-card {
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .widget-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .widget-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--light), var(--pink), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--teal), var(--pink), var(--lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            background: linear-gradient(90deg, var(--rose), var(--lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .badge {
+            padding: 5px 15px;
+            background: linear-gradient(135deg, var(--pink), var(--lavender));
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--pink), var(--lavender));
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(244, 166, 199, 0.4);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--rose);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--light);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--pink);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Price Display */
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--teal), var(--pink), var(--lavender));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            margin: 20px 0;
+        }
+
+        /* Lists */
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-list li:before {
+            content: '✓ ';
+            color: var(--teal);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <!-- Landing Page -->
+    <div id="landingPage">
+        <div class="landing-container">
+            <div class="logo-section">
+                <div class="logo-bird" onclick="animateLogo()">
+                    <svg viewBox="0 0 120 120">
+                        <defs>
+                            <linearGradient id="dataGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#5eb3b6;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#f4a6c7;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#8b6aa7;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <g transform="translate(60, 60)">
+                            <!-- Bird silhouette -->
+                            <ellipse cx="0" cy="0" rx="25" ry="20" fill="#1a1a2e"/>
+                            <circle cx="-10" cy="-10" r="12" fill="#1a1a2e"/>
+                            <path d="M-20 -10 L-26 -8 L-20 -6 Z" fill="#1a1a2e"/>
+                            <path d="M-15 0 Q-40 -15 -50 -8 Q-40 5 -30 8 Q-20 6 -15 3 Z" fill="#1a1a2e"/>
+                            <path d="M15 0 Q40 -15 50 -8 Q40 5 30 8 Q20 6 15 3 Z" fill="#1a1a2e"/>
+                            <!-- Data bars on chest -->
+                            <rect x="-10" y="-3" width="2" height="10" fill="white" opacity="0.9"/>
+                            <rect x="-6" y="-5" width="2" height="12" fill="white" opacity="0.9"/>
+                            <rect x="-2" y="-2" width="2" height="8" fill="white" opacity="0.9"/>
+                            <rect x="2" y="-6" width="2" height="14" fill="white" opacity="0.9"/>
+                            <rect x="6" y="-4" width="2" height="11" fill="white" opacity="0.9"/>
+                        </g>
+                    </svg>
+                </div>
+                <h1 class="company-name">LOG OF CHI</h1>
+                <p class="tagline">Transforming Data Into Intelligence</p>
+            </div>
+
+            <form class="sign-in-form" onsubmit="handleSignIn(event)">
+                <h2 class="form-title">Access Your Data Intelligence Platform</h2>
+                
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email address" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">Sign In to Dashboard</button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="#" onclick="handleDemoAccess()" style="color: var(--pink); text-decoration: none;">Try Demo Access</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard">
+        <nav class="top-nav">
+            <div class="nav-logo" onclick="showHome()">LOG OF CHI</div>
+            
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+                <button class="tab-btn" onclick="switchTab('services')">Services</button>
+                <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
+                <button class="tab-btn" onclick="switchTab('team')">Team</button>
+                <button class="tab-btn" onclick="switchTab('booking')">Book Me</button>
+                <button class="tab-btn" onclick="switchTab('contact')">Contact</button>
+            </div>
+            
+            <div class="user-menu">
+                <div class="user-avatar">CA</div>
+            </div>
+        </nav>
+
+        <div class="content-area">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">AI Model Performance</h3>
+                        </div>
+                        <div class="metric-value">94.7%</div>
+                        <div class="metric-label">Accuracy Rate</div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Healthcare Analytics</h3>
+                        </div>
+                        <div class="metric-value">12.5K</div>
+                        <div class="metric-label">Patients Analyzed</div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Data Pipeline</h3>
+                        </div>
+                        <div class="metric-value">847 GB</div>
+                        <div class="metric-label">Processed Today</div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Active Projects</h3>
+                        </div>
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">In Progress</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Tab -->
+            <div id="services" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="widget-card">
+                        <h3 class="widget-title">Healthcare AI Solutions</h3>
+                        <p>Specialized AI models for medical diagnosis and patient care</p>
+                        <ul class="feature-list">
+                            <li>Medical NLP Processing</li>
+                            <li>Clinical Decision Support</li>
+                            <li>Patient Risk Stratification</li>
+                        </ul>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Data Engineering</h3>
+                        <p>End-to-end data pipeline solutions</p>
+                        <ul class="feature-list">
+                            <li>ETL Pipeline Design</li>
+                            <li>Real-time Stream Processing</li>
+                            <li>Data Lake Architecture</li>
+                        </ul>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Machine Learning Consulting</h3>
+                        <p>Expert ML solutions tailored to your needs</p>
+                        <ul class="feature-list">
+                            <li>Model Development</li>
+                            <li>Algorithm Optimization</li>
+                            <li>MLOps Implementation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Tab -->
+            <div id="projects" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="widget-card">
+                        <h3 class="widget-title">Better Days Appliance Repair</h3>
+                        <p><strong>Full Stack Web Development</strong></p>
+                        <div class="metric-value">250%</div>
+                        <div class="metric-label">Traffic Increase</div>
+                        <button class="btn btn-primary" onclick="window.open('https://www.betterdaysappliancerepair.com', '_blank')">Visit Site</button>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">CNN Image Classifier</h3>
+                        <p><strong>Deep Learning for Cat/Dog Classification</strong></p>
+                        <div class="metric-value">98%</div>
+                        <div class="metric-label">Classification Accuracy</div>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Healthcare AI Dashboard</h3>
+                        <p><strong>Interactive Dashboard for AI Model Evaluation</strong></p>
+                        <ul class="feature-list">
+                            <li>Real-time performance metrics</li>
+                            <li>Bias detection tools</li>
+                            <li>HIPAA-compliant visualization</li>
+                        </ul>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Data Governance Framework</h3>
+                        <p><strong>Enterprise Data Management</strong></p>
+                        <ul class="feature-list">
+                            <li>Automated quality monitoring</li>
+                            <li>Metadata management</li>
+                            <li>Compliance tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Tab -->
+            <div id="team" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="widget-card">
+                        <h3 class="widget-title">CEO & Founder</h3>
+                        <span class="badge">Cazandra Aporbo</span>
+                        <p style="margin-top: 15px;">MS in Data Science from University of Denver. Johns Hopkins AI Healthcare Certified.</p>
+                        <div class="metric-value">47+</div>
+                        <div class="metric-label">Projects Completed</div>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Senior ML Engineer</h3>
+                        <p>Deep Learning & NLP Specialist</p>
+                        <ul class="feature-list">
+                            <li>Neural network architectures</li>
+                            <li>MLOps pipelines</li>
+                            <li>Model optimization</li>
+                        </ul>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Lead Data Engineer</h3>
+                        <p>ETL & Cloud Architecture Expert</p>
+                        <ul class="feature-list">
+                            <li>Data pipeline design</li>
+                            <li>Cloud infrastructure</li>
+                            <li>Real-time processing</li>
+                        </ul>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Healthcare AI Specialist</h3>
+                        <p>Clinical AI & Diagnostics</p>
+                        <ul class="feature-list">
+                            <li>HIPAA compliance</li>
+                            <li>Medical AI models</li>
+                            <li>Clinical validation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Tab -->
+            <div id="booking" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="widget-card">
+                        <h3 class="widget-title">Same-Day Emergency Consultation</h3>
+                        <div class="price">$500</div>
+                        <p>Need immediate help? Get expert guidance today.</p>
+                        <ul class="feature-list">
+                            <li>90-minute Zoom session</li>
+                            <li>Written action plan within 24 hours</li>
+                            <li>1 week follow-up support</li>
+                        </ul>
+                        <button class="btn btn-primary">Book Emergency Session</button>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Data Checkup - Starter</h3>
+                        <div class="price">$350</div>
+                        <p>Perfect for small teams</p>
+                        <ul class="feature-list">
+                            <li>1 hour consultation</li>
+                            <li>Data audit</li>
+                            <li>Recommendations report</li>
+                        </ul>
+                        <button class="btn btn-primary">Get Started</button>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">AI Accelerator - Professional</h3>
+                        <div class="price">$3,500</div>
+                        <p>For businesses ready to deploy AI</p>
+                        <ul class="feature-list">
+                            <li>20 hours consulting</li>
+                            <li>Custom AI strategy</li>
+                            <li>2 weeks support</li>
+                        </ul>
+                        <button class="btn btn-primary">Get Started</button>
+                    </div>
+
+                    <div class="widget-card">
+                        <h3 class="widget-title">Enterprise Solution</h3>
+                        <div class="price">Custom</div>
+                        <p>Large organizations & healthcare systems</p>
+                        <ul class="feature-list">
+                            <li>Full AI development</li>
+                            <li>System integration</li>
+                            <li>3-6 months support</li>
+                        </ul>
+                        <button class="btn btn-primary">Get Quote</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Tab -->
+            <div id="contact" class="tab-content">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <div class="widget-card">
+                        <h2 style="text-align: center; margin-bottom: 30px;">Let's Build Together</h2>
+                        <p style="text-align: center; margin-bottom: 30px;">
+                            Transform your healthcare business with AI and data science. 
+                            Email: <a href="mailto:logofchi@gmail.com" style="color: var(--pink);">logofchi@gmail.com</a>
+                        </p>
+                        
+                        <form onsubmit="handleContact(event)">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Company</label>
+                                <input type="text">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Service Interest</label>
+                                <select>
+                                    <option>Select a service</option>
+                                    <option>Healthcare AI Solutions</option>
+                                    <option>Data Engineering</option>
+                                    <option>ML Consulting</option>
+                                    <option>Custom Development</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea rows="5" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Background animation
+        function initBackground() {
+            const bg = document.getElementById('bgAnimation');
+            for (let i = 0; i < 10; i++) {
+                const orb = document.createElement('div');
+                orb.className = 'floating-orb';
+                orb.style.width = Math.random() * 200 + 50 + 'px';
+                orb.style.height = orb.style.width;
+                orb.style.left = Math.random() * 100 + '%';
+                orb.style.top = Math.random() * 100 + '%';
+                orb.style.animationDelay = Math.random() * 20 + 's';
+                bg.appendChild(orb);
+            }
+        }
+
+        // Sign in handler
+        function handleSignIn(event) {
+            event.preventDefault();
+            document.getElementById('landingPage').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('mainDashboard').classList.add('active');
+            }, 500);
+        }
+
+        // Demo access
+        function handleDemoAccess() {
+            document.getElementById('landingPage').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('mainDashboard').classList.add('active');
+            }, 500);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Contact form
+        function handleContact(event) {
+            event.preventDefault();
+            alert('Message sent! I will respond within 4 hours.');
+            event.target.reset();
+        }
+
+        // Logo animation
+        function animateLogo() {
+            const logo = document.querySelector('.logo-bird');
+            logo.style.transform = 'scale(1.2) rotate(360deg)';
+            setTimeout(() => {
+                logo.style.transform = 'scale(1) rotate(0)';
+            }, 600);
+        }
+
+        // Show home
+        function showHome() {
+            document.querySelector('.tab-btn').click();
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initBackground();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library of Algorithmic Wonders - Through the Data Looking Glass</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Source+Code+Pro&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #ffeaa7 0%, #dfe6e9 25%, #a8e6cf 50%, #ffd3e1 75%, #c8b6ff 100%);
+            background-size: 400% 400%;
+            animation: dreamscape 20s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="20" font-size="20">📖</text></svg>'), auto;
+        }
+
+        @keyframes dreamscape {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .portal-entrance {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 400px;
+            transition: all 1s ease;
+            z-index: 1000;
+        }
+
+        .portal-entrance.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(10);
+        }
+
+        .rabbit-hole {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            clip-path: polygon(50% 0%, 80% 25%, 100% 50%, 80% 75%, 50% 100%, 20% 75%, 0% 50%, 20% 25%);
+            animation: spin 10s linear infinite;
+            box-shadow: 0 0 100px rgba(102, 126, 234, 0.8);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .welcome-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .main-library {
+            display: none;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            animation: fadeIn 2s ease;
+        }
+
+        .main-library.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .navigation-compass {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            z-index: 100;
+        }
+
+        .compass-rose {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            transform: rotate(45deg);
+            display: grid;
+            place-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .compass-label {
+            transform: rotate(-45deg);
+            font-size: 12px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .search-wonderland {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 3px solid transparent;
+            background-image: linear-gradient(white, white), 
+                              linear-gradient(45deg, #667eea, #764ba2, #f093fb, #667eea);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            padding: 30px;
+            margin: 20px 0;
+            clip-path: polygon(2% 0%, 98% 0%, 100% 20px, 100% calc(100% - 20px), 98% 100%, 2% 100%, 0% calc(100% - 20px), 0% 20px);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        #bookSearch {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 18px;
+            border: 2px solid #dfe6e9;
+            background: white;
+            font-family: 'Playfair Display', serif;
+            transition: all 0.3s;
+        }
+
+        #bookSearch:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .dimension-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .dimension-door {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%, 0 15px);
+        }
+
+        .dimension-door:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-3px) rotate(1deg);
+        }
+
+        .dimension-door.active {
+            background: linear-gradient(135deg, #764ba2, #f093fb);
+            color: white;
+        }
+
+        .book-garden {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+            perspective: 1000px;
+        }
+
+        .book-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.5s;
+            cursor: pointer;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .book-card:hover {
+            transform: rotateY(5deg) translateZ(20px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(102, 126, 234, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        .book-title {
+            font-size: 20px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .book-author {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .book-description {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .book-metadata {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .metadata-tag {
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #ffd3e1, #c8b6ff);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+        }
+
+        .tea-table {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            padding: 15px;
+            transform: perspective(500px) rotateX(10deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .tea-table-title {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .algorithm-quote {
+            font-style: italic;
+            font-size: 12px;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        .floating-equation {
+            position: fixed;
+            font-family: 'Source Code Pro', monospace;
+            color: rgba(102, 126, 234, 0.6);
+            font-size: 14px;
+            pointer-events: none;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            33% { transform: translateY(-20px) translateX(10px) rotate(5deg); }
+            66% { transform: translateY(20px) translateX(-10px) rotate(-5deg); }
+        }
+
+        .cheshire-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border: 3px solid #667eea;
+            font-size: 18px;
+            text-align: center;
+            color: #2d3748;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            max-width: 500px;
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+        }
+
+        .cheshire-message.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .stats-wonderland {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 2px solid #667eea;
+            backdrop-filter: blur(10px);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 12px;
+        }
+
+        .stat-line {
+            margin: 5px 0;
+            color: #4a5568;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .ethics-maze {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            padding: 40px;
+            overflow: auto;
+        }
+
+        .ethics-maze.active {
+            display: block;
+        }
+
+        .maze-path {
+            max-width: 800px;
+            margin: 0 auto;
+            color: white;
+        }
+
+        .ethical-question {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .choice-button {
+            padding: 10px 20px;
+            margin: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .choice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading-spiral {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            display: none;
+        }
+
+        .loading-spiral.active {
+            display: block;
+        }
+
+        .spiral-path {
+            stroke: #667eea;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawSpiral 2s linear infinite;
+        }
+
+        @keyframes drawSpiral {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .book-details-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            z-index: 3000;
+        }
+
+        .book-details-modal.active {
+            display: block;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .book-garden {
+                grid-template-columns: 1fr;
+            }
+            
+            .dimension-selector {
+                flex-direction: column;
+            }
+            
+            .navigation-compass {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Portal Entrance -->
+    <div class="portal-entrance" id="portalEntrance">
+        <div class="rabbit-hole"></div>
+        <div class="welcome-text">
+            <h2>Click to Fall</h2>
+            <p>Into the Library</p>
+        </div>
+    </div>
+
+    <!-- Main Library -->
+    <div class="main-library" id="mainLibrary">
+        <!-- Navigation Compass -->
+        <div class="navigation-compass">
+            <div class="compass-rose">
+                <div class="compass-label">
+                    <strong>NAVIGATE</strong><br>
+                    Ethics ↑<br>
+                    ML ←→<br>
+                    Data ↓
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Display -->
+        <div class="stats-wonderland">
+            <div class="stat-line">Books Discovered: <span class="stat-value" id="bookCount">0</span></div>
+            <div class="stat-line">Dimensions Explored: <span class="stat-value" id="dimensionCount">1</span></div>
+            <div class="stat-line">Wisdom Level: <span class="stat-value" id="wisdomLevel">Novice</span></div>
+            <div class="stat-line">Time in Library: <span class="stat-value" id="timeSpent">0:00</span></div>
+        </div>
+
+        <!-- Search Wonderland -->
+        <div class="search-wonderland">
+            <h1 style="text-align: center; margin-bottom: 20px; color: #2d3748; font-size: 36px;">
+                The Library of Algorithmic Wonders
+            </h1>
+            <p style="text-align: center; color: #4a5568; margin-bottom: 30px; font-style: italic;">
+                "We're all mad here. Mad about data, ethics, and the beauty of algorithms."
+            </p>
+            <div class="search-box">
+                <input type="text" id="bookSearch" placeholder="What knowledge do you seek? (Try 'deep learning', 'AI ethics', 'Kahneman'...)">
+                <button class="search-btn" onclick="searchBooks()">Seek</button>
+            </div>
+        </div>
+
+        <!-- Dimension Doors -->
+        <div class="dimension-selector">
+            <div class="dimension-door active" onclick="switchDimension('featured')">Featured Wonders</div>
+            <div class="dimension-door" onclick="switchDimension('ethics')">Ethical Labyrinths</div>
+            <div class="dimension-door" onclick="switchDimension('ml')">Machine Learning Gardens</div>
+            <div class="dimension-door" onclick="switchDimension('datascience')">Data Science Realms</div>
+            <div class="dimension-door" onclick="switchDimension('bestsellers')">Bestseller Heights</div>
+            <div class="dimension-door" onclick="switchDimension('philosophy')">Philosophy Depths</div>
+            <div class="dimension-door" onclick="switchDimension('statistics')">Statistical Dimensions</div>
+            <div class="dimension-door" onclick="switchDimension('visualization')">Visualization Valleys</div>
+        </div>
+
+        <!-- Book Garden -->
+        <div class="book-garden" id="bookGarden"></div>
+
+        <!-- Tea Table -->
+        <div class="tea-table">
+            <div class="tea-table-title">Mad Hatter's Algorithm</div>
+            <div class="algorithm-quote" id="algorithmQuote">
+                "Why is a raven like a writing desk? Both can produce a few notes, though they are very flat; and it is never put with the wrong end in front!"
+            </div>
+        </div>
+
+        <!-- Cheshire Message -->
+        <div class="cheshire-message" id="cheshireMessage">
+            <p id="cheshireText"></p>
+            <button class="choice-button" onclick="hideCheshire()">Continue Journey</button>
+        </div>
+
+        <!-- Ethics Maze -->
+        <div class="ethics-maze" id="ethicsMaze">
+            <div class="maze-path">
+                <h2 style="text-align: center; margin-bottom: 30px;">The Ethical Labyrinth</h2>
+                <div class="ethical-question">
+                    <h3>A Question of Balance</h3>
+                    <p>Your AI model achieves 99% accuracy but shows bias against underrepresented groups. Do you deploy it?</p>
+                    <button class="choice-button" onclick="ethicalChoice('fairness')">Prioritize Fairness</button>
+                    <button class="choice-button" onclick="ethicalChoice('accuracy')">Prioritize Accuracy</button>
+                    <button class="choice-button" onclick="ethicalChoice('balance')">Seek Balance</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Details Modal -->
+        <div class="book-details-modal" id="bookDetailsModal">
+            <span class="close-modal" onclick="closeBookDetails()">×</span>
+            <div id="bookDetailsContent"></div>
+        </div>
+
+        <!-- Loading Spiral -->
+        <svg class="loading-spiral" id="loadingSpiral">
+            <path class="spiral-path" d="M50,50 Q80,20 50,50 T20,50 Q50,80 50,50 T80,50 Q50,20 50,50"></path>
+        </svg>
+    </div>
+
+    <!-- Floating Equations -->
+    <div class="floating-equation" style="top: 20%; left: 80%;">∇L = ∂L/∂w</div>
+    <div class="floating-equation" style="top: 70%; left: 10%;">P(A|B) = P(B|A)P(A)/P(B)</div>
+    <div class="floating-equation" style="top: 40%; right: 5%;">H(X) = -Σ p(x)log p(x)</div>
+    <div class="floating-equation" style="bottom: 30%; left: 60%;">min ||Xw - y||²</div>
+
+    <script>
+        // Book Database with Real Books
+        const bookDatabase = {
+            featured: [
+                {
+                    title: "Weapons of Math Destruction",
+                    author: "Cathy O'Neil",
+                    description: "How big data increases inequality and threatens democracy. A former Wall Street quant sounds an alarm on mathematical models.",
+                    category: "Ethics & AI",
+                    year: 2016,
+                    rating: 4.8,
+                    concepts: ["algorithmic bias", "fairness", "social justice"]
+                },
+                {
+                    title: "The Book of Why",
+                    author: "Judea Pearl",
+                    description: "The new science of cause and effect, revolutionizing how we understand the world through causal inference.",
+                    category: "Machine Learning",
+                    year: 2018,
+                    rating: 4.9,
+                    concepts: ["causality", "inference", "probability"]
+                },
+                {
+                    title: "Thinking, Fast and Slow",
+                    author: "Daniel Kahneman",
+                    description: "Explores the two systems that drive the way we think and make choices.",
+                    category: "Behavioral Science",
+                    year: 2011,
+                    rating: 4.7,
+                    concepts: ["cognitive bias", "decision making", "psychology"]
+                }
+            ],
+            ethics: [
+                {
+                    title: "Race After Technology",
+                    author: "Ruha Benjamin",
+                    description: "Abolitionist tools for the New Jim Code. How technology reinforces racial hierarchies.",
+                    category: "AI Ethics",
+                    year: 2019,
+                    rating: 4.9,
+                    concepts: ["racial bias", "algorithmic justice", "technology ethics"]
+                },
+                {
+                    title: "Artificial Intelligence: A Guide for Thinking Humans",
+                    author: "Melanie Mitchell",
+                    description: "A clear-sighted guide to AI, machine learning, and the questions we should be asking.",
+                    category: "AI Ethics",
+                    year: 2019,
+                    rating: 4.6,
+                    concepts: ["AI understanding", "human-AI interaction", "future of AI"]
+                },
+                {
+                    title: "The Alignment Problem",
+                    author: "Brian Christian",
+                    description: "Machine learning and human values - how to ensure AI systems do what we want.",
+                    category: "AI Safety",
+                    year: 2020,
+                    rating: 4.8,
+                    concepts: ["value alignment", "AI safety", "machine ethics"]
+                }
+            ],
+            ml: [
+                {
+                    title: "Pattern Recognition and Machine Learning",
+                    author: "Christopher Bishop",
+                    description: "The definitive textbook on pattern recognition and machine learning techniques.",
+                    category: "Machine Learning",
+                    year: 2006,
+                    rating: 4.9,
+                    concepts: ["pattern recognition", "Bayesian methods", "neural networks"]
+                },
+                {
+                    title: "Deep Learning",
+                    author: "Ian Goodfellow, Yoshua Bengio, Aaron Courville",
+                    description: "The comprehensive textbook on deep learning from three luminaries in the field.",
+                    category: "Deep Learning",
+                    year: 2016,
+                    rating: 4.8,
+                    concepts: ["neural networks", "optimization", "generative models"]
+                },
+                {
+                    title: "The Elements of Statistical Learning",
+                    author: "Trevor Hastie, Robert Tibshirani, Jerome Friedman",
+                    description: "Data mining, inference, and prediction from a statistical perspective.",
+                    category: "Statistical Learning",
+                    year: 2009,
+                    rating: 4.9,
+                    concepts: ["statistical learning", "data mining", "prediction"]
+                }
+            ],
+            datascience: [
+                {
+                    title: "Naked Statistics",
+                    author: "Charles Wheelan",
+                    description: "Stripping the dread from data - making statistics intuitive and fun.",
+                    category: "Statistics",
+                    year: 2013,
+                    rating: 4.5,
+                    concepts: ["statistics basics", "data intuition", "probability"]
+                },
+                {
+                    title: "Data Science from Scratch",
+                    author: "Joel Grus",
+                    description: "First principles with Python - building data science tools from the ground up.",
+                    category: "Data Science",
+                    year: 2019,
+                    rating: 4.6,
+                    concepts: ["Python", "algorithms", "data structures"]
+                },
+                {
+                    title: "Storytelling with Data",
+                    author: "Cole Nussbaumer Knaflic",
+                    description: "A data visualization guide for business professionals.",
+                    category: "Data Visualization",
+                    year: 2015,
+                    rating: 4.7,
+                    concepts: ["visualization", "communication", "design"]
+                }
+            ],
+            bestsellers: [
+                {
+                    title: "Sapiens: A Brief History of Humankind",
+                    author: "Yuval Noah Harari",
+                    description: "How Homo sapiens came to rule the world through cognitive revolution.",
+                    category: "History & Science",
+                    year: 2014,
+                    rating: 4.8,
+                    concepts: ["human evolution", "cognitive revolution", "culture"]
+                },
+                {
+                    title: "Educated",
+                    author: "Tara Westover",
+                    description: "A memoir about the transformative power of education and the price of knowledge.",
+                    category: "Memoir",
+                    year: 2018,
+                    rating: 4.9,
+                    concepts: ["education", "self-discovery", "resilience"]
+                },
+                {
+                    title: "Atomic Habits",
+                    author: "James Clear",
+                    description: "Tiny changes, remarkable results - an easy way to build good habits.",
+                    category: "Self-Improvement",
+                    year: 2018,
+                    rating: 4.7,
+                    concepts: ["habits", "behavior change", "productivity"]
+                }
+            ],
+            philosophy: [
+                {
+                    title: "Superintelligence",
+                    author: "Nick Bostrom",
+                    description: "Paths, dangers, strategies for the coming age of artificial general intelligence.",
+                    category: "AI Philosophy",
+                    year: 2014,
+                    rating: 4.6,
+                    concepts: ["AGI", "existential risk", "future of humanity"]
+                },
+                {
+                    title: "Life 3.0",
+                    author: "Max Tegmark",
+                    description: "Being human in the age of artificial intelligence.",
+                    category: "AI Philosophy",
+                    year: 2017,
+                    rating: 4.5,
+                    concepts: ["AI future", "consciousness", "cosmic perspective"]
+                },
+                {
+                    title: "The Second Machine Age",
+                    author: "Erik Brynjolfsson, Andrew McAfee",
+                    description: "Work, progress, and prosperity in a time of brilliant technologies.",
+                    category: "Technology & Society",
+                    year: 2014,
+                    rating: 4.4,
+                    concepts: ["automation", "digital economy", "future of work"]
+                }
+            ],
+            statistics: [
+                {
+                    title: "The Signal and the Noise",
+                    author: "Nate Silver",
+                    description: "Why so many predictions fail - but some don't. The art and science of prediction.",
+                    category: "Statistics & Prediction",
+                    year: 2012,
+                    rating: 4.6,
+                    concepts: ["prediction", "probability", "Bayesian thinking"]
+                },
+                {
+                    title: "How Not to Be Wrong",
+                    author: "Jordan Ellenberg",
+                    description: "The power of mathematical thinking in everyday life.",
+                    category: "Mathematics",
+                    year: 2014,
+                    rating: 4.5,
+                    concepts: ["mathematical thinking", "logic", "real-world applications"]
+                },
+                {
+                    title: "The Art of Statistics",
+                    author: "David Spiegelhalter",
+                    description: "Learning from data - how to find the truth in a world of data.",
+                    category: "Statistics",
+                    year: 2019,
+                    rating: 4.7,
+                    concepts: ["data literacy", "statistical thinking", "uncertainty"]
+                }
+            ],
+            visualization: [
+                {
+                    title: "The Visual Display of Quantitative Information",
+                    author: "Edward Tufte",
+                    description: "The classic book on statistical graphics, charts, tables.",
+                    category: "Data Visualization",
+                    year: 1983,
+                    rating: 4.9,
+                    concepts: ["visual design", "information graphics", "data-ink ratio"]
+                },
+                {
+                    title: "Information Dashboard Design",
+                    author: "Stephen Few",
+                    description: "Displaying data for at-a-glance monitoring.",
+                    category: "Dashboard Design",
+                    year: 2013,
+                    rating: 4.6,
+                    concepts: ["dashboard design", "visual perception", "cognitive load"]
+                },
+                {
+                    title: "Data Points",
+                    author: "Nathan Yau",
+                    description: "Visualization that means something - a guide to making sense of data.",
+                    category: "Data Visualization",
+                    year: 2013,
+                    rating: 4.5,
+                    concepts: ["visualization process", "storytelling", "design principles"]
+                }
+            ]
+        };
+
+        // More comprehensive book search data
+        const additionalBooks = [
+            {
+                title: "Algorithms to Live By",
+                author: "Brian Christian & Tom Griffiths",
+                description: "The computer science of human decisions - applying algorithms to everyday life.",
+                category: "Computer Science & Life",
+                year: 2016,
+                rating: 4.7,
+                concepts: ["algorithms", "decision making", "optimization"]
+            },
+            {
+                title: "Gödel, Escher, Bach",
+                author: "Douglas Hofstadter",
+                description: "An eternal golden braid exploring consciousness, recursion, and intelligence.",
+                category: "Philosophy & AI",
+                year: 1979,
+                rating: 4.9,
+                concepts: ["consciousness", "recursion", "artificial intelligence"]
+            },
+            {
+                title: "The Master Algorithm",
+                author: "Pedro Domingos",
+                description: "How the quest for the ultimate learning machine will remake our world.",
+                category: "Machine Learning",
+                year: 2015,
+                rating: 4.4,
+                concepts: ["machine learning", "algorithms", "AI future"]
+            },
+            {
+                title: "Everybody Lies",
+                author: "Seth Stephens-Davidowitz",
+                description: "Big data, new data, and what the internet can tell us about who we really are.",
+                category: "Data Science & Society",
+                year: 2017,
+                rating: 4.3,
+                concepts: ["big data", "human behavior", "internet data"]
+            },
+            {
+                title: "The Information",
+                author: "James Gleick",
+                description: "A history, a theory, a flood - the story of information from drums to quantum computing.",
+                category: "Information Theory",
+                year: 2011,
+                rating: 4.6,
+                concepts: ["information theory", "communication", "entropy"]
+            }
+        ];
+
+        // Combine all books for search
+        let allBooks = [];
+        Object.values(bookDatabase).forEach(category => {
+            allBooks = allBooks.concat(category);
+        });
+        allBooks = allBooks.concat(additionalBooks);
+
+        // Global variables
+        let currentDimension = 'featured';
+        let startTime = Date.now();
+        let bookCount = 0;
+        let dimensionsExplored = new Set(['featured']);
+        let wisdomLevel = 'Novice';
+
+        // Algorithm quotes for the tea table
+        const algorithmQuotes = [
+            "In the garden of forking paths, every decision tree branches infinitely.",
+            "The gradient always descends, but sometimes we must climb to see clearly.",
+            "Entropy increases, but information brings order to chaos.",
+            "In Bayesian wonderland, prior beliefs meet posterior realities.",
+            "The neural network dreams in backpropagation.",
+            "Cross-validation: trust, but verify, five times over.",
+            "The curse of dimensionality: more features, more problems.",
+            "Overfitting is believing too much in what you've seen.",
+            "The bootstrap pulls itself up by its own samples.",
+            "In the land of big data, the one-eyed model is king."
+        ];
+
+        // Initialize
+        document.getElementById('portalEntrance').addEventListener('click', enterLibrary);
+
+        function enterLibrary() {
+            document.getElementById('portalEntrance').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('portalEntrance').style.display = 'none';
+                document.getElementById('mainLibrary').classList.add('active');
+                loadBooks('featured');
+                startLibraryTimer();
+                rotateQuotes();
+            }, 1000);
+        }
+
+        function loadBooks(dimension) {
+            const garden = document.getElementById('bookGarden');
+            const books = bookDatabase[dimension] || bookDatabase.featured;
+            
+            garden.innerHTML = '';
+            books.forEach((book, index) => {
+                setTimeout(() => {
+                    garden.appendChild(createBookCard(book));
+                    bookCount++;
+                    updateStats();
+                }, index * 100);
+            });
+        }
+
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.innerHTML = `
+                <h3 class="book-title">${book.title}</h3>
+                <p class="book-author">${book.author}</p>
+                <p class="book-description">${book.description}</p>
+                <div class="book-metadata">
+                    <span class="metadata-tag">${book.category}</span>
+                    <span class="metadata-tag">${book.year}</span>
+                    <span class="metadata-tag">★ ${book.rating}</span>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => showBookDetails(book));
+            
+            // Add random animation delay for floating effect
+            card.style.animationDelay = Math.random() * 2 + 's';
+            
+            return card;
+        }
+
+        function showBookDetails(book) {
+            const modal = document.getElementById('bookDetailsModal');
+            const content = document.getElementById('bookDetailsContent');
+            
+            content.innerHTML = `
+                <h2 style="color: #2d3748; margin-bottom: 20px;">${book.title}</h2>
+                <p style="color: #667eea; margin-bottom: 15px;">by ${book.author}</p>
+                <p style="color: #4a5568; line-height: 1.6; margin-bottom: 20px;">${book.description}</p>
+                <div style="margin-bottom: 20px;">
+                    <strong>Key Concepts:</strong>
+                    <div style="margin-top: 10px;">
+                        ${book.concepts.map(c => `<span class="metadata-tag" style="margin: 5px;">${c}</span>`).join('')}
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                    <span>Published: ${book.year}</span>
+                    <span>Rating: ${book.rating} ★</span>
+                    <span>Category: ${book.category}</span>
+                </div>
+                <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, rgba(224, 170, 255, 0.1), rgba(199, 125, 255, 0.1)); border-left: 3px solid #667eea;">
+                    <p style="font-style: italic; color: #4a5568;">
+                        "Every book is a portal to another dimension of understanding. This one leads to ${book.concepts[0]}."
+                    </p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeBookDetails() {
+            document.getElementById('bookDetailsModal').classList.remove('active');
+        }
+
+        function switchDimension(dimension) {
+            currentDimension = dimension;
+            dimensionsExplored.add(dimension);
+            
+            // Update active state
+            document.querySelectorAll('.dimension-door').forEach(door => {
+                door.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show loading
+            document.getElementById('loadingSpiral').classList.add('active');
+            
+            // Load new books
+            setTimeout(() => {
+                loadBooks(dimension);
+                document.getElementById('loadingSpiral').classList.remove('active');
+                updateStats();
+                
+                // Show special messages for certain dimensions
+                if (dimension === 'ethics') {
+                    setTimeout(() => {
+                        document.getElementById('ethicsMaze').classList.add('active');
+                    }, 500);
+                } else if (dimension === 'philosophy') {
+                    showCheshireMessage("In the realm of philosophy, we ponder: If a neural network dreams, does it dream of electric sheep?");
+                }
+            }, 500);
+        }
+
+        function searchBooks() {
+            const searchTerm = document.getElementById('bookSearch').value.toLowerCase();
+            if (!searchTerm) return;
+            
+            const results = allBooks.filter(book => 
+                book.title.toLowerCase().includes(searchTerm) ||
+                book.author.toLowerCase().includes(searchTerm) ||
+                book.description.toLowerCase().includes(searchTerm) ||
+                book.concepts.some(c => c.toLowerCase().includes(searchTerm))
+            );
+            
+            const garden = document.getElementById('bookGarden');
+            garden.innerHTML = '';
+            
+            if (results.length === 0) {
+                showCheshireMessage("'I've searched high and low, through every algorithm and thee, but found no books matching your query. Perhaps try a different key?'");
+            } else {
+                results.forEach((book, index) => {
+                    setTimeout(() => {
+                        garden.appendChild(createBookCard(book));
+                    }, index * 100);
+                });
+                showCheshireMessage(`Found ${results.length} books in the infinite library. "We're painting the roses red with data," as they say.`);
+            }
+        }
+
+        function showCheshireMessage(message) {
+            const cheshire = document.getElementById('cheshireMessage');
+            document.getElementById('cheshireText').textContent = message;
+            cheshire.classList.add('visible');
+            
+            setTimeout(() => {
+                cheshire.classList.remove('visible');
+            }, 5000);
+        }
+
+        function hideCheshire() {
+            document.getElementById('cheshireMessage').classList.remove('visible');
+        }
+
+        function ethicalChoice(choice) {
+            let message = '';
+            switch(choice) {
+                case 'fairness':
+                    message = "You've chosen the path of fairness. The algorithm adjusts, seeking balance in its judgments.";
+                    wisdomLevel = 'Ethical Practitioner';
+                    break;
+                case 'accuracy':
+                    message = "You've chosen accuracy above all. The model performs well, but at what cost?";
+                    wisdomLevel = 'Utilitarian';
+                    break;
+                case 'balance':
+                    message = "You seek the middle way. The path is harder, but perhaps more wise.";
+                    wisdomLevel = 'Philosopher';
+                    break;
+            }
+            
+            showCheshireMessage(message);
+            document.getElementById('ethicsMaze').classList.remove('active');
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('bookCount').textContent = bookCount;
+            document.getElementById('dimensionCount').textContent = dimensionsExplored.size;
+            document.getElementById('wisdomLevel').textContent = wisdomLevel;
+        }
+
+        function startLibraryTimer() {
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timeSpent').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function rotateQuotes() {
+            setInterval(() => {
+                const quote = algorithmQuotes[Math.floor(Math.random() * algorithmQuotes.length)];
+                document.getElementById('algorithmQuote').textContent = quote;
+            }, 10000);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement.id === 'bookSearch') {
+                searchBooks();
+            } else if (e.key === 'Escape') {
+                closeBookDetails();
+                document.getElementById('ethicsMaze').classList.remove('active');
+            }
+        });
+
+        // Add floating animation to equations
+        document.querySelectorAll('.floating-equation').forEach((eq, index) => {
+            eq.style.animationDelay = `${index * 2}s`;
+        });
+
+        // Easter egg: Konami code reveals all books
+        let konamiCode = [];
+        const konamiPattern = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.keyCode);
+            konamiCode = konamiCode.slice(-10);
+            
+            if (konamiCode.join(',') === konamiPattern.join(',')) {
+                showCheshireMessage("You've unlocked the Complete Codex! All knowledge is now visible.");
+                const garden = document.getElementById('bookGarden');
+                garden.innerHTML = '';
+                allBooks.forEach((book, index) => {
+                    setTimeout(() => {
+                        garden.appendChild(createBookCard(book));
+                    }, index * 50);
+                });
+                wisdomLevel = 'Omniscient';
+                updateStats();
+            }
+        });
+    </script>
+</body>
+</html>

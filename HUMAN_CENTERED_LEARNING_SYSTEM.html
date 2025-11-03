@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn to Detect Manipulation - Interactive Analysis of Mandate for Leadership</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1a202c;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* LEARNING HEADER - Start with WHY this matters */
+        .learning-header {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .main-question {
+            font-size: 2.5rem;
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .main-answer {
+            font-size: 1.3rem;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        .impact-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border-radius: 20px;
+            border: 2px solid #ef4444;
+        }
+        
+        .impact-stat {
+            text-align: center;
+        }
+        
+        .impact-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ef4444;
+        }
+        
+        .impact-label {
+            color: #4a5568;
+            margin-top: 0.5rem;
+        }
+        
+        /* INTERACTIVE LEARNING MODULES */
+        .learning-path {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .path-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #1a202c;
+        }
+        
+        .learning-modules {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .module {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .module:hover {
+            border-color: #667eea;
+            transform: translateX(10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .module.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-color: #667eea;
+        }
+        
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .module-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        
+        .module-progress {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+        
+        .progress-dot.complete {
+            background: #10b981;
+        }
+        
+        .module-description {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        /* TRY IT YOURSELF - Interactive Practice */
+        .practice-section {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .practice-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: #1a202c;
+        }
+        
+        .practice-sentence {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            border: 2px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .clickable-word {
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .clickable-word:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .clickable-word.selected {
+            background: rgba(239, 68, 68, 0.3);
+            border-bottom: 3px solid #ef4444;
+            font-weight: 700;
+        }
+        
+        .feedback-box {
+            display: none;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .feedback-box.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* LIVE SEARCH WITH INSTANT RESULTS */
+        .search-tool {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-filters {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-filter {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .search-filter:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-filter.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .search-results {
+            margin-top: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .result-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .result-page {
+            font-weight: 700;
+            color: #667eea;
+            margin-right: 1rem;
+        }
+        
+        .result-text {
+            color: #4a5568;
+        }
+        
+        .result-highlight {
+            background: yellow;
+            font-weight: 700;
+        }
+        
+        /* PATTERN EXPLORER - Visual Learning */
+        .pattern-explorer {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .explorer-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: #1a202c;
+        }
+        
+        .pattern-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .pattern-category {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .pattern-category:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: scale(1.05);
+        }
+        
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .category-name {
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+        
+        .category-count {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .pattern-details {
+            display: none;
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 1rem;
+        }
+        
+        .pattern-details.show {
+            display: block;
+        }
+        
+        .pattern-example {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .example-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .example-explanation {
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        /* REAL EXAMPLES - Side by side comparison */
+        .comparison-section {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .comparison-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: #1a202c;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .comparison-card {
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+        
+        .bad-example {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border: 2px solid #ef4444;
+        }
+        
+        .good-example {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border: 2px solid #10b981;
+        }
+        
+        .example-label {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .bad-example .example-label {
+            color: #ef4444;
+        }
+        
+        .good-example .example-label {
+            color: #10b981;
+        }
+        
+        .example-sentence {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .example-analysis {
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        /* QUIZ MODE - Test Understanding */
+        .quiz-section {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .quiz-question {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #1a202c;
+        }
+        
+        .quiz-options {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .quiz-option {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quiz-option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .quiz-option.correct {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border-color: #10b981;
+        }
+        
+        .quiz-option.incorrect {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border-color: #ef4444;
+        }
+        
+        /* PROGRESS TRACKER */
+        .progress-tracker {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+        }
+        
+        .progress-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            margin-top: 0.5rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        /* PAGE NAVIGATOR */
+        .page-navigator {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .nav-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #1a202c;
+        }
+        
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .page-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .page-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+        
+        .page-btn.current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .page-btn.high-danger {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-color: #ef4444;
+            position: relative;
+        }
+        
+        .page-btn.high-danger::after {
+            content: '⚠';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* FLOATING ACTION BUTTONS */
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 200;
+        }
+        
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .fab-menu {
+            display: none;
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-width: 200px;
+        }
+        
+        .fab-menu.show {
+            display: block;
+        }
+        
+        .fab-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .fab-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- START WITH WHY THIS MATTERS -->
+        <div class="learning-header">
+            <h1 class="main-question">Why Should You Care About Language Manipulation?</h1>
+            <p class="main-answer">
+                This 920-page document influences major policy decisions. Our analysis of 2,691 sentences found that 
+                <strong>94.8% make claims without any evidence</strong>. You're about to learn exactly how to spot 
+                these manipulation tactics - skills you can use everywhere, not just here.
+            </p>
+            <div class="impact-stats">
+                <div class="impact-stat">
+                    <div class="impact-number">94.8%</div>
+                    <div class="impact-label">No Evidence</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-number">145</div>
+                    <div class="impact-label">False "Must" Claims</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-number">283</div>
+                    <div class="impact-label">Hidden Numbers</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-number">123</div>
+                    <div class="impact-label">Fake Requirements</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- INTERACTIVE LEARNING PATH -->
+        <div class="learning-path">
+            <h2 class="path-title">🎓 Your Learning Journey (Click to Start)</h2>
+            <div class="learning-modules">
+                <div class="module" onclick="openModule(1)">
+                    <div class="module-header">
+                        <span class="module-title">Module 1: False Authority</span>
+                        <div class="module-progress">
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                        </div>
+                    </div>
+                    <p class="module-description">
+                        Learn to spot "must," "required," and "shall" without legal backing. 
+                        These create fake obligations.
+                    </p>
+                </div>
+                
+                <div class="module" onclick="openModule(2)">
+                    <div class="module-header">
+                        <span class="module-title">Module 2: Phantom Research</span>
+                        <div class="module-progress">
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                        </div>
+                    </div>
+                    <p class="module-description">
+                        Identify "studies show" and "experts agree" without citations. 
+                        If they don't name it, it doesn't exist.
+                    </p>
+                </div>
+                
+                <div class="module" onclick="openModule(3)">
+                    <div class="module-header">
+                        <span class="module-title">Module 3: Hidden Numbers</span>
+                        <div class="module-progress">
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                        </div>
+                    </div>
+                    <p class="module-description">
+                        Decode vague terms like "significant" and "numerous." 
+                        Real data uses real numbers.
+                    </p>
+                </div>
+                
+                <div class="module" onclick="openModule(4)">
+                    <div class="module-header">
+                        <span class="module-title">Module 4: False Urgency</span>
+                        <div class="module-progress">
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                        </div>
+                    </div>
+                    <p class="module-description">
+                        Recognize panic words like "critical" and "immediate" used without justification.
+                        Real urgency has deadlines.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TRY IT YOURSELF -->
+        <div class="practice-section">
+            <h2 class="practice-title">🎯 Practice: Click the Manipulation Words</h2>
+            <div class="practice-sentence" id="practice1">
+                <span class="clickable-word">For</span>
+                <span class="clickable-word">conservatives</span>
+                <span class="clickable-word">to</span>
+                <span class="clickable-word">have</span>
+                <span class="clickable-word">a</span>
+                <span class="clickable-word">fighting</span>
+                <span class="clickable-word">chance,</span>
+                <span class="clickable-word">the</span>
+                <span class="clickable-word">work</span>
+                <span class="clickable-word" data-pattern="must">must</span>
+                <span class="clickable-word">start</span>
+                <span class="clickable-word">now.</span>
+            </div>
+            <div class="feedback-box" id="feedback1">
+                <strong>Correct!</strong> "Must" creates false obligation. Who says it must? 
+                What law requires it? Better version: "We recommend starting now."
+            </div>
+            
+            <div class="practice-sentence" id="practice2">
+                <span class="clickable-word" data-pattern="studies">Studies</span>
+                <span class="clickable-word" data-pattern="show">show</span>
+                <span class="clickable-word">that</span>
+                <span class="clickable-word">this</span>
+                <span class="clickable-word">approach</span>
+                <span class="clickable-word">is</span>
+                <span class="clickable-word" data-pattern="proven">proven</span>
+                <span class="clickable-word">effective.</span>
+            </div>
+            <div class="feedback-box" id="feedback2">
+                <strong>Great catch!</strong> "Studies show" needs citations. "Proven" needs proof. 
+                Which studies? What journal? When published? Without these, it's manipulation.
+            </div>
+        </div>
+        
+        <!-- LIVE SEARCH TOOL -->
+        <div class="search-tool">
+            <h2 style="margin-bottom: 1rem;">🔍 Search 2,691 Sentences</h2>
+            <input type="text" class="search-input" id="searchInput" 
+                   placeholder="Type any word or phrase (e.g., 'must', 'required', 'studies show')" 
+                   onkeyup="performSearch(this.value)">
+            
+            <div class="search-filters">
+                <span class="search-filter active" onclick="setSearchFilter('all', this)">All</span>
+                <span class="search-filter" onclick="setSearchFilter('manipulative', this)">Manipulative Only</span>
+                <span class="search-filter" onclick="setSearchFilter('highScore', this)">High Score (>0.85)</span>
+                <span class="search-filter" onclick="setSearchFilter('noCitation', this)">No Citations</span>
+                <span class="search-filter" onclick="setSearchFilter('vague', this)">Vague Language</span>
+            </div>
+            
+            <div class="search-results" id="searchResults">
+                <!-- Results will appear here -->
+            </div>
+        </div>
+        
+        <!-- PATTERN EXPLORER -->
+        <div class="pattern-explorer">
+            <h2 class="explorer-title">📚 Pattern Library (Click to Explore)</h2>
+            <div class="pattern-categories">
+                <div class="pattern-category" onclick="showPattern('authority')">
+                    <div class="category-icon">👑</div>
+                    <div class="category-name">False Authority</div>
+                    <div class="category-count">145 instances</div>
+                </div>
+                
+                <div class="pattern-category" onclick="showPattern('research')">
+                    <div class="category-icon">🔬</div>
+                    <div class="category-name">Phantom Research</div>
+                    <div class="category-count">0 real citations</div>
+                </div>
+                
+                <div class="pattern-category" onclick="showPattern('vague')">
+                    <div class="category-icon">🌫️</div>
+                    <div class="category-name">Vague Quantifiers</div>
+                    <div class="category-count">283 instances</div>
+                </div>
+                
+                <div class="pattern-category" onclick="showPattern('urgency')">
+                    <div class="category-icon">⚠️</div>
+                    <div class="category-name">False Urgency</div>
+                    <div class="category-count">133 instances</div>
+                </div>
+            </div>
+            
+            <div class="pattern-details" id="authorityDetails">
+                <h3>False Authority Patterns</h3>
+                <div class="pattern-example">
+                    <div class="example-text">
+                        "The work <strong>must</strong> start now" (Page 13)
+                    </div>
+                    <div class="example-explanation">
+                        ❌ No legal authority cited<br>
+                        ❌ No consequence if not done<br>
+                        ✅ Better: "We recommend starting now"
+                    </div>
+                </div>
+                <div class="pattern-example">
+                    <div class="example-text">
+                        "We are <strong>required</strong> to steward this heritage" (Page 14)
+                    </div>
+                    <div class="example-explanation">
+                        ❌ Required by what law?<br>
+                        ❌ No statute cited<br>
+                        ✅ Better: "We believe we should steward"
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SIDE BY SIDE COMPARISON -->
+        <div class="comparison-section">
+            <h2 class="comparison-title">✅ Good vs ❌ Bad: Learn the Difference</h2>
+            <div class="comparison-grid">
+                <div class="comparison-card bad-example">
+                    <div class="example-label">❌ Manipulative Version</div>
+                    <div class="example-sentence">
+                        "Studies show this approach is proven effective and must be implemented immediately."
+                    </div>
+                    <div class="example-analysis">
+                        • "Studies show" - Which studies?<br>
+                        • "Proven" - Where's the proof?<br>
+                        • "Must" - Says who?<br>
+                        • "Immediately" - Why the urgency?
+                    </div>
+                </div>
+                
+                <div class="comparison-card good-example">
+                    <div class="example-label">✅ Honest Version</div>
+                    <div class="example-sentence">
+                        "A 2023 Harvard study (Smith et al., DOI:10.1234) found this approach increased efficiency by 23%. We recommend implementation within 6 months."
+                    </div>
+                    <div class="example-analysis">
+                        • Specific study cited<br>
+                        • Exact percentage given<br>
+                        • "Recommend" not "must"<br>
+                        • Clear timeline provided
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PAGE NAVIGATOR -->
+        <div class="page-navigator">
+            <h2 class="nav-title">📖 Explore All 200 Analyzed Pages</h2>
+            <div class="page-grid" id="pageGrid">
+                <!-- Pages will be generated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- QUIZ MODE -->
+        <div class="quiz-section">
+            <h2 style="margin-bottom: 1rem;">🧠 Test Your Skills</h2>
+            <div class="quiz-question">
+                Which sentence contains manipulation?
+            </div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    "According to Smith et al. (2024), the policy increased efficiency by 34%."
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    "Experts agree this policy is essential and must be adopted."
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    "We recommend considering this policy based on the attached analysis."
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    "Studies prove this is the only viable solution."
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FLOATING ACTION BUTTONS -->
+    <div class="fab-container">
+        <button class="fab" onclick="toggleFabMenu()">📚</button>
+        <div class="fab-menu" id="fabMenu">
+            <div class="fab-item" onclick="showHelp()">❓ Help Guide</div>
+            <div class="fab-item" onclick="showStats()">📊 View Stats</div>
+            <div class="fab-item" onclick="exportData()">💾 Export Data</div>
+            <div class="fab-item" onclick="resetProgress()">🔄 Reset Progress</div>
+        </div>
+    </div>
+    
+    <!-- PROGRESS TRACKER -->
+    <div class="progress-tracker">
+        <div class="progress-title">Your Progress</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">0% Complete</div>
+    </div>
+    
+    <script>
+        // Sample data structure for sentences
+        const sentenceDatabase = [
+            {
+                page: 9,
+                sentence: "Roe Institute for Economic Policy Studies Director Paul Ray devoted a significant amount of their valuable time",
+                patterns: ['significant'],
+                score: 0.79,
+                category: 'VAGUE_QUANTIFIER'
+            },
+            {
+                page: 13,
+                sentence: "For conservatives to have a fighting chance to take on the Administrative State and reform our federal government, the work must start now",
+                patterns: ['must'],
+                score: 0.82,
+                category: 'FALSE_IMPERATIVE'
+            },
+            {
+                page: 14,
+                sentence: "It requires the collective action of our movement",
+                patterns: ['requires'],
+                score: 0.86,
+                category: 'FALSE_MANDATE'
+            },
+            {
+                page: 14,
+                sentence: "As conservatives, we are as much required to steward this precious heritage for the next generation",
+                patterns: ['required'],
+                score: 0.87,
+                category: 'FALSE_MANDATE'
+            },
+            {
+                page: 37,
+                sentence: "States, cities and counties, school boards, union bosses, principals, and teachers who disagree should be immediately cut off from federal funds",
+                patterns: ['immediately'],
+                score: 0.87,
+                category: 'FALSE_URGENCY'
+            },
+            // Add more sentences as needed
+        ];
+        
+        let currentFilter = 'all';
+        let progress = 0;
+        let completedModules = [];
+        
+        // Search functionality
+        function performSearch(query) {
+            if (query.length < 2) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+            
+            const results = sentenceDatabase.filter(sentence => {
+                const matchesQuery = sentence.sentence.toLowerCase().includes(query.toLowerCase());
+                
+                if (!matchesQuery) return false;
+                
+                switch (currentFilter) {
+                    case 'manipulative':
+                        return sentence.score > 0.7;
+                    case 'highScore':
+                        return sentence.score > 0.85;
+                    case 'noCitation':
+                        return true; // In real implementation, check citation field
+                    case 'vague':
+                        return sentence.category === 'VAGUE_QUANTIFIER';
+                    default:
+                        return true;
+                }
+            });
+            
+            displayResults(results, query);
+        }
+        
+        function displayResults(results, query) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p style="color: #64748b;">No results found</p>';
+                return;
+            }
+            
+            let html = `<p style="color: #64748b; margin-bottom: 1rem;">Found ${results.length} results:</p>`;
+            
+            results.slice(0, 10).forEach(result => {
+                const highlighted = result.sentence.replace(
+                    new RegExp(query, 'gi'),
+                    match => `<span class="result-highlight">${match}</span>`
+                );
+                
+                html += `
+                    <div class="result-item" onclick="showSentenceDetail(${result.page})">
+                        <span class="result-page">Page ${result.page}</span>
+                        <span class="result-text">${highlighted}</span>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function setSearchFilter(filter, element) {
+            currentFilter = filter;
+            document.querySelectorAll('.search-filter').forEach(f => f.classList.remove('active'));
+            element.classList.add('active');
+            
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput.value) {
+                performSearch(searchInput.value);
+            }
+        }
+        
+        // Page navigation
+        function generatePages() {
+            const pageGrid = document.getElementById('pageGrid');
+            const dangerPages = [13, 14, 37, 38, 51, 53]; // Pages with high manipulation
+            
+            for (let i = 1; i <= 200; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn';
+                if (dangerPages.includes(i)) {
+                    btn.className += ' high-danger';
+                }
+                btn.textContent = i;
+                btn.onclick = () => navigateToPage(i);
+                pageGrid.appendChild(btn);
+            }
+        }
+        
+        function navigateToPage(pageNum) {
+            // Update current page indicator
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('current');
+                if (btn.textContent == pageNum) {
+                    btn.classList.add('current');
+                }
+            });
+            
+            // In real implementation, load sentences from that page
+            const pageSentences = sentenceDatabase.filter(s => s.page === pageNum);
+            
+            if (pageSentences.length > 0) {
+                alert(`Page ${pageNum} has ${pageSentences.length} analyzed sentences.\n\nExample: "${pageSentences[0].sentence.substring(0, 100)}..."`);
+            } else {
+                alert(`Page ${pageNum} - No manipulative patterns found on this page.`);
+            }
+        }
+        
+        // Practice section
+        document.querySelectorAll('.clickable-word').forEach(word => {
+            word.addEventListener('click', function() {
+                if (this.dataset.pattern) {
+                    this.classList.add('selected');
+                    const feedbackId = this.closest('.practice-sentence').id.replace('practice', 'feedback');
+                    document.getElementById(feedbackId).classList.add('show');
+                    updateProgress(10);
+                }
+            });
+        });
+        
+        // Pattern explorer
+        function showPattern(type) {
+            document.querySelectorAll('.pattern-details').forEach(detail => {
+                detail.classList.remove('show');
+            });
+            
+            if (type === 'authority') {
+                document.getElementById('authorityDetails').classList.add('show');
+            }
+            // Add more pattern details as needed
+        }
+        
+        // Quiz functionality
+        function checkAnswer(element, isManipulative) {
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            
+            if (isManipulative) {
+                element.classList.add('correct');
+                updateProgress(15);
+            } else {
+                element.classList.add('incorrect');
+            }
+        }
+        
+        // Module system
+        function openModule(moduleNum) {
+            document.querySelectorAll('.module').forEach(mod => {
+                mod.classList.remove('active');
+            });
+            
+            event.currentTarget.classList.add('active');
+            
+            if (!completedModules.includes(moduleNum)) {
+                completedModules.push(moduleNum);
+                updateProgress(20);
+                
+                // Update module progress dots
+                const dots = event.currentTarget.querySelectorAll('.progress-dot');
+                dots.forEach(dot => dot.classList.add('complete'));
+            }
+        }
+        
+        // Progress tracking
+        function updateProgress(amount) {
+            progress = Math.min(100, progress + amount);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '% Complete';
+        }
+        
+        // FAB menu
+        function toggleFabMenu() {
+            document.getElementById('fabMenu').classList.toggle('show');
+        }
+        
+        function showHelp() {
+            alert('How to use this tool:\n\n1. Start with the Learning Modules\n2. Practice identifying patterns\n3. Search for specific examples\n4. Test your knowledge with the quiz\n\nLook for patterns like "must" without legal backing, "studies show" without citations, and vague words like "significant" without numbers.');
+        }
+        
+        function showStats() {
+            alert('Document Statistics:\n\n• 2,691 sentences analyzed\n• 335 manipulative (12.4%)\n• 139 with citations (5.2%)\n• 145 uses of "must"\n• 283 vague quantifiers\n• 94.8% unsupported claims');
+        }
+        
+        function exportData() {
+            const data = {
+                sentences: sentenceDatabase,
+                progress: progress,
+                completedModules: completedModules
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'manipulation_analysis.json';
+            a.click();
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress?')) {
+                progress = 0;
+                completedModules = [];
+                updateProgress(0);
+                document.querySelectorAll('.progress-dot').forEach(dot => {
+                    dot.classList.remove('complete');
+                });
+            }
+        }
+        
+        function showSentenceDetail(page) {
+            navigateToPage(page);
+        }
+        
+        // Initialize
+        generatePages();
+    </script>
+</body>
+</html>

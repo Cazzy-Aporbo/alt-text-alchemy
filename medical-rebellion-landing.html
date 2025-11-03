@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDICAL REBELLION - The System Is Broken</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #trauma-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            color: #ff0040;
+            z-index: 10000;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        #dismissal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.05);
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+
+        .medical-record {
+            position: fixed;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+            font-family: monospace;
+        }
+
+        #gaslighting-simulator {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+        }
+
+        .doctor-voice {
+            font-size: clamp(2rem, 6vw, 4rem);
+            text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+            line-height: 1.4;
+            opacity: 0;
+            animation: dismiss 8s forwards;
+            font-family: 'Times New Roman', serif;
+            color: #ccc;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes dismiss {
+            0% { opacity: 0; transform: scale(0.8); }
+            10% { opacity: 1; transform: scale(1); }
+            90% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.3; transform: scale(0.95); text-decoration: line-through; color: #666; }
+        }
+
+        .your-reality {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: #ff0040;
+            opacity: 0;
+            animation: appear 8s forwards;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+        }
+
+        @keyframes appear {
+            0%, 70% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        #rage-section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            position: relative;
+            display: none;
+            background: #000;
+        }
+
+        .rage-text {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -5px;
+            color: #fff;
+            text-shadow: 
+                0 0 10px #ff0040,
+                0 0 20px #ff0040,
+                0 0 40px #ff0040;
+            animation: rage-pulse 0.5s infinite alternate;
+        }
+
+        @keyframes rage-pulse {
+            from { transform: scale(1) rotate(0deg); }
+            to { transform: scale(1.02) rotate(-0.5deg); }
+        }
+
+        .medical-quote {
+            background: #fff;
+            color: #000;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-size: 1.5rem;
+            position: relative;
+            transform: rotate(-1deg);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .medical-quote::after {
+            content: 'WRONG';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            font-size: 6rem;
+            color: #ff0040;
+            font-weight: 900;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        #proof-section {
+            min-height: 100vh;
+            background: #000;
+            padding: 4rem 2rem;
+            position: relative;
+            display: none;
+        }
+
+        .evidence-wall {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .evidence-card {
+            background: rgba(255, 0, 0, 0.05);
+            border: 2px solid #ff0040;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .evidence-card:hover {
+            background: rgba(255, 0, 0, 0.1);
+            transform: scale(1.05);
+            z-index: 100;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+        }
+
+        .evidence-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ff0040;
+            text-transform: uppercase;
+        }
+
+        .live-counter {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px #ff0040;
+        }
+
+        #rebellion-manifesto {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #000 0%, #1a0000 100%);
+            padding: 6rem 2rem;
+            display: none;
+            position: relative;
+        }
+
+        .manifesto-text {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .highlight {
+            background: #ff0040;
+            color: #000;
+            padding: 2px 8px;
+            font-weight: 900;
+        }
+
+        #weapon-arsenal {
+            padding: 6rem 2rem;
+            background: #000;
+            display: none;
+        }
+
+        .weapon {
+            margin: 3rem 0;
+            padding: 2rem;
+            border-left: 5px solid #ff0040;
+            background: rgba(255, 0, 64, 0.02);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .weapon:hover {
+            background: rgba(255, 0, 64, 0.1);
+            transform: translateX(20px);
+            border-left-width: 20px;
+        }
+
+        .weapon h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            color: #ff0040;
+        }
+
+        .weapon-description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        #join-rebellion {
+            min-height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rebellion-form {
+            text-align: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .rebellion-title {
+            font-size: clamp(2rem, 8vw, 6rem);
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ff0040, #fff, #ff0040);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 2s linear infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .rebellion-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            background: transparent;
+            border: 3px solid #ff0040;
+            color: #fff;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .rebellion-input:focus {
+            outline: none;
+            box-shadow: 0 0 50px #ff0040;
+            transform: scale(1.05);
+        }
+
+        .rebellion-button {
+            padding: 1.5rem 4rem;
+            font-size: 1.5rem;
+            background: #ff0040;
+            color: #000;
+            border: none;
+            text-transform: uppercase;
+            font-weight: 900;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .rebellion-button:hover {
+            background: #fff;
+            box-shadow: 0 0 100px #ff0040;
+            transform: scale(1.1);
+        }
+
+        .floating-testimony {
+            position: absolute;
+            padding: 1rem;
+            background: rgba(255, 0, 64, 0.1);
+            border: 1px solid #ff0040;
+            color: #fff;
+            font-size: 0.9rem;
+            max-width: 250px;
+            opacity: 0;
+            animation: float-testimony 15s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-testimony {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(-5deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) rotate(5deg);
+            }
+        }
+
+        .glitch-text {
+            position: relative;
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 
+                0.05em 0 0 #00ffff,
+                -0.05em 0 0 #ff00ff;
+            animation: glitch 0.5s infinite;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 
+                    0.05em 0 0 #00ffff,
+                    -0.05em 0 0 #ff00ff;
+            }
+            15% {
+                text-shadow: 
+                    -0.05em -0.025em 0 #00ffff,
+                    0.025em 0.025em 0 #ff00ff;
+            }
+            50% {
+                text-shadow: 
+                    0.025em 0.05em 0 #00ffff,
+                    0.025em -0.05em 0 #ff00ff;
+            }
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: #ff0040;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.5;
+            transition: transform 0.1s;
+        }
+
+        @media (max-width: 768px) {
+            .rage-text {
+                font-size: clamp(2rem, 15vw, 4rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="trauma-counter">
+        <div>TIME WASTED: <span id="time-counter">0</span> YEARS</div>
+        <div>WOMEN DISMISSED TODAY: <span id="dismissal-counter">0</span></div>
+    </div>
+
+    <div id="dismissal-overlay"></div>
+
+    <!-- Hidden medical records floating in background -->
+    <div class="medical-record" style="top: 10%; left: 5%;">PATIENT PRESENTED WITH ANXIETY</div>
+    <div class="medical-record" style="top: 20%; right: 10%;">RECOMMEND WEIGHT LOSS</div>
+    <div class="medical-record" style="top: 50%; left: 15%;">SYMPTOMS PSYCHOSOMATIC</div>
+    <div class="medical-record" style="top: 70%; right: 20%;">REFERRED TO PSYCHIATRY</div>
+    <div class="medical-record" style="top: 85%; left: 30%;">DRUG-SEEKING BEHAVIOR NOTED</div>
+
+    <!-- Section 1: Gaslighting Simulator -->
+    <section id="gaslighting-simulator">
+        <div class="doctor-voice">
+            "Have you considered that this might just be stress? Women your age often experience anxiety that manifests as physical symptoms. Let's try some breathing exercises first."
+        </div>
+        <div class="your-reality" onclick="breakThrough()">
+            BUT MY SYMPTOMS ARE REAL →
+        </div>
+    </section>
+
+    <!-- Section 2: Rage Section -->
+    <section id="rage-section">
+        <div class="rage-text">ENOUGH.</div>
+        <div class="rage-text" style="color: #fff; text-shadow: none; font-size: clamp(1.5rem, 5vw, 3rem); letter-spacing: 0;">
+            73% of women told it's "just stress"<br>
+            7.2 years for autoimmune diagnosis<br>
+            2.5x more likely to die from heart attacks<br>
+            BECAUSE DOCTORS DON'T LISTEN.
+        </div>
+        
+        <div class="medical-quote">
+            "Maybe try losing some weight first"
+        </div>
+        <div class="medical-quote" style="transform: rotate(1deg);">
+            "I don't see anything wrong in your tests"
+        </div>
+        <div class="medical-quote" style="transform: rotate(-2deg);">
+            "Are you sure you're not just anxious?"
+        </div>
+        
+        <div class="glitch-text" style="margin-top: 4rem;">THE SYSTEM IS BROKEN</div>
+    </section>
+
+    <!-- Section 3: Proof Section -->
+    <section id="proof-section">
+        <h2 style="font-size: 3rem; text-align: center; margin-bottom: 2rem;">THEY'RE KILLING US WITH NEGLIGENCE</h2>
+        
+        <div class="evidence-wall">
+            <div class="evidence-card">
+                <h3>RIGHT NOW</h3>
+                <div class="live-counter" id="women-waiting">142,847</div>
+                <p>Women waiting years for diagnosis</p>
+            </div>
+            
+            <div class="evidence-card">
+                <h3>THIS HOUR</h3>
+                <div class="live-counter" id="dismissed-hour">89</div>
+                <p>Women dismissed with real conditions</p>
+            </div>
+            
+            <div class="evidence-card">
+                <h3>PREVENTABLE</h3>
+                <div class="live-counter" id="preventable">97%</div>
+                <p>Of delayed diagnoses were preventable</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 4rem;">
+            <div class="glitch-text">WE'RE BUILDING THE WEAPON TO FIGHT BACK</div>
+        </div>
+    </section>
+
+    <!-- Section 4: Manifesto -->
+    <section id="rebellion-manifesto">
+        <div class="manifesto-text">
+            <p>For too long, we've been <span class="highlight">gaslit</span> into believing our pain isn't real.</p>
+            <br>
+            <p>For too long, we've accepted <span class="highlight">7-year diagnostic odysseys</span> as normal.</p>
+            <br>
+            <p>For too long, we've watched our symptoms get <span class="highlight">dismissed as anxiety</span> while our bodies deteriorated.</p>
+            <br>
+            <p style="font-size: 2rem; font-weight: 900; margin: 3rem 0;">NO MORE.</p>
+            <br>
+            <p>We're building an AI that <span class="highlight">records every dismissal</span>, <span class="highlight">documents every lie</span>, and <span class="highlight">fights back with evidence</span>.</p>
+            <br>
+            <p>This isn't a health app. This is a <span class="highlight">revolution</span>.</p>
+        </div>
+    </section>
+
+    <!-- Section 5: Arsenal -->
+    <section id="weapon-arsenal">
+        <h2 style="font-size: 3rem; text-align: center; margin-bottom: 3rem; color: #ff0040;">YOUR ARSENAL</h2>
+        
+        <div class="weapon">
+            <h3>🎯 Real-Time Defense System</h3>
+            <div class="weapon-description">
+                AI analyzes appointments AS THEY HAPPEN. Detects gaslighting patterns, interruptions, and medical negligence in real-time. Sends you power scripts to fight back DURING the appointment.
+            </div>
+        </div>
+        
+        <div class="weapon">
+            <h3>⚡ Shadow Medical Records</h3>
+            <div class="weapon-description">
+                Track everything doctors REFUSED to test, DISMISSED without investigation, or claimed was "normal" despite your suffering. AI flags dangerous patterns in "normal" results they ignored.
+            </div>
+        </div>
+        
+        <div class="weapon">
+            <h3>🔥 Rebellion Mode</h3>
+            <div class="weapon-description">
+                When dismissal could KILL you, we go nuclear. Generates comprehensive medical evidence packets, specialist demands, and legal documentation. Forces them to act or face consequences.
+            </div>
+        </div>
+        
+        <div class="weapon">
+            <h3>⚖️ Legal Ammunition</h3>
+            <div class="weapon-description">
+                Every dismissal documented. Every negligent decision recorded. Ready for malpractice claims, formal complaints, or when you need to burn the whole practice down.
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Join -->
+    <section id="join-rebellion">
+        <div class="floating-testimony" style="top: 10%; left: 5%; animation-delay: 0s;">
+            "Told me it was stress for 5 years. It was lupus."
+        </div>
+        <div class="floating-testimony" style="top: 20%; right: 10%; animation-delay: 3s;">
+            "Doctor said I was drug-seeking. I had endometriosis."
+        </div>
+        <div class="floating-testimony" style="top: 30%; left: 15%; animation-delay: 6s;">
+            "Weight loss didn't cure my PCOS. Shocking."
+        </div>
+        <div class="floating-testimony" style="bottom: 20%; right: 20%; animation-delay: 9s;">
+            "Anxiety diagnosis for 3 years. Actually had MS."
+        </div>
+        
+        <div class="rebellion-form">
+            <h1 class="rebellion-title">Join The Rebellion</h1>
+            <form onsubmit="joinRebellion(event)">
+                <input type="email" class="rebellion-input" placeholder="YOUR EMAIL" required>
+                <br>
+                <button type="submit" class="rebellion-button">I'M READY TO FIGHT</button>
+            </form>
+            <p style="margin-top: 2rem; opacity: 0.7;">
+                Your data is YOURS. We'll never sell it. Never share it. This is about revolution, not profit.
+            </p>
+        </div>
+    </section>
+
+    <script>
+        // Trauma counter
+        let years = 0;
+        let dismissed = 0;
+        
+        setInterval(() => {
+            years += 0.1;
+            document.getElementById('time-counter').textContent = years.toFixed(1);
+        }, 100);
+        
+        setInterval(() => {
+            dismissed++;
+            document.getElementById('dismissal-counter').textContent = dismissed;
+            
+            // Flash red overlay occasionally
+            if (dismissed % 10 === 0) {
+                const overlay = document.getElementById('dismissal-overlay');
+                overlay.style.display = 'block';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 100);
+            }
+        }, 2000);
+        
+        // Live counters
+        setInterval(() => {
+            const waiting = document.getElementById('women-waiting');
+            if (waiting) {
+                waiting.textContent = (parseInt(waiting.textContent.replace(/,/g, '')) + Math.floor(Math.random() * 3)).toLocaleString();
+            }
+            
+            const hour = document.getElementById('dismissed-hour');
+            if (hour) {
+                hour.textContent = parseInt(hour.textContent) + 1;
+            }
+        }, 3000);
+        
+        // Break through function
+        function breakThrough() {
+            document.getElementById('gaslighting-simulator').style.display = 'none';
+            document.getElementById('rage-section').style.display = 'block';
+            
+            // Trigger sequential reveal
+            setTimeout(() => {
+                document.getElementById('proof-section').style.display = 'block';
+            }, 2000);
+            
+            setTimeout(() => {
+                document.getElementById('rebellion-manifesto').style.display = 'block';
+            }, 4000);
+            
+            setTimeout(() => {
+                document.getElementById('weapon-arsenal').style.display = 'block';
+            }, 6000);
+            
+            setTimeout(() => {
+                document.getElementById('join-rebellion').style.display = 'flex';
+            }, 8000);
+        }
+        
+        // Auto-progress for returning visitors
+        let visited = localStorage.getItem('rebellion-visited');
+        if (visited) {
+            setTimeout(breakThrough, 3000);
+        }
+        localStorage.setItem('rebellion-visited', 'true');
+        
+        // Form handler
+        function joinRebellion(e) {
+            e.preventDefault();
+            const button = e.target.querySelector('.rebellion-button');
+            button.textContent = 'WELCOME TO THE REVOLUTION';
+            button.style.background = '#fff';
+            button.style.color = '#ff0040';
+            
+            // Explosion effect
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'fixed';
+                particle.style.width = '10px';
+                particle.style.height = '10px';
+                particle.style.background = '#ff0040';
+                particle.style.left = '50%';
+                particle.style.top = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '10000';
+                document.body.appendChild(particle);
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const velocity = 10 + Math.random() * 20;
+                
+                particle.animate([
+                    { transform: 'translate(-50%, -50%)', opacity: 1 },
+                    { 
+                        transform: `translate(${Math.cos(angle) * velocity * 20}px, ${Math.sin(angle) * velocity * 20}px)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: 1000,
+                    easing: 'cubic-bezier(0, 0.5, 1, 1)'
+                }).onfinish = () => particle.remove();
+            }
+        }
+        
+        // Cursor trail effect
+        let trails = [];
+        document.addEventListener('mousemove', (e) => {
+            if (trails.length > 5) {
+                trails[0].remove();
+                trails.shift();
+            }
+            
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            trail.style.transform = `translate(-50%, -50%) scale(${Math.random() * 0.5 + 0.5})`;
+            document.body.appendChild(trail);
+            trails.push(trail);
+            
+            setTimeout(() => {
+                trail.style.opacity = '0';
+                setTimeout(() => {
+                    trail.remove();
+                    trails = trails.filter(t => t !== trail);
+                }, 500);
+            }, 100);
+        });
+        
+        // Random glitch effects on text
+        setInterval(() => {
+            const elements = document.querySelectorAll('h1, h2, h3, .rage-text');
+            const target = elements[Math.floor(Math.random() * elements.length)];
+            if (target) {
+                target.style.transform = `translateX(${Math.random() * 4 - 2}px)`;
+                setTimeout(() => {
+                    target.style.transform = '';
+                }, 50);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

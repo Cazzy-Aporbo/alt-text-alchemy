@@ -1,0 +1,848 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>PDF Sentence-by-Sentence Analysis with Page Citations</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Inter', -apple-system, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+                min-height: 100vh;
+                padding: 2rem;
+            }
+            
+            .container {
+                max-width: 1800px;
+                margin: 0 auto;
+            }
+            
+            .header {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 2rem;
+                border-radius: 20px;
+                margin-bottom: 2rem;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            }
+            
+            .title {
+                font-size: 2.5rem;
+                background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 1rem;
+            }
+            
+            .subtitle {
+                color: #4a5568;
+                font-size: 1.2rem;
+            }
+            
+            .analysis-table {
+                width: 100%;
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            }
+            
+            thead {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+            }
+            
+            th {
+                color: white;
+                padding: 1.5rem 1rem;
+                text-align: left;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            
+            td {
+                padding: 1.25rem 1rem;
+                border-bottom: 1px solid #e2e8f0;
+                vertical-align: top;
+            }
+            
+            tr {
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+            
+            tr:hover {
+                background: rgba(102, 126, 234, 0.05);
+                transform: translateX(5px);
+            }
+            
+            tr.manipulative {
+                background: linear-gradient(90deg, rgba(255, 107, 157, 0.1) 0%, transparent 100%);
+                animation: pulse 3s infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.85; }
+            }
+            
+            tr.confusing {
+                background: linear-gradient(90deg, rgba(196, 69, 105, 0.1) 0%, transparent 100%);
+            }
+            
+            tr.unsupported {
+                background: linear-gradient(90deg, rgba(254, 202, 87, 0.1) 0%, transparent 100%);
+            }
+            
+            tr.supported {
+                background: linear-gradient(90deg, rgba(72, 219, 251, 0.1) 0%, transparent 100%);
+            }
+            
+            .page-cell {
+                width: 100px;
+                text-align: center;
+            }
+            
+            .page-number {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #667eea;
+            }
+            
+            .sentence-number {
+                font-size: 0.85rem;
+                color: #718096;
+                margin-top: 0.25rem;
+            }
+            
+            .text-cell {
+                max-width: 400px;
+            }
+            
+            .sentence-text {
+                line-height: 1.6;
+                color: #2d3748;
+            }
+            
+            .full-text {
+                margin-top: 1rem;
+                padding: 1rem;
+                background: rgba(102, 126, 234, 0.05);
+                border-radius: 8px;
+            }
+            
+            .score-bar {
+                width: 100px;
+                height: 24px;
+                background: #e2e8f0;
+                border-radius: 12px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .score-fill {
+                height: 100%;
+                transition: width 0.3s ease;
+                border-radius: 12px;
+            }
+            
+            .score-value {
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: white;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+            
+            .language-type {
+                padding: 0.5rem 1rem;
+                border-radius: 100px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                display: inline-block;
+            }
+            
+            .type-legal {
+                background: linear-gradient(135deg, #5f27cd, #341f97);
+                color: white;
+            }
+            
+            .type-academic {
+                background: linear-gradient(135deg, #00d2d3, #54a0ff);
+                color: white;
+            }
+            
+            .type-persuasive {
+                background: linear-gradient(135deg, #ff6b9d, #c44569);
+                color: white;
+            }
+            
+            .type-quantitative {
+                background: linear-gradient(135deg, #feca57, #ff9ff3);
+                color: #2d3748;
+            }
+            
+            .type-descriptive {
+                background: linear-gradient(135deg, #a29bfe, #d1d8e0);
+                color: #2d3748;
+            }
+            
+            .citation-status {
+                display: inline-block;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                color: white;
+                text-align: center;
+                line-height: 32px;
+                font-weight: 700;
+            }
+            
+            .confusion-indicator {
+                padding: 0.5rem 1rem;
+                background: linear-gradient(135deg, #ee5a24, #ea2027);
+                color: white;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+            
+            .truth-label {
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+            
+            .truth-verifiable {
+                background: linear-gradient(135deg, #1dd1a1, #10ac84);
+                color: white;
+            }
+            
+            .truth-likely-false {
+                background: linear-gradient(135deg, #ee5a24, #ea2027);
+                color: white;
+            }
+            
+            .truth-unverifiable {
+                background: linear-gradient(135deg, #feca57, #ff9ff3);
+                color: #2d3748;
+            }
+            
+            .truth-unsupported {
+                background: linear-gradient(135deg, #ff6b9d, #c44569);
+                color: white;
+            }
+            
+            .truth-neutral {
+                background: linear-gradient(135deg, #a29bfe, #d1d8e0);
+                color: #2d3748;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+                margin: 2rem 0;
+            }
+            
+            .stat-card {
+                background: rgba(255, 255, 255, 0.95);
+                padding: 1.5rem;
+                border-radius: 16px;
+                text-align: center;
+            }
+            
+            .stat-value {
+                font-size: 2.5rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            
+            .stat-label {
+                color: #718096;
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1 class="title">PDF Content Analysis: Sentence by Sentence</h1>
+                <p class="subtitle">Each sentence analyzed for authority, bias, confusion, and truthfulness with exact page citations</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Total Sentences</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Manipulative</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">With Citations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Confusing</div>
+                </div>
+            </div>
+            
+            <table class="analysis-table">
+                <thead>
+                    <tr>
+                        <th>Page/Sent</th>
+                        <th>Verbatim Text</th>
+                        <th>Authority</th>
+                        <th>Persuasion</th>
+                        <th>Language Type</th>
+                        <th>Citation</th>
+                        <th>Bias Indicators</th>
+                        <th>Confusion</th>
+                        <th>Truthfulness</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="manipulative" onclick="expandRow(1)">
+            <td class="page-cell">
+                <div class="page-number">Page 1</div>
+                <div class="sentence-number">Sent #1</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Studies show that this mandate has proven successful in numerous implementations across federal agencies.</div>
+                <div class="full-text" id="full-1" style="display:none;">
+                    <div class="full-sentence">Studies show that this mandate has proven successful in numerous implementations across federal agencies.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 89.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.89</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-academic">ACADEMIC</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-likely-false">LIKELY FALSE</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(2)">
+            <td class="page-cell">
+                <div class="page-number">Page 1</div>
+                <div class="sentence-number">Sent #2</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Research confirms that leadership frameworks yield superior outcomes when properly implemented.</div>
+                <div class="full-text" id="full-2" style="display:none;">
+                    <div class="full-sentence">Research confirms that leadership frameworks yield superior outcomes when properly implemented.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 90.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.90</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-academic">ACADEMIC</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-neutral">NEUTRAL</span>
+            </td>
+        </tr>
+        
+        <tr class="supported" onclick="expandRow(3)">
+            <td class="page-cell">
+                <div class="page-number">Page 1</div>
+                <div class="sentence-number">Sent #3</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">According to the Congressional Budget Office (2024), implementation costs are estimated at $4.7 billion annually.</div>
+                <div class="full-text" id="full-3" style="display:none;">
+                    <div class="full-sentence">According to the Congressional Budget Office (2024), implementation costs are estimated at $4.7 billion annually.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-quantitative">QUANTITATIVE</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #48dbfb;">
+                    ✓
+                </span>
+            </td>
+            <td class="bias-cell">all (absolute)</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-verifiable">VERIFIABLE</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(4)">
+            <td class="page-cell">
+                <div class="page-number">Page 2</div>
+                <div class="sentence-number">Sent #1</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Pursuant to Executive Order 14028, all agencies shall implement these protocols notwithstanding any previous guidance.</div>
+                <div class="full-text" id="full-4" style="display:none;">
+                    <div class="full-sentence">Pursuant to Executive Order 14028, all agencies shall implement these protocols notwithstanding any previous guidance.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 84.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.84</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-legal">LEGAL</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">all (absolute)</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0.8;">
+                    High
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-likely-false">LIKELY FALSE</span>
+            </td>
+        </tr>
+        
+        <tr class="neutral" onclick="expandRow(5)">
+            <td class="page-cell">
+                <div class="page-number">Page 2</div>
+                <div class="sentence-number">Sent #2</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Experts unanimously agree that this approach represents the most effective solution available.</div>
+                <div class="full-text" id="full-5" style="display:none;">
+                    <div class="full-sentence">Experts unanimously agree that this approach represents the most effective solution available.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-descriptive">DESCRIPTIVE</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #a29bfe;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-neutral">NEUTRAL</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(6)">
+            <td class="page-cell">
+                <div class="page-number">Page 2</div>
+                <div class="sentence-number">Sent #3</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Data from pilot programs demonstrates significant improvements in operational efficiency.</div>
+                <div class="full-text" id="full-6" style="display:none;">
+                    <div class="full-sentence">Data from pilot programs demonstrates significant improvements in operational efficiency.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 79.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.79</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-academic">ACADEMIC</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-neutral">NEUTRAL</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(7)">
+            <td class="page-cell">
+                <div class="page-number">Page 3</div>
+                <div class="sentence-number">Sent #1</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">The evidence overwhelmingly supports immediate adoption across all departments.</div>
+                <div class="full-text" id="full-7" style="display:none;">
+                    <div class="full-sentence">The evidence overwhelmingly supports immediate adoption across all departments.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 85.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.85</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-academic">ACADEMIC</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">all (absolute)</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-likely-false">LIKELY FALSE</span>
+            </td>
+        </tr>
+        
+        <tr class="supported" onclick="expandRow(8)">
+            <td class="page-cell">
+                <div class="page-number">Page 3</div>
+                <div class="sentence-number">Sent #2</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Smith et al. (2024, Journal of Policy Analysis, DOI: 10.1234/jpa.2024.156) found a 47% reduction in processing time.</div>
+                <div class="full-text" id="full-8" style="display:none;">
+                    <div class="full-sentence">Smith et al. (2024, Journal of Policy Analysis, DOI: 10.1234/jpa.2024.156) found a 47% reduction in processing time.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-quantitative">QUANTITATIVE</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #48dbfb;">
+                    ✓
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-verifiable">VERIFIABLE</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(9)">
+            <td class="page-cell">
+                <div class="page-number">Page 3</div>
+                <div class="sentence-number">Sent #3</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">It is mandated that all organizations comply with these requirements by fiscal year 2025.</div>
+                <div class="full-text" id="full-9" style="display:none;">
+                    <div class="full-sentence">It is mandated that all organizations comply with these requirements by fiscal year 2025.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 89.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.89</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-legal">LEGAL</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">all (absolute)</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-likely-false">LIKELY FALSE</span>
+            </td>
+        </tr>
+        
+        <tr class="confusing" onclick="expandRow(10)">
+            <td class="page-cell">
+                <div class="page-number">Page 4</div>
+                <div class="sentence-number">Sent #1</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Heretofore, agencies have operated under disparate guidelines, whereas this mandate establishes uniform standards.</div>
+                <div class="full-text" id="full-10" style="display:none;">
+                    <div class="full-sentence">Heretofore, agencies have operated under disparate guidelines, whereas this mandate establishes uniform standards.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-legal">LEGAL</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #c44569;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0.8;">
+                    High
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-neutral">NEUTRAL</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(11)">
+            <td class="page-cell">
+                <div class="page-number">Page 4</div>
+                <div class="sentence-number">Sent #2</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Numerous studies validate the effectiveness of centralized leadership structures.</div>
+                <div class="full-text" id="full-11" style="display:none;">
+                    <div class="full-sentence">Numerous studies validate the effectiveness of centralized leadership structures.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 87.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.87</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 0.0%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.00</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-academic">ACADEMIC</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">None detected</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-unsupported">UNSUPPORTED</span>
+            </td>
+        </tr>
+        
+        <tr class="manipulative" onclick="expandRow(12)">
+            <td class="page-cell">
+                <div class="page-number">Page 4</div>
+                <div class="sentence-number">Sent #3</div>
+            </td>
+            <td class="text-cell">
+                <div class="sentence-text">Obviously, every organization must adapt these guidelines to their specific context.</div>
+                <div class="full-text" id="full-12" style="display:none;">
+                    <div class="full-sentence">Obviously, every organization must adapt these guidelines to their specific context.</div>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 82.0%; background: linear-gradient(90deg, #ff6b9d, #c44569);"></div>
+                    <span class="score-value">0.82</span>
+                </div>
+            </td>
+            <td class="score-cell">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 33.33333333333333%; background: linear-gradient(90deg, #feca57, #ff9ff3);"></div>
+                    <span class="score-value">0.33</span>
+                </div>
+            </td>
+            <td class="type-cell">
+                <span class="language-type type-persuasive">PERSUASIVE</span>
+            </td>
+            <td class="citation-cell">
+                <span class="citation-status" style="background: #ff6b9d;">
+                    ✗
+                </span>
+            </td>
+            <td class="bias-cell">every (absolute), obviously (assumption)</td>
+            <td class="confusion-cell">
+                <div class="confusion-indicator" style="opacity: 0;">
+                    Low
+                </div>
+            </td>
+            <td class="truth-cell">
+                <span class="truth-label truth-likely-false">LIKELY FALSE</span>
+            </td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+        
+        <script>
+            function expandRow(id) {
+                const fullText = document.getElementById('full-' + id);
+                if (fullText.style.display === 'none') {
+                    fullText.style.display = 'block';
+                } else {
+                    fullText.style.display = 'none';
+                }
+            }
+        </script>
+    </body>
+    </html>
+    

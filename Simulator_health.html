@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Research · Digital Twin — Prototype</title>
+
+<!--
+QA CHECKLIST (acceptance criteria)
+[Performance]
+- Single HTML file, no frameworks/CDNs, minimal JS; CSS animations disabled in Reduced Motion.
+- Avoids layout thrash; throttled scroll parallax.
+[Accessibility]
+- WCAG 2.2 AA contrast; keyboard focus states; ARIA labels on nav, sliders, and buttons.
+- Reduced Motion toggle, Dyslexia Mode (wider letter spacing, increased line-height).
+- Color-blind-friendly palette; not red/green dependent.
+[Safety]
+- Education-only disclaimer; non-diagnostic language; no PHI required.
+- Image sharing or uploads not included in this demo; HIPAA-aware copy.
+[Functionality]
+- Tabs: Overview, Twin, Inputs, What-If, Predictions, Algorithms, Explainability, FAQ.
+- Auto-compute on slider move; working buttons: Compute, Reset, Pre-Visit Brief (download).
+- What-If presets + manual deltas; Apply Scenario changes state; rationale text.
+- Predictions show KPIs, Top Drivers, Protectors, Uncertainty badge.
+- Explainability shows feature contributions.
+- Guided Tour works.
+-->
+
+<style>
+  :root{
+    --indigo:#100a27;
+    --ink:#EDE9FF;
+    --muted:#CFC7F7;
+    --accent:#FF6FB5;   /* rose */
+    --orchid:#8A7CFF;   /* orchid */
+    --teal:#35E6C8;     /* teal */
+    --gold:#F3C969;
+    --ok:#21c07a;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+    --card:rgba(255,255,255,0.10);
+    --card2:rgba(255,255,255,0.14);
+    --border:rgba(255,255,255,0.22);
+    --focus:#A5B4FC;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto,Helvetica,Arial;
+    color:var(--ink);
+    background: #0a0a16; /* fallback if no image */
+    background-image: url(BACKGROUND_IMAGE_URL);
+    background-size: cover; background-position:center; background-attachment: fixed;
+  }
+  .reduced-motion *{animation:none !important; transition:none !important}
+  .dyslexia{letter-spacing:.3px; line-height:1.6}
+
+  /* Vignette & parallax */
+  .vignette{position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(900px 620px at 60% 35%, rgba(138,124,255,.22), transparent 55%),
+      radial-gradient(800px 600px at 20% 80%, rgba(255,111,181,.10), transparent 60%),
+      linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.70));
+  }
+
+  /* Nav */
+  .nav{position:fixed; left:0; right:0; top:0; z-index:30;
+      background:rgba(10,10,22,.65); backdrop-filter: blur(12px);
+      border-bottom:1px solid var(--border);}
+  .nav-inner{max-width:1200px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .brand{font-weight:900; letter-spacing:.4px;
+         background:linear-gradient(135deg,var(--orchid),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap}
+  .tab{cursor:pointer; padding:10px 14px; border-radius:999px; border:1px solid var(--border);
+       background:rgba(255,255,255,.07); color:#f1efff; font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.6px}
+  .tab:hover{border-color:#c4b5fd}
+  .tab.active{background:linear-gradient(135deg,rgba(138,124,255,.28),rgba(255,111,181,.20)); color:#fff}
+  .toggles{margin-left:auto; display:flex; gap:8px}
+  .toggle{padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,.06); cursor:pointer; font-weight:800}
+
+  /* Container & sections */
+  .container{max-width:1200px; margin:0 auto; padding:96px 18px 90px}
+  .section{display:none} .section.active{display:block}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .card + .card{margin-top:12px}
+  .grid{display:grid; gap:16px}
+  .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media (max-width:980px){.g-3,.g-2{grid-template-columns:1fr}}
+
+  .title-xl{font-size:34px; font-weight:900; letter-spacing:-.4px; margin:0 0 8px}
+  .subtitle{margin:0 0 12px; color:var(--muted)}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{padding:8px 10px; border-radius:999px; border:1px solid var(--border); background:rgba(255,255,255,.08); font-size:12px; font-weight:800}
+
+  .row{display:flex; align-items:center; gap:10px; justify-content:space-between; margin:8px 0}
+  .lbl{font-size:13px}
+  .val{font-weight:900; min-width:52px; text-align:right}
+  .slider{width:100%}
+  .tip{font-size:11px; color:var(--muted)}
+
+  .btn{padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,.08); color:#fff; font-weight:900; cursor:pointer}
+  .btn:hover{transform:translateY(-1px); border-color:#a78bfa}
+  .btn.primary{background:linear-gradient(135deg, rgba(138,124,255,.35), rgba(53,230,200,.25)); border-color:#c4b5fd}
+  .btn.ghost{background:rgba(255,255,255,.04)}
+
+  .kpi{padding:12px; border-radius:12px; background:var(--card2); border:1px solid var(--border)}
+  .kpi .k{font-size:28px; font-weight:900}
+  .kpi .l{font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:#d9d4ff; opacity:.9}
+  .bar{height:8px; background:rgba(255,255,255,.10); border-radius:6px; overflow:hidden; margin-top:6px}
+  .fill{height:100%; background:linear-gradient(90deg, var(--accent), var(--orchid), var(--teal)); width:0%; transition:width .35s ease}
+
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; background:rgba(0,0,0,.45);
+        border:1px dashed var(--border); border-radius:10px; padding:12px; white-space:pre-wrap; color:#efeaff}
+
+  /* Twin visual */
+  .twin-stage{position:relative; height:540px; display:flex; align-items:center; justify-content:center}
+  .silhouette{position:relative; width:280px; height:440px; border-radius:140px; background:
+      radial-gradient(70% 90% at 50% 35%, rgba(255,255,255,.15), rgba(255,255,255,.02) 60%),
+      linear-gradient(180deg, rgba(138,124,255,.24), rgba(53,230,200,.18));
+      box-shadow: inset 0 0 50px rgba(255,255,255,.05), 0 15px 60px rgba(138,124,255,.25)}
+  .silhouette:before,.silhouette:after{content:""; position:absolute; left:50%; transform:translateX(-50%); border-radius:50%;
+      background:radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.08), transparent 70%)}
+  .silhouette:before{top:-70px; width:220px; height:220px}
+  .silhouette:after{bottom:-90px; width:230px; height:230px}
+
+  .heart{position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
+      width:40px; height:40px; background:radial-gradient(circle at 30% 30%, #ff9acb, #ff2e85);
+      clip-path:path('M16.7 29 C12 24 4 19 4 11 a7 7 0 0 1 12-4 a7 7 0 0 1 12 4 c0 8-8 13-12.7 18z');
+      filter:drop-shadow(0 0 14px rgba(255,47,133,.85)); animation:beat 1.2s ease-in-out infinite}
+  @keyframes beat{0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.22)}}
+  .orbit{position:absolute; width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 10px var(--teal)}
+  .o1{animation:orbit 7s linear infinite} .o2{animation:orbit 9s linear infinite} .o3{animation:orbit 11s linear infinite}
+  @keyframes orbit{from{transform:rotate(0deg) translateX(130px) rotate(0)} to{transform:rotate(360deg) translateX(130px) rotate(-360deg)}}
+
+  /* Uncertainty badge */
+  .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:rgba(255,255,255,.08); font-weight:800}
+  .dot{width:8px; height:8px; border-radius:50%}
+  .dot.low{background:var(--ok)} .dot.med{background:var(--warn)} .dot.high{background:var(--bad)}
+
+  /* Status ribbon */
+  .status{position:fixed; left:0; right:0; bottom:0; z-index:25; background:rgba(10,10,22,.75); backdrop-filter:blur(10px);
+          border-top:1px solid var(--border); display:flex; gap:12px; align-items:center; justify-content:center; padding:10px}
+  .pill{display:flex; gap:8px; align-items:center; background:rgba(255,255,255,.08); border:1px solid var(--border); border-radius:999px; padding:8px 12px; font-weight:900}
+
+  /* Focus */
+  :focus-visible{outline:2px dashed var(--focus); outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="vignette" aria-hidden="true"></div>
+
+<nav class="nav" role="navigation" aria-label="Primary">
+  <div class="nav-inner">
+    <div class="brand" aria-label="Digital Twin">Health Simulator · Digital Twin</div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Sections">
+      <button class="tab active" data-target="overview" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
+      <button class="tab" data-target="twin" role="tab" aria-controls="twin" aria-selected="false">Twin</button>
+      <button class="tab" data-target="inputs" role="tab" aria-controls="inputs" aria-selected="false">Inputs</button>
+      <button class="tab" data-target="simulator" role="tab" aria-controls="simulator" aria-selected="false">What-If</button>
+      <button class="tab" data-target="predictions" role="tab" aria-controls="predictions" aria-selected="false">Predictions</button>
+      <button class="tab" data-target="algorithms" role="tab" aria-controls="algorithms" aria-selected="false">Algorithms</button>
+      <button class="tab" data-target="explain" role="tab" aria-controls="explain" aria-selected="false">Explainability</button>
+      <button class="tab" data-target="faq" role="tab" aria-controls="faq" aria-selected="false">FAQ</button>
+      <button class="tab" id="tour" role="button" aria-label="Start guided tour">Start Tour</button>
+    </div>
+    <div class="toggles">
+      <button class="toggle" id="t-reduced" aria-pressed="false" title="Reduce motion animations">Reduce Motion</button>
+      <button class="toggle" id="t-dyslexia" aria-pressed="false" title="Dyslexia Mode">Dyslexia Mode</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container" id="app" aria-live="polite">
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="section active" role="region" aria-labelledby="h-overview">
+    <div class="card">
+      <h1 id="h-overview" class="title-xl">Your Virtual Twin</h1>
+      <p class="subtitle">A calming, whole-body model that learns from everyday patterns and simulates safe “what-if” futures. <b>Education-only · Non-diagnostic</b> · Privacy-first.</p>
+      <div class="chips" title="Determinants of Health">
+        <div class="chip" data-tip="Biometrics, cycle, symptoms">Biology</div>
+        <div class="chip" data-tip="Sleep, activity, hydration, caffeine">Behavior</div>
+        <div class="chip" data-tip="Air quality, noise, temperature">Environment</div>
+        <div class="chip" data-tip="Support networks, workload">Social</div>
+        <div class="chip" data-tip="Stress, mood">Psychological</div>
+        <div class="chip" data-tip="Values-work fit, time pressure, chronotype mismatch">Life-Alignment</div>
+      </div>
+    </div>
+
+    <div class="grid g-3" aria-label="Key indicators">
+      <div class="card kpi"><div class="l">Life-Alignment Index</div><div class="k" id="k-life">–</div><div class="bar"><div id="bar-life" class="fill"></div></div></div>
+      <div class="card kpi"><div class="l">Symptom Escalation Risk</div><div class="k" id="k-risk">–</div><div class="bar"><div id="bar-risk" class="fill"></div></div></div>
+      <div class="card kpi"><div class="l">Cardio Load (Windkessel)</div><div class="k" id="k-cardio">–</div><div class="bar"><div id="bar-cardio" class="fill"></div></div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 6px">How to use</h3>
+      <p class="subtitle">1) Adjust sliders in <b>Inputs</b> — predictions update instantly. 2) Try <b>What-If</b> presets or craft your own. 3) Review <b>Predictions</b> with top drivers, protectors, and uncertainty. 4) Download a <b>Pre-Visit Brief</b> for your provider.</p>
+      <button class="btn primary" onclick="go('inputs')">Jump to Inputs</button>
+    </div>
+  </section>
+
+  <!-- TWIN -->
+  <section id="twin" class="section" role="region" aria-labelledby="h-twin">
+    <div class="card">
+      <h2 id="h-twin" class="title-xl">Twin Visualization</h2>
+      <div class="twin-stage" aria-label="Female virtual twin visualization">
+        <div class="silhouette">
+          <div class="heart" aria-label="Heart (animated)"></div>
+          <div class="orbit o1" style="top:30%; left:50%"></div>
+          <div class="orbit o2" style="top:70%; left:50%"></div>
+          <div class="orbit o3" style="top:50%; left:50%"></div>
+        </div>
+      </div>
+      <p class="subtitle">The heart drives a gentle rhythm; ribbons (not shown in this minimal demo) can depict hormones, stress, and environmental halos.</p>
+    </div>
+  </section>
+
+  <!-- INPUTS -->
+  <section id="inputs" class="section" role="region" aria-labelledby="h-inputs">
+    <div class="grid g-2">
+      <div class="card">
+        <h2 id="h-inputs" class="title-xl">Biological & Behavioral</h2>
+        <div class="row"><div class="lbl">Cycle day</div><input aria-label="Cycle day" class="slider" id="cycle" type="range" min="1" max="28" value="14"/><div class="val" id="v-cycle">14</div></div>
+        <div class="tip">Hormonal variability often peaks around late-luteal; affects risk.</div>
+        <div class="row"><div class="lbl">Sleep (h)</div><input aria-label="Sleep hours" class="slider" id="sleep" type="range" min="3" max="10" value="7"/><div class="val" id="v-sleep">7</div></div>
+        <div class="row"><div class="lbl">Activity (min)</div><input aria-label="Activity minutes" class="slider" id="activity" type="range" min="0" max="120" value="35"/><div class="val" id="v-activity">35</div></div>
+        <div class="row"><div class="lbl">Hydration (glasses)</div><input aria-label="Hydration glasses" class="slider" id="hydration" type="range" min="0" max="12" value="6"/><div class="val" id="v-hydration">6</div></div>
+        <div class="row"><div class="lbl">Caffeine (mg)</div><input aria-label="Caffeine mg" class="slider" id="caffeine" type="range" min="0" max="500" value="120"/><div class="val" id="v-caffeine">120</div></div>
+      </div>
+      <div class="card">
+        <h2 class="title-xl">Environment · Social · Psychological · Life-Alignment</h2>
+        <div class="row"><div class="lbl">Air Quality Index</div><input aria-label="Air Quality Index" class="slider" id="aqi" type="range" min="0" max="250" value="70"/><div class="val" id="v-aqi">70</div></div>
+        <div class="row"><div class="lbl">Noise exposure</div><input aria-label="Noise exposure" class="slider" id="noise" type="range" min="0" max="100" value="30"/><div class="val" id="v-noise">30</div></div>
+        <div class="row"><div class="lbl">Stress</div><input aria-label="Stress level" class="slider" id="stress" type="range" min="0" max="100" value="45"/><div class="val" id="v-stress">45</div></div>
+        <div class="row"><div class="lbl">Mood (−100..+100)</div><input aria-label="Mood" class="slider" id="mood" type="range" min="-100" max="100" value="10"/><div class="val" id="v-mood">10</div></div>
+        <div class="row"><div class="lbl">Support</div><input aria-label="Support" class="slider" id="support" type="range" min="0" max="100" value="70"/><div class="val" id="v-support">70</div></div>
+        <div class="row"><div class="lbl">Chronotype mismatch (h)</div><input aria-label="Chronotype mismatch hours" class="slider" id="mismatch" type="range" min="0" max="6" value="2"/><div class="val" id="v-mismatch">2</div></div>
+        <div class="row"><div class="lbl">Values/Work fit</div><input aria-label="Values work fit" class="slider" id="fit" type="range" min="0" max="100" value="68"/><div class="val" id="v-fit">68</div></div>
+        <div class="row"><div class="lbl">Time pressure</div><input aria-label="Time pressure" class="slider" id="pressure" type="range" min="0" max="100" value="55"/><div class="val" id="v-pressure">55</div></div>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:12px">
+      <button class="btn primary" id="btn-compute" title="Recompute from sliders">Compute Predictions</button>
+      <button class="btn" id="btn-brief" title="Create provider-ready notes">Generate & Download Pre-Visit Brief</button>
+      <button class="btn ghost" id="btn-reset" title="Restore defaults">Reset</button>
+    </div>
+  </section>
+
+  <!-- WHAT-IF -->
+  <section id="simulator" class="section" role="region" aria-labelledby="h-sim">
+    <div class="card">
+      <h2 id="h-sim" class="title-xl">What-If Scenario Builder</h2>
+      <p class="subtitle">Experiment with micro-changes and see predicted impact with plain-language rationale.</p>
+      <div class="grid g-3">
+        <div class="card">
+          <h4 style="margin:0 0 6px">Preset scenarios</h4>
+          <select id="preset" aria-label="Scenario presets" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,.06); color:#fff; font-weight:700">
+            <option value="none">Choose a preset…</option>
+            <option value="travel">Travel week (jet lag + low sleep)</option>
+            <option value="aqi">High AQI day (poor air quality)</option>
+            <option value="cd26">Cycle day 26 (late-luteal sensitivity)</option>
+            <option value="reset">Back to baseline</option>
+          </select>
+          <div class="row"><div class="lbl">+ Sleep (h)</div><input class="slider" id="w-sleep" type="range" min="0" max="3" value="1"/><div class="val" id="wv-sleep">+1</div></div>
+          <div class="row"><div class="lbl">− Caffeine (mg)</div><input class="slider" id="w-caf" type="range" min="0" max="300" value="100"/><div class="val" id="wv-caf">−100</div></div>
+          <div class="row"><div class="lbl">AQI improvement</div><input class="slider" id="w-aqi" type="range" min="0" max="100" value="30"/><div class="val" id="wv-aqi">−30</div></div>
+          <div class="row"><div class="lbl">+ Activity (min)</div><input class="slider" id="w-act" type="range" min="0" max="60" value="20"/><div class="val" id="wv-act">+20</div></div>
+          <div class="row"><div class="lbl">Stress relief</div><input class="slider" id="w-stress" type="range" min="0" max="50" value="15"/><div class="val" id="wv-stress">−15</div></div>
+          <div style="display:flex; gap:10px; margin-top:10px">
+            <button class="btn primary" id="btn-run">Run Simulation</button>
+            <button class="btn" id="btn-apply">Apply Scenario</button>
+          </div>
+        </div>
+        <div class="card">
+          <h4 style="margin:0 0 6px">Projected change</h4>
+          <div class="row"><div class="lbl">Risk ↓</div><div class="val" id="sim-risk">–</div></div>
+          <div class="row"><div class="lbl">Cardio Load ↓</div><div class="val" id="sim-cardio">–</div></div>
+          <div class="row"><div class="lbl">Life-Alignment ↑</div><div class="val" id="sim-life">–</div></div>
+          <div class="bar"><div id="sim-bar" class="fill" style="width:0%"></div></div>
+          <div style="margin-top:10px" id="uncert-wrap">
+            <span class="badge" id="uncert"><span class="dot med" id="uncert-dot"></span><span id="uncert-text">Uncertainty: Medium — based on limited coverage</span></span>
+          </div>
+        </div>
+        <div class="card">
+          <h4 style="margin:0 0 6px">Plain-language rationale</h4>
+          <div class="code" id="sim-explain">Choose a preset or adjust sliders, then click “Run Simulation”.</div>
+          <div class="tip" id="sim-why"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREDICTIONS -->
+  <section id="predictions" class="section" role="region" aria-labelledby="h-pred">
+    <div class="grid g-3">
+      <div class="card">
+        <h2 id="h-pred" class="title-xl">Symptom Escalation Risk</h2>
+        <div class="kpi"><div class="k" id="p-risk-k">–</div><div class="bar"><div id="p-risk-bar" class="fill"></div></div></div>
+        <p class="subtitle" id="p-risk-note">Drivers & protectors appear after compute.</p>
+      </div>
+      <div class="card">
+        <h2 class="title-xl">Cardio Load (Windkessel proxy)</h2>
+        <div class="kpi"><div class="k" id="p-cardio-k">–</div><div class="bar"><div id="p-cardio-bar" class="fill"></div></div></div>
+        <p class="subtitle">Heuristic from caffeine, stress, sleep debt & activity (educational only).</p>
+      </div>
+      <div class="card">
+        <h2 class="title-xl">Pre-Visit Brief</h2>
+        <div class="code" id="brief">Use “Generate & Download Pre-Visit Brief”.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALGORITHMS -->
+  <section id="algorithms" class="section" role="region" aria-labelledby="h-algo">
+    <div class="card">
+      <h2 id="h-algo" class="title-xl">Model Mapping (illustrative)</h2>
+      <p class="subtitle">Educational mapping of determinants → algorithm families (neuro/physio + ML/LLM).</p>
+      <div class="grid g-3">
+        <div class="card">
+          <h4>Neural / Cognitive</h4>
+          <ul>
+            <li>Hodgkin–Huxley, Izhikevich — neuronal excitability</li>
+            <li>Wilson–Cowan — stress–recovery oscillations</li>
+            <li>Dynamic Causal Modeling — connectivity explanations</li>
+            <li>Global Workspace motifs — attention/overload</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Cardio / Respiratory</h4>
+          <ul>
+            <li>Guyton circulation — systemic balance</li>
+            <li>Windkessel — arterial compliance → “Cardio Load”</li>
+            <li>Lumped lung models — exposure → breath ease</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Learning & Inference</h4>
+          <ul>
+            <li>Bayesian updating — confidence & uncertainty</li>
+            <li>LLM reasoning — plain-language pattern tiles</li>
+            <li>Multimodal fusion — text + wearable + environment</li>
+          </ul>
+        </div>
+      </div>
+      <h4>Formulas used here (heuristic)</h4>
+      <div class="code" id="formulas"></div>
+    </div>
+  </section>
+
+  <!-- EXPLAINABILITY -->
+  <section id="explain" class="section" role="region" aria-labelledby="h-explain">
+    <div class="grid g-2">
+      <div class="card">
+        <h2 id="h-explain" class="title-xl">Feature Contributions</h2>
+        <div class="code" id="contri">Move any slider — contributions update automatically.</div>
+      </div>
+      <div class="card">
+        <h2 class="title-xl">Safety & Limits</h2>
+        <ul>
+          <li>Education-only; not diagnostic or treatment advice.</li>
+          <li>Minimal inputs; no PHI required for this demo.</li>
+          <li>Uncertainty surfaced; confidence depends on coverage & conflicts.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="section" role="region" aria-labelledby="h-faq">
+    <div class="card">
+      <h2 id="h-faq" class="title-xl">Frequently Asked Questions</h2>
+      <details open><summary>Is this a medical device?</summary><p class="subtitle">No. This demo is educational and non-prescriptive.</p></details>
+      <details><summary>How do you combine determinants?</summary><p class="subtitle">We normalize inputs, apply literature-inspired weights, and compute composite scores; see “Algorithms → Formulas.”</p></details>
+      <details><summary>How do what-ifs work?</summary><p class="subtitle">We apply slider deltas to inputs, recompute scores, and show direction + magnitude with a plain-language rationale.</p></details>
+      <details><summary>Privacy?</summary><p class="subtitle">Runs locally in your browser. Production architecture is HIPAA-aligned with minimal PII.</p></details>
+    </div>
+  </section>
+
+</main>
+
+<!-- Live Status Ribbon -->
+<div class="status" role="status" aria-live="polite">
+  <div class="pill">Life-Alignment: <span id="stat-life" style="margin-left:6px">–</span></div>
+  <div class="pill">Risk: <span id="stat-risk" style="margin-left:6px">–</span></div>
+  <div class="pill">Cardio Load: <span id="stat-cardio" style="margin-left:6px">–</span></div>
+</div>
+
+<!-- Design Tokens (for AI/designers) -->
+<script id="design-tokens" type="application/json">
+{
+  "colors": {
+    "background":"#0a0a16",
+    "indigo":"#100a27",
+    "ink":"#EDE9FF",
+    "muted":"#CFC7F7",
+    "accent":"#FF6FB5",
+    "orchid":"#8A7CFF",
+    "teal":"#35E6C8",
+    "gold":"#F3C969",
+    "ok":"#21c07a",
+    "warn":"#f59e0b",
+    "bad":"#ef4444",
+    "border":"rgba(255,255,255,0.22)"
+  },
+  "radii":{"xs":6,"sm":10,"md":12,"lg":16,"xl":20},
+  "spacing":{"xs":6,"sm":10,"md":12,"lg":16,"xl":20},
+  "shadows":{"soft":"0 10px 30px rgba(0,0,0,.25)"},
+  "type":{"base":"system-ui","mono":"ui-monospace","sizes":{"sm":12,"base":14,"lg":16,"xl":20,"xxl":34}}
+}
+</script>
+
+<script>
+  /* ---------- Parallax scroll (throttled) ---------- */
+  let ticking=false;
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){
+      window.requestAnimationFrame(()=>{
+        const y=window.scrollY || 0;
+        document.body.style.backgroundPosition = `center calc(50% + ${y*0.05}px)`;
+        ticking=false;
+      });
+      ticking=true;
+    }
+  });
+
+  /* ---------- Tabs & navigation ---------- */
+  function go(id){
+    document.querySelectorAll(".tab").forEach(b=>{
+      const active = b.dataset.target===id;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+  document.querySelectorAll(".tab[data-target]").forEach(btn=> btn.addEventListener("click",()=>go(btn.dataset.target)));
+
+  // Accessibility toggles
+  const appEl=document.getElementById("app");
+  document.getElementById("t-reduced").addEventListener("click", (e)=>{
+    const on=appEl.classList.toggle("reduced-motion");
+    e.currentTarget.setAttribute("aria-pressed", on);
+  });
+  document.getElementById("t-dyslexia").addEventListener("click", (e)=>{
+    const on=appEl.classList.toggle("dyslexia");
+    e.currentTarget.setAttribute("aria-pressed", on);
+  });
+
+  // Guided tour
+  document.getElementById("tour").addEventListener("click", ()=>{
+    go("inputs");
+    setTimeout(()=>{
+      alert("1) Adjust sliders in Inputs — metrics update instantly.\n2) Open What-If for presets or custom deltas.\n3) View Predictions for KPIs, top drivers & protectors, and uncertainty.\n4) Generate a Pre-Visit Brief and download it.");
+    }, 50);
+  });
+
+  /* ---------- Helpers ---------- */
+  const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+  const sig   =(z)=>1/(1+Math.exp(-z));
+  const round =(x,n=2)=>Number(x).toFixed(n);
+
+  /* ---------- State ---------- */
+  const state = {
+    cycle:14, sleep:7, activity:35, hydration:6, caffeine:120,
+    aqi:70, noise:30, stress:45, mood:10, support:70,
+    mismatch:2, fit:68, pressure:55
+  };
+
+  /* ---------- Bind sliders (auto-compute) ---------- */
+  function bind(id){
+    const el  = document.getElementById(id);
+    const out = document.getElementById("v-"+id);
+    const set = v => { state[id]=Number(v); out.textContent=v; computeAll(); };
+    set(el.value);
+    el.addEventListener("input", e=> set(e.target.value));
+  }
+  ["cycle","sleep","activity","hydration","caffeine","aqi","noise","stress","mood","support","mismatch","fit","pressure"].forEach(bind);
+
+  /* ---------- Heuristic formulas (educational) ---------- */
+  function lifeAlignment(s){
+    const score = 0.35*s.fit + 0.20*(100 - s.pressure) + 0.20*(100 - s.mismatch*16.7) +
+                  0.15*s.support + 0.10*((clamp(s.mood,-100,100)+100)/2);
+    return clamp(score,0,100);
+  }
+  function cardioLoad(s){
+    const sleepDebt = clamp(8 - s.sleep, 0, 6);
+    const z = 0.35*(s.caffeine/400) + 0.25*(s.stress/100) + 0.20*(sleepDebt/6) +
+              0.10*(1 - s.activity/120) + 0.10*(1 - s.hydration/12);
+    return clamp(z,0,1);
+  }
+  function riskScore(s){
+    const hormonal = Math.max(0, Math.sin((s.cycle/28)*Math.PI*2 - Math.PI/6));
+    const sleepDebt = clamp(8 - s.sleep, 0, 6)/6;
+    const env = 0.6*(s.aqi/250) + 0.4*(s.noise/100);
+    const protect = 0.5*(s.activity/120) + 0.5*(s.hydration/12);
+    const psycho = 0.6*(s.stress/100) + 0.4*((100 - clamp(s.mood,-100,100))/200);
+    const lifeMis = (s.pressure/100)*0.5 + (s.mismatch/6)*0.3 + ((100 - s.fit)/100)*0.2;
+    const z = 1.3*hormonal + 0.9*sleepDebt + 0.9*psycho + 0.6*env - 0.8*protect + 0.7*lifeMis;
+    return clamp(sig(z-1.5), 0, 1);
+  }
+
+  /* ---------- Uncertainty (toy) ---------- */
+  function uncertaintyScore(s){
+    // Coverage: distance from mid-range; Conflict: inconsistent signals
+    const mid = {
+      sleep:7, activity:45, hydration:8, caffeine:150, aqi:60, noise:35, stress:40, mood:0, support:60, mismatch:1, fit:70, pressure:50
+    };
+    let coverage = 0;
+    const keys = Object.keys(mid);
+    keys.forEach(k=>{
+      const span = (k==="mood")?200: (k==="caffeine"?500: (k==="activity"?120:(k==="hydration"?12:(k==="aqi"?250:(k==="mismatch"?6:100)))));
+      const d = Math.abs((s[k] - mid[k]) / (span||100));
+      coverage += d;
+    });
+    coverage = coverage/keys.length; // 0..~0.5
+
+    // Conflict: high caffeine + high sleep, high stress + positive mood, high AQI + high activity outdoors (proxy)
+    let conflict = 0;
+    if (s.caffeine>300 && s.sleep>=8) conflict += 0.3;
+    if (s.stress>70 && s.mood>20) conflict += 0.3;
+    if (s.aqi>180 && s.activity>60) conflict += 0.3;
+
+    const u = clamp(coverage*1.2 + conflict, 0, 1);
+    return u; // 0 low → 1 high
+  }
+
+  /* ---------- Contributions ---------- */
+  function contributors(){
+    const s = state;
+    const feats = [
+      {name:"Stress", w:0.9,  x:s.stress/100},
+      {name:"Sleep debt", w:0.9,  x:clamp(8 - s.sleep, 0, 6)/6},
+      {name:"Hormonal variability", w:1.3, x:Math.max(0, Math.sin((s.cycle/28)*Math.PI*2 - Math.PI/6))},
+      {name:"Air quality", w:0.36, x:s.aqi/250},
+      {name:"Noise", w:0.24, x:s.noise/100},
+      {name:"Life misalignment", w:0.7, x:(s.pressure/100)*0.5 + (s.mismatch/6)*0.3 + ((100 - s.fit)/100)*0.2},
+      {name:"Activity (protective)", w:-0.4, x:s.activity/120},
+      {name:"Hydration (protective)", w:-0.4, x:s.hydration/12},
+      {name:"Mood (protective)", w:-0.18, x:(clamp(s.mood,-100,100)+100)/200},
+    ];
+    feats.forEach(f => f.c = f.w * f.x);
+    return {
+      all: feats,
+      top: feats.slice().sort((a,b)=> b.c - a.c),
+      bottom: feats.slice().sort((a,b)=> a.c - b.c)
+    };
+  }
+  function explainContrib(dr){
+    const lines = [];
+    lines.push("Feature  |  weight × normalized value  =  contribution");
+    lines.push("------------------------------------------------------");
+    dr.all.forEach(f=>{
+      lines.push(`${f.name.padEnd(18)} | ${f.w.toFixed(2).padEnd(5)}× ${f.x.toFixed(2).padEnd(5)} = ${f.c.toFixed(3)}`);
+    });
+    return lines.join("\n");
+  }
+
+  /* ---------- Compute & UI updates ---------- */
+  function computeAll(){
+    const life  = lifeAlignment(state);
+    const risk  = riskScore(state);
+    const card  = cardioLoad(state);
+
+    // Overview KPIs
+    document.getElementById("k-life").textContent = Math.round(life);
+    document.getElementById("bar-life").style.width = Math.round(life)+"%";
+    document.getElementById("k-risk").textContent = Math.round(risk*100)+"%";
+    document.getElementById("bar-risk").style.width = Math.round(risk*100)+"%";
+    document.getElementById("k-cardio").textContent = card.toFixed(2);
+    document.getElementById("bar-cardio").style.width = Math.round(card*100)+"%";
+
+    // Predictions
+    document.getElementById("p-risk-k").textContent = Math.round(risk*100)+"%";
+    document.getElementById("p-risk-bar").style.width = Math.round(risk*100)+"%";
+    document.getElementById("p-cardio-k").textContent = card.toFixed(2);
+    document.getElementById("p-cardio-bar").style.width = Math.round(card*100)+"%";
+
+    const dr = contributors();
+    document.getElementById("contri").textContent = explainContrib(dr);
+    document.getElementById("p-risk-note").textContent =
+      "Top drivers: " + dr.top.slice(0,3).map(d=>d.name).join(", ") +
+      " · Protectors: " + dr.bottom.slice(0,2).map(d=>d.name).join(", ");
+
+    // Status ribbon
+    document.getElementById("stat-life").textContent   = Math.round(life)+"/100";
+    document.getElementById("stat-risk").textContent   = Math.round(risk*100)+"%";
+    document.getElementById("stat-cardio").textContent = card.toFixed(2);
+
+    // Uncertainty
+    const u = uncertaintyScore(state);
+    const dot = document.getElementById("uncert-dot");
+    const txt = document.getElementById("uncert-text");
+    if (u < 0.33){ dot.className="dot low"; txt.textContent = "Uncertainty: Low — inputs well-covered"; }
+    else if (u < 0.66){ dot.className="dot med"; txt.textContent = "Uncertainty: Medium — limited coverage"; }
+    else { dot.className="dot high"; txt.textContent = "Uncertainty: High — conflicting/extreme inputs"; }
+  }
+
+  // Buttons
+  document.getElementById("btn-compute").addEventListener("click", computeAll);
+  document.getElementById("btn-reset").addEventListener("click", ()=>{
+    Object.assign(state,{cycle:14,sleep:7,activity:35,hydration:6,caffeine:120,aqi:70,noise:30,stress:45,mood:10,support:70,mismatch:2,fit:68,pressure:55});
+    ["cycle","sleep","activity","hydration","caffeine","aqi","noise","stress","mood","support","mismatch","fit","pressure"].forEach(id=>{
+      const el=document.getElementById(id); const out=document.getElementById("v-"+id);
+      el.value=state[id]; out.textContent=state[id];
+    });
+    computeAll();
+  });
+  document.getElementById("btn-brief").addEventListener("click", ()=>{
+    const life = Math.round(lifeAlignment(state));
+    const risk = Math.round(riskScore(state)*100);
+    const card = cardioLoad(state).toFixed(2);
+    const key  = contributors().top.slice(0,3).map(f=>f.name).join(", ");
+    const txt = `Health Simulator — Pre-Visit Brief (Demo)
+——————————————————————————
+Life-Alignment: ${life}/100
+Symptom Risk: ${risk}%
+Cardio Load: ${card}
+Top Drivers: ${key}
+
+Notes for my provider
+• Noticing changes around cycle day ${state.cycle}.
+• Stress ${state.stress}/100 with AQI ${state.aqi}.
+• Sleep ${state.sleep}h; caffeine ${state.caffeine}mg.
+• Would like safe ways to improve recovery and reduce escalation risk.
+
+Disclaimer: Educational demo. Not medical advice.`;
+    document.getElementById("brief").textContent = txt;
+
+    // Download
+    const blob = new Blob([txt], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'PreVisit_Brief.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  /* ---------- What-If ---------- */
+  const ws = {sleep:1,caf:100,aqi:30,act:20,stress:15};
+  function bindW(id,key,sign){
+    const el=document.getElementById(id); const out=document.getElementById("wv-"+key);
+    const fmt=v=>(sign==='+'?'+':'−')+v; const set=v=>{ws[key]=Number(v);out.textContent=fmt(v)};
+    set(el.value); el.addEventListener("input",e=>set(e.target.value));
+  }
+  bindW("w-sleep","sleep","+"); bindW("w-caf","caf","−"); bindW("w-aqi","aqi","−"); bindW("w-act","act","+"); bindW("w-stress","stress","−");
+
+  document.getElementById("preset").addEventListener("change",(e)=>{
+    const p = e.target.value;
+    if (p==="travel"){ Object.assign(ws,{sleep:0,caf:50,aqi:10,act:0,stress:25}); }
+    else if (p==="aqi"){ Object.assign(ws,{sleep:1,caf:50,aqi:60,act:10,stress:10}); }
+    else if (p==="cd26"){ Object.assign(ws,{sleep:1,caf:80,aqi:10,act:15,stress:10}); }
+    else if (p==="reset"){ Object.assign(ws,{sleep:1,caf:100,aqi:30,act:20,stress:15}); }
+    document.getElementById("w-sleep").value = ws.sleep; document.getElementById("wv-sleep").textContent = "+"+ws.sleep;
+    document.getElementById("w-caf").value   = ws.caf;   document.getElementById("wv-caf").textContent   = "−"+ws.caf;
+    document.getElementById("w-aqi").value   = ws.aqi;   document.getElementById("wv-aqi").textContent   = "−"+ws.aqi;
+    document.getElementById("w-act").value   = ws.act;   document.getElementById("wv-act").textContent   = "+"+ws.act;
+    document.getElementById("w-stress").value= ws.stress;document.getElementById("wv-stress").textContent= "−"+ws.stress;
+  });
+
+  document.getElementById("btn-run").addEventListener("click", ()=>{
+    const base = {life:lifeAlignment(state), risk:riskScore(state), cardio:cardioLoad(state)};
+    const s2 = Object.assign({}, state, {
+      sleep: clamp(state.sleep + ws.sleep, 3, 10),
+      caffeine: clamp(state.caffeine - ws.caf, 0, 500),
+      aqi: clamp(state.aqi - ws.aqi, 0, 250),
+      activity: clamp(state.activity + ws.act, 0, 120),
+      stress: clamp(state.stress - ws.stress, 0, 100)
+    });
+    const sim = {life:lifeAlignment(s2), risk:riskScore(s2), cardio:cardioLoad(s2)};
+    const dRisk = Math.round((base.risk - sim.risk)*100);
+    const dCard = (base.cardio - sim.cardio).toFixed(2);
+    const dLife = Math.round(sim.life - base.life);
+    document.getElementById("sim-risk").textContent   = (dRisk>=0?'−':'+') + Math.abs(dRisk) + '%';
+    document.getElementById("sim-cardio").textContent = (dCard>=0?'−':'+') + Math.abs(dCard);
+    document.getElementById("sim-life").textContent   = (dLife>=0?'+':'−') + Math.abs(dLife);
+    document.getElementById("sim-bar").style.width    = clamp(dLife + dRisk, 0, 100) + '%';
+    document.getElementById("sim-explain").textContent =
+      `More sleep (+${ws.sleep}h), less caffeine (−${ws.caf}mg), better AQI (−${ws.aqi}), activity (+${ws.act}min), and stress relief (−${ws.stress}) combine to lower risk and cardio load while improving Life-Alignment.`;
+
+    const why = [];
+    if (ws.sleep>0) why.push("sleep ↑ reduces sleep-debt component");
+    if (ws.caf>0)   why.push("caffeine ↓ lowers cardio load");
+    if (ws.aqi>0)   why.push("AQI ↓ eases environmental stressors");
+    if (ws.act>0)   why.push("activity ↑ boosts protective factors");
+    if (ws.stress>0)why.push("stress ↓ reduces psycho component");
+    document.getElementById("sim-why").textContent = "Why this changed: " + (why.join("; ") || "n/a");
+
+    // Update uncertainty based on new state s2
+    const u = uncertaintyScore(s2);
+    const dot = document.getElementById("uncert-dot");
+    const txt = document.getElementById("uncert-text");
+    if (u < 0.33){ dot.className="dot low"; txt.textContent = "Uncertainty: Low — inputs well-covered"; }
+    else if (u < 0.66){ dot.className="dot med"; txt.textContent = "Uncertainty: Medium — limited coverage"; }
+    else { dot.className="dot high"; txt.textContent = "Uncertainty: High — conflicting/extreme inputs"; }
+
+    go("predictions");
+  });
+
+  document.getElementById("btn-apply").addEventListener("click", ()=>{
+    // Apply deltas to the actual state
+    state.sleep    = clamp(state.sleep + ws.sleep, 3, 10);
+    state.caffeine = clamp(state.caffeine - ws.caf, 0, 500);
+    state.aqi      = clamp(state.aqi - ws.aqi, 0, 250);
+    state.activity = clamp(state.activity + ws.act, 0, 120);
+    state.stress   = clamp(state.stress - ws.stress, 0, 100);
+    if (document.getElementById("preset").value==="cd26") state.cycle = 26;
+
+    // Reflect in sliders
+    ["cycle","sleep","activity","hydration","caffeine","aqi","noise","stress","mood","support","mismatch","fit","pressure"].forEach(id=>{
+      const el=document.getElementById(id); const out=document.getElementById("v-"+id); el.value=state[id]; out.textContent=state[id];
+    });
+    computeAll();
+    go("predictions");
+  });
+
+  // Formulas text
+  document.getElementById("formulas").textContent =
+`Life-Alignment = 0.35·fit + 0.20·(100−pressure) + 0.20·(100−mismatch·16.7) + 0.15·support + 0.10·((mood+100)/2)
+Cardio Load (0–1) ≈ 0.35·(caffeine/400) + 0.25·(stress/100) + 0.20·(sleepDebt/6) + 0.10·(1−activity/120) + 0.10·(1−hydration/12)
+Symptom Risk = σ(1.3·hormonal + 0.9·sleepDebt + 0.9·psycho + 0.6·environment − 0.8·protection + 0.7·lifeMis − 1.5)
+
+Where:
+  hormonal = max(0, sin(2π·cycle/28 − π/6))  // late-luteal sensitivity (illustrative)
+  sleepDebt = clamp(8 − sleep, 0, 6)/6
+  psycho = 0.6·(stress/100) + 0.4·((100 − mood)/200)
+  environment = 0.6·(AQI/250) + 0.4·(noise/100)
+  protection = 0.5·(activity/120) + 0.5·(hydration/12)
+  lifeMis = 0.5·(pressure/100) + 0.3·(mismatch/6) + 0.2·((100 − fit)/100)
+  σ = logistic sigmoid
+Note: Heuristics for demo only; not clinical advice.`;
+
+  // Initialize
+  computeAll();
+</script>
+</body>
+</html>
+

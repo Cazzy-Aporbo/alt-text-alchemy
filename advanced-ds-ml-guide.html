@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Data Science & ML Engineering Mastery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --text: #f5f5f5;
+            --text-secondary: #b8b8b8;
+            --gradient1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: var(--gradient1);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: drift 20s linear infinite;
+        }
+
+        @keyframes drift {
+            to { transform: translate(20px, 20px); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            position: relative;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--secondary);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: var(--highlight);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient2);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: #4facfe;
+        }
+
+        h4 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 0.8rem;
+            color: #f5576c;
+        }
+
+        /* Content Blocks */
+        .concept-card {
+            background: var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--highlight);
+            transition: transform 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateX(5px);
+        }
+
+        .formula {
+            background: rgba(79, 172, 254, 0.1);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(79, 172, 254, 0.1));
+            border: 2px solid var(--highlight);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .grid-item {
+            background: rgba(15, 52, 96, 0.5);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover {
+            background: rgba(15, 52, 96, 0.8);
+            transform: scale(1.02);
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--gradient2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 0.2rem;
+        }
+
+        /* Interactive Elements */
+        .accordion {
+            margin: 1rem 0;
+        }
+
+        .accordion-header {
+            background: var(--accent);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-header:hover {
+            background: rgba(15, 52, 96, 0.8);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+        }
+
+        .accordion-content.active {
+            max-height: 2000px;
+            padding: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.8rem; }
+            h3 { font-size: 1.4rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚀 Advanced Data Science & ML Engineering</h1>
+        <p class="subtitle">Master-Level Theoretical Foundations & Practical Implementation</p>
+    </header>
+
+    <nav>
+        <div class="nav-container">
+            <button class="nav-btn" onclick="scrollToSection('foundations')">Mathematical Foundations</button>
+            <button class="nav-btn" onclick="scrollToSection('statistics')">Advanced Statistics</button>
+            <button class="nav-btn" onclick="scrollToSection('ml-theory')">ML Theory</button>
+            <button class="nav-btn" onclick="scrollToSection('deep-learning')">Deep Learning</button>
+            <button class="nav-btn" onclick="scrollToSection('algorithms')">Algorithms</button>
+            <button class="nav-btn" onclick="scrollToSection('implementation')">Implementation</button>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Mathematical Foundations -->
+        <section id="foundations" class="section">
+            <h2>📐 Mathematical Foundations</h2>
+            
+            <h3>Linear Algebra for ML</h3>
+            <div class="concept-card">
+                <h4>Matrix Decompositions</h4>
+                <div class="formula">
+                    <strong>Singular Value Decomposition (SVD):</strong><br>
+                    A = UΣV^T<br><br>
+                    Where:<br>
+                    • U: m×m orthogonal matrix (left singular vectors)<br>
+                    • Σ: m×n diagonal matrix (singular values)<br>
+                    • V^T: n×n orthogonal matrix (right singular vectors)<br><br>
+                    Applications: PCA, Matrix Completion, Recommender Systems
+                </div>
+                
+                <div class="formula">
+                    <strong>Eigendecomposition:</strong><br>
+                    A = QΛQ^(-1)<br><br>
+                    For symmetric matrices: A = QΛQ^T<br>
+                    Where Λ contains eigenvalues λᵢ and Q contains eigenvectors
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h4>Optimization Theory</h4>
+                <div class="formula">
+                    <strong>Gradient Descent:</strong><br>
+                    θ_{t+1} = θ_t - α∇_θ J(θ)<br><br>
+                    <strong>Newton's Method:</strong><br>
+                    θ_{t+1} = θ_t - H^(-1)∇_θ J(θ)<br>
+                    Where H is the Hessian matrix
+                </div>
+                
+                <div class="code-block">
+                    <pre>import numpy as np
+
+def adam_optimizer(params, grads, m, v, t, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+    """Advanced Adam Optimizer Implementation"""
+    t += 1
+    m = beta1 * m + (1 - beta1) * grads
+    v = beta2 * v + (1 - beta2) * (grads ** 2)
+    
+    # Bias correction
+    m_hat = m / (1 - beta1 ** t)
+    v_hat = v / (1 - beta2 ** t)
+    
+    # Parameter update
+    params = params - lr * m_hat / (np.sqrt(v_hat) + eps)
+    return params, m, v, t</pre>
+                </div>
+            </div>
+
+            <h3>Probability Theory</h3>
+            <div class="concept-card">
+                <h4>Advanced Distributions</h4>
+                <div class="grid">
+                    <div class="grid-item">
+                        <strong>Dirichlet Distribution:</strong><br>
+                        PDF: f(x;α) = (1/B(α)) ∏ᵢ xᵢ^(αᵢ-1)<br>
+                        Used in: LDA, Bayesian mixture models
+                    </div>
+                    <div class="grid-item">
+                        <strong>Wishart Distribution:</strong><br>
+                        Generalization of chi-squared for matrices<br>
+                        Used in: Bayesian inference for covariance
+                    </div>
+                    <div class="grid-item">
+                        <strong>Student-t Process:</strong><br>
+                        Robust alternative to Gaussian Process<br>
+                        Heavy tails for outlier handling
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Statistics -->
+        <section id="statistics" class="section">
+            <h2>📊 Advanced Statistical Methods</h2>
+            
+            <h3>Causal Inference</h3>
+            <div class="concept-card">
+                <h4>Structural Causal Models</h4>
+                <div class="highlight-box">
+                    <strong>Pearl's Causal Hierarchy:</strong>
+                    <ol>
+                        <li><strong>Association (Seeing):</strong> P(y|x) - Statistical relationships</li>
+                        <li><strong>Intervention (Doing):</strong> P(y|do(x)) - Effect of interventions</li>
+                        <li><strong>Counterfactuals (Imagining):</strong> P(y_x|x',y') - What-if scenarios</li>
+                    </ol>
+                </div>
+                
+                <div class="formula">
+                    <strong>Average Treatment Effect (ATE):</strong><br>
+                    ATE = E[Y(1) - Y(0)] = E[Y|T=1] - E[Y|T=0]<br><br>
+                    <strong>Propensity Score Matching:</strong><br>
+                    e(x) = P(T=1|X=x)
+                </div>
+            </div>
+
+            <h3>Bayesian Statistics</h3>
+            <div class="concept-card">
+                <h4>Hierarchical Bayesian Models</h4>
+                <div class="code-block">
+                    <pre>import pymc as pm
+import numpy as np
+
+# Hierarchical Bayesian Model for A/B Testing
+with pm.Model() as hierarchical_model:
+    # Hyperpriors
+    mu_alpha = pm.Normal('mu_alpha', mu=0, sigma=10)
+    sigma_alpha = pm.HalfCauchy('sigma_alpha', beta=2)
+    
+    # Group-level parameters
+    alpha = pm.Normal('alpha', mu=mu_alpha, sigma=sigma_alpha, shape=n_groups)
+    
+    # Individual-level parameters
+    theta = pm.Beta('theta', alpha=alpha[group_idx], beta=beta)
+    
+    # Likelihood
+    y = pm.Binomial('y', n=n_trials, p=theta, observed=observed_data)
+    
+    # Posterior sampling
+    trace = pm.sample(2000, tune=1000, return_inferencedata=True)</pre>
+                </div>
+                
+                <div class="formula">
+                    <strong>Bayes Factor:</strong><br>
+                    BF₁₀ = P(D|M₁) / P(D|M₀) = ∫ P(D|θ₁,M₁)P(θ₁|M₁)dθ₁ / ∫ P(D|θ₀,M₀)P(θ₀|M₀)dθ₀
+                </div>
+            </div>
+
+            <h3>Time Series Analysis</h3>
+            <div class="concept-card">
+                <h4>State Space Models</h4>
+                <div class="formula">
+                    <strong>Kalman Filter:</strong><br>
+                    State equation: x_t = F_t x_{t-1} + B_t u_t + w_t<br>
+                    Observation equation: z_t = H_t x_t + v_t<br><br>
+                    Where w_t ~ N(0, Q_t) and v_t ~ N(0, R_t)
+                </div>
+                
+                <div class="code-block">
+                    <pre>class KalmanFilter:
+    def __init__(self, F, B, H, Q, R, x0, P0):
+        self.F = F  # State transition matrix
+        self.B = B  # Control matrix
+        self.H = H  # Observation matrix
+        self.Q = Q  # Process noise covariance
+        self.R = R  # Observation noise covariance
+        self.x = x0  # Initial state estimate
+        self.P = P0  # Initial error covariance
+    
+    def predict(self, u=0):
+        # Prediction step
+        self.x = self.F @ self.x + self.B @ u
+        self.P = self.F @ self.P @ self.F.T + self.Q
+        return self.x
+    
+    def update(self, z):
+        # Update step
+        y = z - self.H @ self.x  # Innovation
+        S = self.H @ self.P @ self.H.T + self.R  # Innovation covariance
+        K = self.P @ self.H.T @ np.linalg.inv(S)  # Kalman gain
+        
+        self.x = self.x + K @ y
+        self.P = (np.eye(len(self.x)) - K @ self.H) @ self.P
+        return self.x</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Machine Learning Theory -->
+        <section id="ml-theory" class="section">
+            <h2>🤖 Machine Learning Theory</h2>
+            
+            <h3>Statistical Learning Theory</h3>
+            <div class="concept-card">
+                <h4>VC Theory & PAC Learning</h4>
+                <div class="formula">
+                    <strong>VC Dimension:</strong><br>
+                    The largest set size that can be shattered by the hypothesis class<br><br>
+                    <strong>Generalization Bound:</strong><br>
+                    P(|R(h) - R̂(h)| ≤ ε) ≥ 1 - δ<br>
+                    Where sample complexity: m ≥ (1/ε²)(d·log(1/ε) + log(1/δ))
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>Rademacher Complexity:</strong><br>
+                    R̂_m(H) = E_σ[sup_{h∈H} (1/m) Σᵢ σᵢh(xᵢ)]<br>
+                    Where σᵢ are independent Rademacher random variables
+                </div>
+            </div>
+
+            <h3>Kernel Methods</h3>
+            <div class="concept-card">
+                <h4>Reproducing Kernel Hilbert Spaces (RKHS)</h4>
+                <div class="formula">
+                    <strong>Kernel Trick:</strong><br>
+                    k(x, y) = ⟨φ(x), φ(y)⟩_H<br><br>
+                    <strong>Popular Kernels:</strong><br>
+                    • RBF: k(x,y) = exp(-γ||x-y||²)<br>
+                    • Matérn: k(x,y) = (2^(1-ν)/Γ(ν))(√(2ν)||x-y||/ℓ)^ν K_ν(√(2ν)||x-y||/ℓ)
+                </div>
+                
+                <div class="code-block">
+                    <pre>class GaussianProcess:
+    def __init__(self, kernel, noise=1e-6):
+        self.kernel = kernel
+        self.noise = noise
+        
+    def fit(self, X, y):
+        self.X = X
+        self.y = y
+        self.K = self.kernel(X, X) + self.noise * np.eye(len(X))
+        self.K_inv = np.linalg.inv(self.K)
+        
+    def predict(self, X_test, return_std=False):
+        K_star = self.kernel(X_test, self.X)
+        mu = K_star @ self.K_inv @ self.y
+        
+        if return_std:
+            K_star_star = self.kernel(X_test, X_test)
+            cov = K_star_star - K_star @ self.K_inv @ K_star.T
+            std = np.sqrt(np.diag(cov))
+            return mu, std
+        return mu</pre>
+                </div>
+            </div>
+
+            <h3>Ensemble Methods Theory</h3>
+            <div class="concept-card">
+                <h4>Boosting Theory</h4>
+                <div class="formula">
+                    <strong>AdaBoost Error Bound:</strong><br>
+                    Training error ≤ exp(-2Σₜ γₜ²)<br>
+                    Where γₜ = 1/2 - εₜ is the edge of weak learner t
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>Gradient Boosting as Functional Gradient Descent:</strong><br>
+                    F_m(x) = F_{m-1}(x) + ρ_m h_m(x)<br>
+                    Where h_m = argmin_h Σᵢ L(yᵢ, F_{m-1}(xᵢ) + h(xᵢ))
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Learning -->
+        <section id="deep-learning" class="section">
+            <h2>🧠 Deep Learning Architecture</h2>
+            
+            <h3>Attention Mechanisms & Transformers</h3>
+            <div class="concept-card">
+                <h4>Multi-Head Self-Attention</h4>
+                <div class="formula">
+                    <strong>Scaled Dot-Product Attention:</strong><br>
+                    Attention(Q,K,V) = softmax(QK^T/√d_k)V<br><br>
+                    <strong>Multi-Head:</strong><br>
+                    MultiHead(Q,K,V) = Concat(head₁,...,head_h)W^O<br>
+                    Where headᵢ = Attention(QW_i^Q, KW_i^K, VW_i^V)
+                </div>
+                
+                <div class="code-block">
+                    <pre>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model, n_heads, dropout=0.1):
+        super().__init__()
+        self.d_model = d_model
+        self.n_heads = n_heads
+        self.d_k = d_model // n_heads
+        
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        self.W_o = nn.Linear(d_model, d_model)
+        
+        self.dropout = nn.Dropout(dropout)
+        
+    def forward(self, query, key, value, mask=None):
+        batch_size = query.size(0)
+        
+        # Linear transformations and split into heads
+        Q = self.W_q(query).view(batch_size, -1, self.n_heads, self.d_k).transpose(1, 2)
+        K = self.W_k(key).view(batch_size, -1, self.n_heads, self.d_k).transpose(1, 2)
+        V = self.W_v(value).view(batch_size, -1, self.n_heads, self.d_k).transpose(1, 2)
+        
+        # Attention
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.d_k).float())
+        
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, -1e9)
+        
+        attention_weights = F.softmax(scores, dim=-1)
+        attention_weights = self.dropout(attention_weights)
+        
+        context = torch.matmul(attention_weights, V)
+        
+        # Concatenate heads
+        context = context.transpose(1, 2).contiguous().view(
+            batch_size, -1, self.d_model
+        )
+        
+        output = self.W_o(context)
+        return output, attention_weights</pre>
+                </div>
+            </div>
+
+            <h3>Generative Models</h3>
+            <div class="concept-card">
+                <h4>Variational Autoencoders (VAE)</h4>
+                <div class="formula">
+                    <strong>ELBO (Evidence Lower Bound):</strong><br>
+                    log p(x) ≥ E_{q(z|x)}[log p(x|z)] - KL[q(z|x)||p(z)]<br><br>
+                    Reconstruction Loss - KL Divergence
+                </div>
+                
+                <h4>Diffusion Models</h4>
+                <div class="formula">
+                    <strong>Forward Process:</strong><br>
+                    q(x_t|x_{t-1}) = N(x_t; √(1-βₜ)x_{t-1}, βₜI)<br><br>
+                    <strong>Reverse Process:</strong><br>
+                    p_θ(x_{t-1}|x_t) = N(x_{t-1}; μ_θ(x_t,t), Σ_θ(x_t,t))
+                </div>
+            </div>
+
+            <h3>Neural Architecture Search</h3>
+            <div class="concept-card">
+                <h4>Differentiable NAS</h4>
+                <div class="code-block">
+                    <pre>class DARTSCell(nn.Module):
+    def __init__(self, operations, C_prev, C):
+        super().__init__()
+        self.ops = nn.ModuleList()
+        for op in operations:
+            self.ops.append(op(C_prev, C))
+        
+        # Architecture parameters
+        self.alpha = nn.Parameter(torch.randn(len(operations)))
+        
+    def forward(self, x):
+        weights = F.softmax(self.alpha, dim=0)
+        return sum(w * op(x) for w, op in zip(weights, self.ops))</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Algorithms -->
+        <section id="algorithms" class="section">
+            <h2>⚡ Advanced Algorithms & Data Structures</h2>
+            
+            <h3>Graph Algorithms</h3>
+            <div class="concept-card">
+                <h4>Network Flow Algorithms</h4>
+                <div class="code-block">
+                    <pre>class FordFulkerson:
+    """Max Flow - Min Cut Algorithm"""
+    def __init__(self, graph):
+        self.graph = graph
+        self.ROW = len(graph)
+        
+    def bfs(self, s, t, parent):
+        visited = [False] * self.ROW
+        queue = []
+        queue.append(s)
+        visited[s] = True
+        
+        while queue:
+            u = queue.pop(0)
+            for ind, val in enumerate(self.graph[u]):
+                if visited[ind] == False and val > 0:
+                    queue.append(ind)
+                    visited[ind] = True
+                    parent[ind] = u
+                    if ind == t:
+                        return True
+        return False
+    
+    def max_flow(self, source, sink):
+        parent = [-1] * self.ROW
+        max_flow = 0
+        
+        while self.bfs(source, sink, parent):
+            path_flow = float("Inf")
+            s = sink
+            
+            # Find minimum residual capacity
+            while s != source:
+                path_flow = min(path_flow, self.graph[parent[s]][s])
+                s = parent[s]
+            
+            max_flow += path_flow
+            v = sink
+            
+            # Update residual capacities
+            while v != source:
+                u = parent[v]
+                self.graph[u][v] -= path_flow
+                self.graph[v][u] += path_flow
+                v = parent[v]
+                
+        return max_flow</pre>
+                </div>
+            </div>
+
+            <h3>Dynamic Programming</h3>
+            <div class="concept-card">
+                <h4>Advanced DP Techniques</h4>
+                <div class="grid">
+                    <div class="grid-item">
+                        <strong>Convex Hull Trick:</strong><br>
+                        Optimizes DP transitions of form:<br>
+                        dp[i] = min(dp[j] + cost(j,i))
+                    </div>
+                    <div class="grid-item">
+                        <strong>Divide & Conquer DP:</strong><br>
+                        For transitions satisfying quadrangle inequality<br>
+                        O(n²) → O(n log n)
+                    </div>
+                    <div class="grid-item">
+                        <strong>Profile DP:</strong><br>
+                        State compression using bitmasks<br>
+                        Used in: TSP, tiling problems
+                    </div>
+                </div>
+            </div>
+
+            <h3>Randomized Algorithms</h3>
+            <div class="concept-card">
+                <h4>Probabilistic Data Structures</h4>
+                <div class="code-block">
+                    <pre>class CountMinSketch:
+    """Probabilistic frequency counting"""
+    def __init__(self, width, depth):
+        self.width = width
+        self.depth = depth
+        self.table = [[0] * width for _ in range(depth)]
+        self.hash_functions = [self._hash_factory(i) for i in range(depth)]
+    
+    def _hash_factory(self, seed):
+        def hash_function(x):
+            return hash((x, seed)) % self.width
+        return hash_function
+    
+    def add(self, item, count=1):
+        for i in range(self.depth):
+            j = self.hash_functions[i](item)
+            self.table[i][j] += count
+    
+    def estimate(self, item):
+        return min(self.table[i][self.hash_functions[i](item)] 
+                  for i in range(self.depth))</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation & Production -->
+        <section id="implementation" class="section">
+            <h2>🔧 Production ML & Implementation</h2>
+            
+            <h3>Distributed Computing</h3>
+            <div class="concept-card">
+                <h4>MapReduce Paradigm</h4>
+                <div class="code-block">
+                    <pre>from pyspark.sql import SparkSession
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.classification import RandomForestClassifier
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
+
+# Initialize Spark
+spark = SparkSession.builder \
+    .appName("DistributedML") \
+    .config("spark.sql.adaptive.enabled", "true") \
+    .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+    .getOrCreate()
+
+# Feature engineering at scale
+assembler = VectorAssembler(
+    inputCols=feature_columns,
+    outputCol="features"
+)
+
+# Distributed training
+rf = RandomForestClassifier(
+    numTrees=100,
+    maxDepth=10,
+    subsamplingRate=0.8,
+    featureSubsetStrategy="sqrt"
+)
+
+# Pipeline
+from pyspark.ml import Pipeline
+pipeline = Pipeline(stages=[assembler, rf])
+
+# Cross-validation with parallelization
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+paramGrid = ParamGridBuilder() \
+    .addGrid(rf.numTrees, [50, 100, 200]) \
+    .addGrid(rf.maxDepth, [5, 10, 15]) \
+    .build()
+
+cv = CrossValidator(
+    estimator=pipeline,
+    estimatorParamMaps=paramGrid,
+    evaluator=BinaryClassificationEvaluator(),
+    numFolds=5,
+    parallelism=4
+)</pre>
+                </div>
+            </div>
+
+            <h3>Model Serving & MLOps</h3>
+            <div class="concept-card">
+                <h4>A/B Testing Framework</h4>
+                <div class="code-block">
+                    <pre>class ABTestAnalyzer:
+    def __init__(self, alpha=0.05, power=0.8):
+        self.alpha = alpha
+        self.power = power
+    
+    def calculate_sample_size(self, baseline_rate, mde, test="two-sided"):
+        """Calculate required sample size for statistical significance"""
+        from statsmodels.stats.power import NormalIndPower
+        
+        effect_size = mde / np.sqrt(baseline_rate * (1 - baseline_rate))
+        power_analysis = NormalIndPower()
+        
+        sample_size = power_analysis.solve_power(
+            effect_size=effect_size,
+            alpha=self.alpha,
+            power=self.power,
+            alternative=test
+        )
+        return int(np.ceil(sample_size))
+    
+    def analyze_results(self, control, treatment):
+        """Statistical analysis of A/B test results"""
+        from scipy import stats
+        
+        # T-test
+        t_stat, p_value = stats.ttest_ind(control, treatment)
+        
+        # Effect size (Cohen's d)
+        pooled_std = np.sqrt((np.var(control) + np.var(treatment)) / 2)
+        cohens_d = (np.mean(treatment) - np.mean(control)) / pooled_std
+        
+        # Confidence interval
+        diff_mean = np.mean(treatment) - np.mean(control)
+        diff_std = np.sqrt(np.var(control)/len(control) + 
+                          np.var(treatment)/len(treatment))
+        ci_low = diff_mean - 1.96 * diff_std
+        ci_high = diff_mean + 1.96 * diff_std
+        
+        return {
+            'p_value': p_value,
+            'effect_size': cohens_d,
+            'lift': diff_mean / np.mean(control),
+            'confidence_interval': (ci_low, ci_high),
+            'significant': p_value < self.alpha
+        }</pre>
+                </div>
+            </div>
+
+            <h3>Performance Optimization</h3>
+            <div class="concept-card">
+                <h4>Model Compression</h4>
+                <div class="highlight-box">
+                    <strong>Techniques:</strong>
+                    <ul>
+                        <li><strong>Quantization:</strong> FP32 → INT8 (4x reduction)</li>
+                        <li><strong>Pruning:</strong> Remove low-magnitude weights</li>
+                        <li><strong>Knowledge Distillation:</strong> Teacher-Student learning</li>
+                        <li><strong>Low-Rank Factorization:</strong> W ≈ UV^T</li>
+                    </ul>
+                </div>
+                
+                <div class="code-block">
+                    <pre># PyTorch Quantization Example
+import torch.quantization as quantization
+
+def quantize_model(model, calibration_data):
+    # Prepare model for quantization
+    model.qconfig = quantization.get_default_qconfig('fbgemm')
+    quantization.prepare(model, inplace=True)
+    
+    # Calibration
+    model.eval()
+    with torch.no_grad():
+        for batch in calibration_data:
+            model(batch)
+    
+    # Convert to quantized model
+    quantization.convert(model, inplace=True)
+    return model</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Topics -->
+        <section class="section">
+            <h2>🎯 Cutting-Edge Topics</h2>
+            
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>Federated Learning</h4>
+                    <p>Privacy-preserving distributed training</p>
+                    <span class="tag">Privacy</span>
+                    <span class="tag">Distributed</span>
+                </div>
+                
+                <div class="grid-item">
+                    <h4>Meta-Learning</h4>
+                    <p>Learning to learn - Few-shot adaptation</p>
+                    <span class="tag">MAML</span>
+                    <span class="tag">Prototypical Networks</span>
+                </div>
+                
+                <div class="grid-item">
+                    <h4>Neural ODEs</h4>
+                    <p>Continuous-depth neural networks</p>
+                    <span class="tag">Differential Equations</span>
+                </div>
+                
+                <div class="grid-item">
+                    <h4>Graph Neural Networks</h4>
+                    <p>Learning on graph-structured data</p>
+                    <span class="tag">GCN</span>
+                    <span class="tag">GAT</span>
+                </div>
+                
+                <div class="grid-item">
+                    <h4>Causal Representation Learning</h4>
+                    <p>Discovering causal structures from data</p>
+                    <span class="tag">ICA</span>
+                    <span class="tag">VAE</span>
+                </div>
+                
+                <div class="grid-item">
+                    <h4>Quantum Machine Learning</h4>
+                    <p>Leveraging quantum computing for ML</p>
+                    <span class="tag">VQE</span>
+                    <span class="tag">QAOA</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Accordion functionality
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('active');
+            });
+        });
+
+        // Add syntax highlighting (you would normally use a library like Prism.js)
+        document.querySelectorAll('pre').forEach(block => {
+            // Basic keyword highlighting
+            const keywords = ['def', 'class', 'import', 'from', 'return', 'if', 'else', 'for', 'while', 'with', 'as', 'self', 'super', 'lambda'];
+            let html = block.innerHTML;
+            keywords.forEach(keyword => {
+                const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+                html = html.replace(regex, `<span style="color: #4facfe; font-weight: bold;">${keyword}</span>`);
+            });
+            block.innerHTML = html;
+        });
+    </script>
+</body>
+</html>

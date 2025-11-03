@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Crystal Weaver - Dimensional Folding Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            overflow: hidden;
+            color: #f0f0f0;
+            position: relative;
+        }
+
+        #customCursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-crystal {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: rotate(45deg);
+            background: linear-gradient(45deg, #e0aaff, #c77dff, #7209b7);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: rotateCrystal 3s linear infinite;
+        }
+
+        @keyframes rotateCrystal {
+            from { transform: rotate(45deg) scale(1); }
+            to { transform: rotate(405deg) scale(1.2); }
+        }
+
+        #mainCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #glitchCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            mix-blend-mode: difference;
+            pointer-events: none;
+        }
+
+        .interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .dimensional-readout {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #e0aaff;
+            text-shadow: 0 0 10px #e0aaff;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 10, 0.7);
+            padding: 20px;
+            border: 1px solid #e0aaff;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+
+        .readout-line {
+            margin: 5px 0;
+            opacity: 0;
+            animation: fadeInLine 0.5s forwards;
+        }
+
+        @keyframes fadeInLine {
+            to { opacity: 1; }
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.7);
+            padding: 20px;
+            border: 1px solid #c77dff;
+            clip-path: polygon(20px 0, 100% 0, calc(100% - 20px) 100%, 0 100%);
+            pointer-events: all;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #e0aaff, #c77dff);
+            border: none;
+            color: #0a0a0a;
+            font-weight: bold;
+            cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(224, 170, 255, 0.5);
+        }
+
+        .timeline-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #e0aaff, #c77dff, #7209b7, #e0aaff);
+            background-size: 200% 100%;
+            animation: timelineFlow 10s linear infinite;
+        }
+
+        @keyframes timelineFlow {
+            from { background-position: 0% 0; }
+            to { background-position: 200% 0; }
+        }
+
+        .quantum-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            text-align: center;
+            color: #e0aaff;
+            text-shadow: 0 0 20px #e0aaff;
+            opacity: 0;
+            pointer-events: none;
+            font-weight: 100;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .reality-tear {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, #e0aaff, transparent);
+            animation: tearAppear 0.5s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes tearAppear {
+            from {
+                height: 0;
+                opacity: 0;
+            }
+            to {
+                height: 200px;
+                opacity: 1;
+            }
+        }
+
+        .crystal-tooltip {
+            position: absolute;
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid #e0aaff;
+            padding: 10px;
+            font-size: 12px;
+            color: #e0aaff;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+        }
+
+        #waveformDisplay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            height: 100px;
+            border: 1px solid #c77dff;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div id="customCursor">
+        <div class="cursor-crystal"></div>
+    </div>
+    
+    <canvas id="mainCanvas"></canvas>
+    <canvas id="glitchCanvas"></canvas>
+    <canvas id="waveformDisplay"></canvas>
+    
+    <div class="interface">
+        <div class="dimensional-readout">
+            <div class="readout-line" style="animation-delay: 0.1s">QUANTUM CRYSTAL WEAVER v.∞</div>
+            <div class="readout-line" style="animation-delay: 0.2s">DIMENSION: <span id="dimension">4.7</span>D</div>
+            <div class="readout-line" style="animation-delay: 0.3s">TEMPORAL FLUX: <span id="flux">0.000</span></div>
+            <div class="readout-line" style="animation-delay: 0.4s">REALITY COHERENCE: <span id="coherence">100</span>%</div>
+            <div class="readout-line" style="animation-delay: 0.5s">CRYSTALS WOVEN: <span id="crystalCount">0</span></div>
+            <div class="readout-line" style="animation-delay: 0.6s">ENTROPY: <span id="entropy">0.00</span></div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn" id="foldBtn">FOLD SPACE</button>
+            <button class="control-btn" id="weaveBtn">WEAVE TIME</button>
+            <button class="control-btn" id="shatterBtn">SHATTER</button>
+            <button class="control-btn" id="transcendBtn">TRANSCEND</button>
+        </div>
+        
+        <div class="timeline-bar"></div>
+        <div class="quantum-message" id="quantumMessage"></div>
+    </div>
+    
+    <div class="crystal-tooltip" id="tooltip"></div>
+
+    <script>
+        // Quantum Crystal Weaver Engine
+        class QuantumCrystalWeaver {
+            constructor() {
+                this.canvas = document.getElementById('mainCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.glitchCanvas = document.getElementById('glitchCanvas');
+                this.glitchCtx = this.glitchCanvas.getContext('2d');
+                this.waveCanvas = document.getElementById('waveformDisplay');
+                this.waveCtx = this.waveCanvas.getContext('2d');
+                
+                this.crystals = [];
+                this.threads = [];
+                this.dimensions = 4.7;
+                this.time = 0;
+                this.entropy = 0;
+                this.coherence = 100;
+                this.flux = 0;
+                this.folding = false;
+                this.weaving = false;
+                this.transcending = false;
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.tears = [];
+                
+                // Audio context for dimensional sounds
+                this.audioContext = null;
+                this.oscillators = [];
+                
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                window.addEventListener('click', (e) => this.handleClick(e));
+                
+                // Initialize with some crystals
+                for (let i = 0; i < 5; i++) {
+                    this.spawnCrystal();
+                }
+                
+                this.setupControls();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.glitchCanvas.width = window.innerWidth;
+                this.glitchCanvas.height = window.innerHeight;
+                this.waveCanvas.width = 300;
+                this.waveCanvas.height = 100;
+            }
+
+            handleMouseMove(e) {
+                this.mouseX = e.clientX;
+                this.mouseY = e.clientY;
+                
+                // Update custom cursor
+                const cursor = document.getElementById('customCursor');
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                
+                // Create reality tears occasionally
+                if (Math.random() < 0.02 && this.tears.length < 5) {
+                    this.createRealityTear(e.clientX, e.clientY);
+                }
+            }
+
+            handleClick(e) {
+                // Spawn a crystal at click location
+                this.spawnCrystal(e.clientX, e.clientY);
+                this.playDimensionalSound();
+            }
+
+            createRealityTear(x, y) {
+                const tear = document.createElement('div');
+                tear.className = 'reality-tear';
+                tear.style.left = x + 'px';
+                tear.style.top = (y - 100) + 'px';
+                document.body.appendChild(tear);
+                
+                this.tears.push(tear);
+                
+                setTimeout(() => {
+                    tear.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(tear);
+                        this.tears = this.tears.filter(t => t !== tear);
+                    }, 500);
+                }, 2000);
+            }
+
+            spawnCrystal(x = null, y = null) {
+                const crystal = {
+                    x: x || Math.random() * this.canvas.width,
+                    y: y || Math.random() * this.canvas.height,
+                    z: Math.random() * 1000 - 500,
+                    size: Math.random() * 30 + 20,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.02,
+                    vertices: this.generateCrystalVertices(),
+                    color: this.generateQuantumColor(),
+                    dimension: Math.random() * 2 + 3,
+                    phase: Math.random() * Math.PI * 2,
+                    resonance: Math.random(),
+                    connections: []
+                };
+                
+                this.crystals.push(crystal);
+                document.getElementById('crystalCount').textContent = this.crystals.length;
+            }
+
+            generateCrystalVertices() {
+                const vertices = [];
+                const faces = Math.floor(Math.random() * 4) + 4; // 4-7 faces
+                
+                for (let i = 0; i < faces; i++) {
+                    const angle = (Math.PI * 2 / faces) * i;
+                    const radius = Math.random() * 20 + 30;
+                    const z = (Math.random() - 0.5) * 40;
+                    vertices.push({
+                        x: Math.cos(angle) * radius,
+                        y: Math.sin(angle) * radius,
+                        z: z
+                    });
+                }
+                
+                return vertices;
+            }
+
+            generateQuantumColor() {
+                const colors = [
+                    { r: 224, g: 170, b: 255 }, // Pastel purple
+                    { r: 199, g: 125, b: 255 }, // Medium purple
+                    { r: 114, g: 9, b: 183 },    // Deep purple
+                    { r: 255, g: 214, b: 227 }, // Pastel pink
+                    { r: 168, g: 237, b: 234 }  // Pastel teal
+                ];
+                
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                return `rgba(${color.r}, ${color.g}, ${color.b}, 0.7)`;
+            }
+
+            foldSpace() {
+                this.folding = true;
+                this.dimensions = Math.min(this.dimensions + 0.3, 11);
+                this.entropy += 0.1;
+                
+                // Warp all crystals
+                this.crystals.forEach(crystal => {
+                    crystal.z += (Math.random() - 0.5) * 200;
+                    crystal.dimension = this.dimensions;
+                    crystal.vertices = crystal.vertices.map(v => ({
+                        x: v.x * (1 + Math.sin(this.time) * 0.1),
+                        y: v.y * (1 + Math.cos(this.time) * 0.1),
+                        z: v.z + (Math.random() - 0.5) * 10
+                    }));
+                });
+                
+                this.showQuantumMessage("FOLDING DIMENSIONAL BOUNDARIES");
+                this.createGlitchEffect();
+                
+                setTimeout(() => {
+                    this.folding = false;
+                }, 2000);
+            }
+
+            weaveTime() {
+                this.weaving = true;
+                
+                // Create temporal threads between crystals
+                this.threads = [];
+                for (let i = 0; i < this.crystals.length - 1; i++) {
+                    for (let j = i + 1; j < this.crystals.length; j++) {
+                        if (Math.random() < 0.3) {
+                            this.threads.push({
+                                start: this.crystals[i],
+                                end: this.crystals[j],
+                                phase: Math.random() * Math.PI * 2,
+                                strength: Math.random()
+                            });
+                        }
+                    }
+                }
+                
+                this.showQuantumMessage("WEAVING TEMPORAL THREADS");
+                
+                setTimeout(() => {
+                    this.weaving = false;
+                }, 3000);
+            }
+
+            shatter() {
+                // Create shattered fragments
+                const fragmentCount = this.crystals.length;
+                this.crystals = [];
+                
+                for (let i = 0; i < fragmentCount * 3; i++) {
+                    const angle = (Math.PI * 2 / (fragmentCount * 3)) * i;
+                    const velocity = Math.random() * 10 + 5;
+                    
+                    this.spawnCrystal(
+                        this.canvas.width / 2 + Math.cos(angle) * velocity * 10,
+                        this.canvas.height / 2 + Math.sin(angle) * velocity * 10
+                    );
+                    
+                    this.crystals[this.crystals.length - 1].velocity = {
+                        x: Math.cos(angle) * velocity,
+                        y: Math.sin(angle) * velocity
+                    };
+                }
+                
+                this.coherence = Math.max(0, this.coherence - 20);
+                this.entropy += 0.5;
+                
+                this.showQuantumMessage("REALITY SHATTERED");
+                this.createGlitchEffect();
+            }
+
+            transcend() {
+                this.transcending = true;
+                this.showQuantumMessage("TRANSCENDING DIMENSIONS");
+                
+                // Elevate all crystals to higher dimensions
+                this.crystals.forEach(crystal => {
+                    crystal.dimension += 2;
+                    crystal.size *= 1.5;
+                    crystal.vertices = this.generate4DVertices();
+                });
+                
+                this.dimensions = parseFloat((this.dimensions + 2.3).toFixed(1));
+                
+                setTimeout(() => {
+                    this.transcending = false;
+                }, 4000);
+            }
+
+            generate4DVertices() {
+                // Generate vertices for a 4D hypercube projection
+                const vertices = [];
+                for (let i = 0; i < 16; i++) {
+                    const binary = i.toString(2).padStart(4, '0');
+                    vertices.push({
+                        x: (parseInt(binary[0]) - 0.5) * 40,
+                        y: (parseInt(binary[1]) - 0.5) * 40,
+                        z: (parseInt(binary[2]) - 0.5) * 40,
+                        w: (parseInt(binary[3]) - 0.5) * 40
+                    });
+                }
+                return vertices;
+            }
+
+            createGlitchEffect() {
+                const glitchCanvas = this.glitchCanvas;
+                glitchCanvas.style.opacity = '1';
+                
+                // Create glitch patterns
+                this.glitchCtx.clearRect(0, 0, glitchCanvas.width, glitchCanvas.height);
+                
+                for (let i = 0; i < 10; i++) {
+                    const y = Math.random() * glitchCanvas.height;
+                    const height = Math.random() * 20;
+                    
+                    this.glitchCtx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+                    this.glitchCtx.fillRect(0, y, glitchCanvas.width, height);
+                }
+                
+                setTimeout(() => {
+                    glitchCanvas.style.opacity = '0';
+                }, 200);
+            }
+
+            showQuantumMessage(text) {
+                const message = document.getElementById('quantumMessage');
+                message.textContent = text;
+                message.style.opacity = '1';
+                
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                }, 2000);
+            }
+
+            playDimensionalSound() {
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(
+                    220 * Math.pow(2, this.dimensions / 12),
+                    this.audioContext.currentTime
+                );
+                
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.2, this.audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.5);
+            }
+
+            drawCrystal(crystal) {
+                this.ctx.save();
+                this.ctx.translate(crystal.x, crystal.y);
+                this.ctx.rotate(crystal.rotation);
+                
+                // Project 3D/4D vertices to 2D
+                const projectedVertices = crystal.vertices.map(v => {
+                    const perspective = 1000 / (1000 + crystal.z + v.z);
+                    return {
+                        x: v.x * perspective,
+                        y: v.y * perspective
+                    };
+                });
+                
+                // Draw crystal faces
+                this.ctx.beginPath();
+                this.ctx.moveTo(projectedVertices[0].x, projectedVertices[0].y);
+                
+                for (let i = 1; i < projectedVertices.length; i++) {
+                    this.ctx.lineTo(projectedVertices[i].x, projectedVertices[i].y);
+                }
+                
+                this.ctx.closePath();
+                
+                // Gradient fill
+                const gradient = this.ctx.createLinearGradient(
+                    -crystal.size, -crystal.size,
+                    crystal.size, crystal.size
+                );
+                gradient.addColorStop(0, crystal.color);
+                gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+                gradient.addColorStop(1, crystal.color);
+                
+                this.ctx.fillStyle = gradient;
+                this.ctx.fill();
+                
+                this.ctx.strokeStyle = crystal.color;
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                
+                // Draw internal structure
+                for (let i = 0; i < projectedVertices.length; i++) {
+                    for (let j = i + 1; j < projectedVertices.length; j++) {
+                        if (Math.random() < 0.3) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(projectedVertices[i].x, projectedVertices[i].y);
+                            this.ctx.lineTo(projectedVertices[j].x, projectedVertices[j].y);
+                            this.ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`;
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+                
+                this.ctx.restore();
+            }
+
+            drawThreads() {
+                this.threads.forEach(thread => {
+                    const amplitude = Math.sin(this.time * 2 + thread.phase) * 20;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(thread.start.x, thread.start.y);
+                    
+                    // Create wavy thread
+                    const steps = 20;
+                    for (let i = 1; i <= steps; i++) {
+                        const t = i / steps;
+                        const x = thread.start.x + (thread.end.x - thread.start.x) * t;
+                        const y = thread.start.y + (thread.end.y - thread.start.y) * t;
+                        const offset = Math.sin(t * Math.PI * 4 + this.time * 3) * amplitude;
+                        
+                        this.ctx.lineTo(x + offset, y + offset);
+                    }
+                    
+                    const gradient = this.ctx.createLinearGradient(
+                        thread.start.x, thread.start.y,
+                        thread.end.x, thread.end.y
+                    );
+                    gradient.addColorStop(0, 'rgba(224, 170, 255, 0.3)');
+                    gradient.addColorStop(0.5, 'rgba(199, 125, 255, 0.5)');
+                    gradient.addColorStop(1, 'rgba(114, 9, 183, 0.3)');
+                    
+                    this.ctx.strokeStyle = gradient;
+                    this.ctx.lineWidth = thread.strength * 3;
+                    this.ctx.stroke();
+                });
+            }
+
+            drawWaveform() {
+                this.waveCtx.clearRect(0, 0, this.waveCanvas.width, this.waveCanvas.height);
+                
+                this.waveCtx.strokeStyle = 'rgba(224, 170, 255, 0.5)';
+                this.waveCtx.lineWidth = 2;
+                this.waveCtx.beginPath();
+                
+                for (let x = 0; x < this.waveCanvas.width; x++) {
+                    const y = this.waveCanvas.height / 2 + 
+                             Math.sin(x * 0.05 + this.time * 2) * 20 * Math.sin(this.time) +
+                             Math.cos(x * 0.1 + this.time) * 10;
+                    
+                    if (x === 0) {
+                        this.waveCtx.moveTo(x, y);
+                    } else {
+                        this.waveCtx.lineTo(x, y);
+                    }
+                }
+                
+                this.waveCtx.stroke();
+                
+                // Draw grid
+                this.waveCtx.strokeStyle = 'rgba(199, 125, 255, 0.1)';
+                this.waveCtx.lineWidth = 1;
+                
+                for (let i = 0; i < 5; i++) {
+                    const y = (this.waveCanvas.height / 5) * i;
+                    this.waveCtx.beginPath();
+                    this.waveCtx.moveTo(0, y);
+                    this.waveCtx.lineTo(this.waveCanvas.width, y);
+                    this.waveCtx.stroke();
+                }
+            }
+
+            updateStats() {
+                this.flux = Math.sin(this.time) * 0.5 + Math.cos(this.time * 1.5) * 0.3;
+                this.entropy = Math.min(10, this.entropy + 0.001);
+                this.coherence = Math.max(0, Math.min(100, this.coherence + (Math.random() - 0.5)));
+                
+                document.getElementById('dimension').textContent = this.dimensions.toFixed(1);
+                document.getElementById('flux').textContent = this.flux.toFixed(3);
+                document.getElementById('coherence').textContent = Math.floor(this.coherence);
+                document.getElementById('entropy').textContent = this.entropy.toFixed(2);
+            }
+
+            update() {
+                this.time += 0.016;
+                
+                // Update crystals
+                this.crystals.forEach(crystal => {
+                    crystal.rotation += crystal.rotationSpeed;
+                    crystal.phase += 0.02;
+                    
+                    // Apply folding effect
+                    if (this.folding) {
+                        crystal.x += Math.sin(crystal.phase) * 2;
+                        crystal.y += Math.cos(crystal.phase) * 2;
+                        crystal.z += Math.sin(this.time) * 5;
+                    }
+                    
+                    // Apply velocity if exists
+                    if (crystal.velocity) {
+                        crystal.x += crystal.velocity.x;
+                        crystal.y += crystal.velocity.y;
+                        crystal.velocity.x *= 0.98;
+                        crystal.velocity.y *= 0.98;
+                    }
+                    
+                    // Gravitational pull toward mouse
+                    const dx = this.mouseX - crystal.x;
+                    const dy = this.mouseY - crystal.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 50 && distance < 300) {
+                        crystal.x += dx * 0.001;
+                        crystal.y += dy * 0.001;
+                    }
+                    
+                    // Wrap around edges
+                    if (crystal.x < -100) crystal.x = this.canvas.width + 100;
+                    if (crystal.x > this.canvas.width + 100) crystal.x = -100;
+                    if (crystal.y < -100) crystal.y = this.canvas.height + 100;
+                    if (crystal.y > this.canvas.height + 100) crystal.y = -100;
+                });
+                
+                // Update threads
+                if (this.weaving) {
+                    this.threads.forEach(thread => {
+                        thread.phase += 0.05;
+                        thread.strength = Math.sin(thread.phase) * 0.5 + 0.5;
+                    });
+                }
+                
+                this.updateStats();
+            }
+
+            draw() {
+                // Create gradient background
+                const bgGradient = this.ctx.createRadialGradient(
+                    this.canvas.width / 2, this.canvas.height / 2, 0,
+                    this.canvas.width / 2, this.canvas.height / 2, this.canvas.width
+                );
+                bgGradient.addColorStop(0, 'rgba(10, 10, 10, 0.95)');
+                bgGradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+                
+                this.ctx.fillStyle = bgGradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw background grid
+                this.ctx.strokeStyle = 'rgba(199, 125, 255, 0.05)';
+                this.ctx.lineWidth = 1;
+                
+                const gridSize = 50;
+                for (let x = 0; x < this.canvas.width; x += gridSize) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x + Math.sin(this.time + x * 0.01) * 10, this.canvas.height);
+                    this.ctx.stroke();
+                }
+                
+                for (let y = 0; y < this.canvas.height; y += gridSize) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.canvas.width, y + Math.cos(this.time + y * 0.01) * 10);
+                    this.ctx.stroke();
+                }
+                
+                // Draw threads
+                if (this.threads.length > 0) {
+                    this.drawThreads();
+                }
+                
+                // Draw crystals
+                this.crystals.forEach(crystal => {
+                    this.drawCrystal(crystal);
+                });
+                
+                // Draw waveform
+                this.drawWaveform();
+            }
+
+            setupControls() {
+                document.getElementById('foldBtn').addEventListener('click', () => this.foldSpace());
+                document.getElementById('weaveBtn').addEventListener('click', () => this.weaveTime());
+                document.getElementById('shatterBtn').addEventListener('click', () => this.shatter());
+                document.getElementById('transcendBtn').addEventListener('click', () => this.transcend());
+            }
+
+            animate() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize the Quantum Crystal Weaver
+        const weaver = new QuantumCrystalWeaver();
+
+        // Easter egg: Konami code
+        let konamiCode = [];
+        const konamiPattern = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.keyCode);
+            konamiCode = konamiCode.slice(-10);
+            
+            if (konamiCode.join(',') === konamiPattern.join(',')) {
+                weaver.showQuantumMessage("INFINITE DIMENSIONS UNLOCKED");
+                weaver.dimensions = 999.9;
+                for (let i = 0; i < 50; i++) {
+                    weaver.spawnCrystal();
+                }
+            }
+        });
+
+        // Add keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'f': weaver.foldSpace(); break;
+                case 'w': weaver.weaveTime(); break;
+                case 's': weaver.shatter(); break;
+                case 't': weaver.transcend(); break;
+                case ' ': 
+                    e.preventDefault();
+                    weaver.spawnCrystal(weaver.mouseX, weaver.mouseY); 
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
