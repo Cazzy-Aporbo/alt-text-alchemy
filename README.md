@@ -141,8 +141,8 @@ A curated collection of innovative data science, AI ethics, and healthcare techn
 
 <div align="center">
 
-### [Chemistry Forever Platform](https://htmlpreview.github.io/?https://github.com/Cazzy-Aporbo/alt-text-alchemy/blob/main/chemistry4eva.html)
-<sub>Interactive Chemistry Education - Making Molecular Science Accessible</sub>
+### [Chemistry Forever Image](https://htmlpreview.github.io/?https://github.com/Cazzy-Aporbo/alt-text-alchemy/blob/main/chemistry4eva.html)
+<sub>Interactive Chemistry Visual - Just For Fun</sub>
 
 ![Chemistry](https://img.shields.io/badge/Chemistry-FFE0B2?style=flat-square) ![Education](https://img.shields.io/badge/Education-E8D8F5?style=flat-square) ![Molecular](https://img.shields.io/badge/Molecular-F0E6FF?style=flat-square)
 
