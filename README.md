@@ -417,7 +417,7 @@ This repository showcases a diverse range of innovative web applications, from A
 ![Ethics](https://img.shields.io/badge/Ethics-FFF9C4?style=flat-square&logo=ethereum&logoColor=3C3C3D)
 
 ### Author
-**Cazzy Aporbo** - Data Science + ML Ethics + 
+**Cazzy Aporbo** - Data Science + ML Design + 
 Ethical AI and women's health technology
 
 ![Profile Views](https://img.shields.io/badge/Profile%20Views-10k+-E8D8F5?style=flat-square)
