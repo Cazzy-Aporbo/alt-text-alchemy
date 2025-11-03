@@ -61,7 +61,7 @@ A curated collection of innovative data science, AI ethics, and healthcare techn
 <div align="center">
 
 ### [ABS The Great Dashboard](https://htmlpreview.github.io/?https://github.com/Cazzy-Aporbo/alt-text-alchemy/blob/main/abs-the-great.html)
-<sub>Absolute Business Statistics - Revolutionary Analytics for Tomorrow's Decisions</sub>
+<sub>Abby - Sailor Moon Image</sub>
 
 ![Statistics](https://img.shields.io/badge/Statistics-E0F7FA?style=flat-square) ![Business](https://img.shields.io/badge/Business-FFF0F5?style=flat-square) ![Analytics](https://img.shields.io/badge/Analytics-F5F5DC?style=flat-square)
 
