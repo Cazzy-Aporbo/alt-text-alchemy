@@ -11,7 +11,7 @@
 ![Visualization](https://img.shields.io/badge/Visualization-E5D4FF?style=for-the-badge&logo=plotly&logoColor=white)
 ![Machine Learning](https://img.shields.io/badge/Machine%20Learning-FFE5E5?style=for-the-badge&logo=pytorch&logoColor=white)
 
-A curated collection of innovative data science, AI ethics, and healthcare technology demonstrations.
+A collection of data science, AI ethics, and healthcare technology demonstrations. 
 
 <div align="center">
 
